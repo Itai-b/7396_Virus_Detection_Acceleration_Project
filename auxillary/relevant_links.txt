@@ -1,0 +1,3 @@
+https://github.com/efficient/libcuckoo - Implementation for cuckoo hash table.
+
+https://www.snort.org/ - Rules for virues
