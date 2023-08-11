@@ -1,21 +1,36 @@
 import re
+regex_string2 = r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims'
+# the r'' indicated raw string in python (so that it won't replace \n with new line and so on).
+# the '/' in the beginning and end represents the beginning and end of a regex expression in JavaScript / Perl.
+# the 'ims' in the end specifying options:
+#     'i' triggers case-insensitivity
+#     'm' specifies multi-line mode
+#     's' (IIRC) enables the dot-all option, meaning that the wildcard '.' includes newline characters.
+# the '^' asserts, "The string must *begin* here, with no preceding characters..."
+# the '$' at the end asserts, "...the string must *end* here, with no following characters."
+# the '\s+' stands for one or more whitespace characters {' ', '\t', '\r\n', '\n'}
+# the 'v' stands for the character 'v'.
+# the '\d+' stands for one or more digit.
+# the '\x2E' stands for the character '.' (= '\.' where the backslash '\' cancels the special wildcard effect of '.').
+# the 'x2C' stands for the character ',' (= '\,')
 
 
-def extract_sub_matches(regex_string):
-    sub_matches = []
+def find_non_special_strings(regex_pattern):
+    regex_pattern = re.sub(r'\\[a-wyzA-WYZ]\+?', ' ', regex_pattern)    # all \_ or \_+ without '\x'
+    # Find all non-special character strings using \w+
+    # For without \x__ expressions use: non_special_strings = re.findall(r'\b[\w-]+\b', regex_pattern)
+    non_special_strings = re.findall(r'\b[\\\w-]+\b', regex_pattern)
+    return non_special_strings
 
-    # Find all capturing groups in the regular expression
-    capturing_groups = re.findall(r'\((?!\?:)(.*?)\)', regex_string)
-
-    # Filter out empty strings and duplicates
-    sub_matches = list(filter(None, capturing_groups))
-
-    return sub_matches
 
 # Example regular expression string
+# Fails for \r\n (that is represented by r'\\r\\n' or one of them would be [\\r\\n]
 regex_string = r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims'
+regex_string2 = r'/^Connection:[^\\r\\n]*?X-F5-Auth/im'
+# Note: Capturing groups are defined with parentheses
 
-sub_matches = extract_sub_matches(regex_string)
+non_special_strings = find_non_special_strings(regex_string)
 print("Sub-exact match expressions:")
-for sub_match in sub_matches:
+for sub_match in non_special_strings:
     print(sub_match)
+

@@ -6,8 +6,11 @@ import re
 import os
 import sys
 
-EXACT_MATCH_RULE_PATTERN = r'content:".*?"'  # exact match rules
-REGEX_RULE_PATTERN = r'pcre:".*?"'           # perl compatible regular expression rules
+# the () signs separates the string that matched the regex into different groups
+# the (?:) indicates a matched group that won't be counted, hence, only groups without '?:' will be counted,
+#   but the regex will still match (and discard) the rest.
+EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
+REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
 """
     Parse a file for specified patterns and extract matching data.
@@ -40,23 +43,11 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
             matches = re.finditer(pattern, line)
             if matches:
                 for match in matches:
-                    data = match.group()
-                    data = strip_data(data, pattern_name)
+                    # group(1) is the first matching groups (regex in '()'), ignoring groups with '(?:)'
+                    data = match.group(1)
                     rule = (line_num, pattern_name, data)
                     rules.append(rule)
     return rules
-
-
-"""
-    An auxiliary function used to strip data of r'(<pattern_name>):".*?"' from pattern_name and parenthesis signs.
-"""
-
-
-def strip_data(data: str, pattern_name: str) -> str:
-    str_to_strip = pattern_name + r':'
-    data = re.sub(str_to_strip, '', data)
-    data = re.sub(r'"', '', data)
-    return data
 
 
 """
