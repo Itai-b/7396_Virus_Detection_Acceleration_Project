@@ -9,6 +9,7 @@ import sys
 # the () signs separates the string that matched the regex into different groups
 # the (?:) indicates a matched group that won't be counted, hence, only groups without '?:' will be counted,
 #   but the regex will still match (and discard) the rest.
+# group(1) is the first matching groups (regex pattern in '()'), ignoring groups with '(?:)'
 EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
@@ -43,7 +44,6 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
             matches = re.finditer(pattern, line)
             if matches:
                 for match in matches:
-                    # group(1) is the first matching groups (regex in '()'), ignoring groups with '(?:)'
                     data = match.group(1)
                     rule = (line_num, pattern_name, data)
                     rules.append(rule)

@@ -1,0 +1,25 @@
+Questions for Alon:
+
+	Q1: How should we represent the exact match string(s)?
+		For example: In content we may have: |00 00 72 ...|, should we keep an array of each char ([' ', ',',...]),
+			including special chars like '00'? Or should we keep them in an array of int ([00, 72, ...]).
+
+	Q2: Given a pcre pattern splitted into string(s) of exact match, should we set a threshold for minimum chars?
+		For example: in the pcre pattern: r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims',
+			the exact matches would be: ['GateCrasher', 'v', '.', ',', 'Server', 'On-Line...']. Should single
+			char string(s) count? Wouldn't it be too spamy (even if we check 50%+ strings exact matched?).
+
+	Q3: Given special options in the pcre (i.e., '/ims' for case-insensitivity and more), should we take that into
+		consideration when creating the exact match automaton?
+		For example: in the pcre patten: r'/GateCrasher/ims' could be any of:
+			* gAtEcRashEr, gatecrasHer, GATECRASHeR,...
+		We could take that into consideration when implementing the automaton, where for every character,
+		if the case-insensitivity was mentioned, we will create every possibility out there? 
+	
+	Q4: ASCII vs UTF-8, if we store it as an array of int, what should we use?
+		In pcre, \x__ represents UTF-8 symbols, in content |00 00 __ ...| represents UTF-8 as well?
+		
+	Q5: Are space char(s) exact match? All chars of '\r\n' '\t' and so on...
+		When shown alone or when a part of a bigger string(s).
+	
+	
