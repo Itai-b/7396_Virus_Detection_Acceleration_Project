@@ -17,7 +17,32 @@ import re
 # Example: "GateCrasher v1.77,   Server On-Line..."
 
 
-def utf8_to_raw_and_ascii(input_string: str) -> (str, list):
+def utf8_to_raw(input:str) -> str:
+    """
+    Converts a UTF-8 encoded string to its raw representation.
+
+    :param input: The input string encoded in UTF-8.
+    :return: A string representing the raw representation of the input string.
+    """
+    # Convert the input string to raw representation
+    raw_string = bytes(input, 'utf-8').decode('unicode-escape')
+
+    return raw_string
+
+def utf8_to_ascii(input:str) -> list:
+    """
+    Converts a UTF-8 encoded string to its ASCII values.
+    
+    :param input: The input string encoded in UTF-8.
+    :return: A string representing the raw representation of the input string.
+    """
+    # Get ASCII values of each character in the input string
+    ascii_values = [ord(char) for char in input]
+
+    return ascii_values
+
+new_var = (str, list)
+def utf8_to_raw_and_ascii(input_string: str) -> new_var:
     """
     Converts a UTF-8 encoded string to its raw representation and provides ASCII values.
 
@@ -84,7 +109,7 @@ def extract_exact_matches(regex_pattern: str) -> list:
     return [s for s in regex_pattern.split(' ') if s.strip()]
 
 
-# TODO: import all pcre strings from the SnortRuleParser.
+# TODO: Delete this part.
 pcre_strings = [
     r'/^\bTest:p{3}[abcd-zA-Z\?]o{2,3}d{2,}\b',
     r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims',
@@ -126,9 +151,8 @@ for i, pcre_string in enumerate(pcre_strings):
     print(ascii_values_list)
     print()
 
-
+# TODO: figure out how to deal with ims flag.
 # TODO: finish implementing run function and call it correctly in SnortRulesParser.
-# TODO: clean the example above
 def run(pcre_string: str, flag='ascii') -> list:
     """
     Runs the Exact Match Extractor functions on a snort rule (represented in a pcre string).
@@ -136,5 +160,13 @@ def run(pcre_string: str, flag='ascii') -> list:
     :param flag: A flag string indicating the wanted representation ('ascii' / 'str') of the output list.
     :return: A list of extracted sub-strings of exact matches (non-ambiguous Regex patterns) as:
         flag == 'ascii': A list of arrays of integers representing the ASCII values of the sub-strings.
-        flag == 'str': A list of raw sub-strings of the exact matches.
+        flag == 'raw': A list of raw sub-strings of the exact matches.
     """
+    matches = extract_exact_matches(pcre_string)
+    if flag == 'ascii':
+        return [utf8_to_ascii(sub_match) for sub_match in matches]
+    elif flag == 'raw':
+        return [utf8_to_raw(sub_match) for sub_match in matches]
+    # TODO: fix the issue with utf8_to_raw function 
+    else:
+        raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "str".')

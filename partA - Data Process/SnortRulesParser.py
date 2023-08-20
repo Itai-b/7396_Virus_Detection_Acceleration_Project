@@ -2,10 +2,11 @@
 # Rules are taken from: https://www.snort.org/downloads/#rule-downloads
 # Rule = tuple (line# in src rule file, pattern_type, rule)
 
+from codecs import utf_8_encode
 import re
 import os
 import sys
-import ExactMatchExtractor
+import ExactMatchExtractor as ExactMatchExtracter
 
 # the () signs separates the string that matched the regex into different groups
 # the (?:) indicates a matched group that won't be counted, hence, only groups without '?:' will be counted,
@@ -43,9 +44,9 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
             if matches:
                 for match in matches:
                     data = match.group(1)
-                    rule = (line_num, pattern_name, data)
                     if pattern_name == 'pcre':
-                        rule = ExactMatchExtracter.run()
+                        data = ExactMatchExtracter.run(data)
+                    rule = (line_num, pattern_name, data)
                     rules.append(rule)
 
     return rules
@@ -63,7 +64,8 @@ def main():
     """
         Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
     """
-    file_path = sys.argv[1]
+    #file_path = sys.argv[1]
+    file_path = 'snort3-community.rules'
     patterns = {'content': EXACT_MATCH_RULE_PATTERN,
                 'pcre': REGEX_RULE_PATTERN}
     rules = parse_file(file_path, patterns)
