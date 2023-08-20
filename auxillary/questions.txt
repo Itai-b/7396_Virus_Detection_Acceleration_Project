@@ -9,12 +9,17 @@ Questions for Alon:
 			the exact matches would be: ['GateCrasher', 'v', '.', ',', 'Server', 'On-Line...']. Should single
 			char string(s) count? Wouldn't it be too spamy (even if we check 50%+ strings exact matched?).
 
-	Q3: Given special options in the pcre (i.e., '/ims' for case-insensitivity and more), should we take that into
+	Q3a: Given special options in the pcre (i.e., '/ims' for case-insensitivity and more), should we take that into
 		consideration when creating the exact match automaton?
 		For example: in the pcre patten: r'/GateCrasher/ims' could be any of:
 			* gAtEcRashEr, gatecrasHer, GATECRASHeR,...
 		We could take that into consideration when implementing the automaton, where for every character,
 		if the case-insensitivity was mentioned, we will create every possibility out there? 
+	
+	Q3b: Regarding to Q3a, given special pcre patterns : o{2} to match exactly 2 times o: 'oo',
+		or given o{2,3} to match between 2-3 times 'oo' or 'ooo', or given o{2,} to match *at least* 2 times o.
+		Should we only consider the first example (exact match 'oo') or also the others (using the minimal number as exact match).
+		For example: o{2} will be exact match 'oo', similarly o{2,} and o{2,500}.
 	
 	Q4: ASCII vs UTF-8, if we store it as an array of int, what should we use?
 		In pcre, \x__ represents UTF-8 symbols, in content |00 00 __ ...| represents UTF-8 as well?

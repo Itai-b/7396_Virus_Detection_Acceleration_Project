@@ -5,6 +5,7 @@
 import re
 import os
 import sys
+import ExactMatchExtractor
 
 # the () signs separates the string that matched the regex into different groups
 # the (?:) indicates a matched group that won't be counted, hence, only groups without '?:' will be counted,
@@ -13,28 +14,25 @@ import sys
 EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
-"""
-    Parse a file for specified patterns and extract matching data.
-
-    Args:
-        file_name (str): The name of the file to parse.
-        patterns (dict): A dictionary of pattern names and corresponding regex patterns.
-
-    Returns:
-        list[tuple[int, str, str]]: A list of tuples containing line number, matched pattern key,
-                                    and the extracted value. If no match, the entire list value is None.
-
-    Example:
-        patterns = {
-            "Version": r'\d+\.\d+',
-            "Name": r'Name:\s+(.*)'
-        }
-        result = parse_file('data.txt', patterns)
-        # Sample output: [(1, 'Version', '1.2'), (2, 'Name', 'John Doe'), ...]
-"""
-
 
 def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
+    """
+        Parse a file for specified patterns and extract matching data.
+
+        :param file_name: A string represents the name of the file to parse.
+        :param patterns: A dictionary of pattern names and corresponding regex patterns.
+
+        :return: A list of tuples containing line number, matched pattern key,
+                    and the extracted value. If no match, the entire list value is None.
+
+        Example:
+            patterns = {
+                "Version": r'\d+\.\d+',
+                "Name": r'Name:\s+(.*)'
+            }
+            result = parse_file('data.txt', patterns)
+            # Sample output: [(1, 'Version', '1.2'), (2, 'Name', 'John Doe'), ...]
+    """
     with open(file_name, 'r') as file:
         lines = file.readlines()
 
@@ -46,26 +44,25 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
                 for match in matches:
                     data = match.group(1)
                     rule = (line_num, pattern_name, data)
+                    if pattern_name == 'pcre':
+                        rule = ExactMatchExtracter.run()
                     rules.append(rule)
+
     return rules
 
 
-"""
-    An auxiliary function used to print rules in new lines.
-"""
-
-
 def print_rules(rules: list(tuple([int, str, str]))):
+    """
+        An auxiliary function used to print rules in new lines.
+    """
     for rule in rules:
         print(rule)
 
 
-"""
-    Usage: python SnortRuleParser.py snort3-community.rules
-"""
-
-
 def main():
+    """
+        Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
+    """
     file_path = sys.argv[1]
     patterns = {'content': EXACT_MATCH_RULE_PATTERN,
                 'pcre': REGEX_RULE_PATTERN}
@@ -77,7 +74,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # Change working directory to script's dir.
+    # Change working directory to script's directory.
     abspath = os.path.abspath(__file__)
     dirname = os.path.dirname(abspath)
     os.chdir(dirname)
