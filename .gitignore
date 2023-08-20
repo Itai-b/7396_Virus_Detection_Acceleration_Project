@@ -33,3 +33,4 @@
 /.vs
 *.xml
 *.iml
+/partA - Data Process/__pycache__/ExactMatchExtractor.cpython-311.pyc
