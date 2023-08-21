@@ -4,5 +4,7 @@ https://www.snort.org/ - Rules for virues.
 
 https://regexr.com/ - Tool for Regex checks.
 
+https://docs.python.org/3/library/re.html - regex python library
+
 https://www.ibm.com/docs/en/rational-clearquest/9.0.1?topic=tags-meta-characters-in-regular-expressions - Regex Metacharacters list.
 
