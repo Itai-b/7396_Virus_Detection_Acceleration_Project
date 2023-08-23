@@ -45,7 +45,8 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
                 for match in matches:
                     data = match.group(1)
                     if pattern_name == 'pcre':
-                        data = ExactMatchExtracter.run(data)
+                        print(data)
+                        data = ExactMatchExtracter.run(data, 'raw')
                     rule = (line_num, pattern_name, data)
                     rules.append(rule)
 

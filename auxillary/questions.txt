@@ -26,5 +26,14 @@ Questions for Alon:
 		
 	Q5: Are space char(s) exact match? All chars of '\r\n' '\t' and so on...
 		When shown alone or when a part of a bigger string(s).
+		
+	Q6: Similarly to question Q3b, for regex patterns that could be infered in more than one way:
+			r'(Login|User)' which can be 'Login' or 'User'
+			r'javax?' which can be 'java' or 'javax'
+		should we only take "hard" exact match (for the first example none, for the second one 'java')
+		or should we also take strings that may or may not appear in a match ('Login', 'User', 'javax').
+		And what does it say about "minor" optionals (e.g., '\x00?' which captures NULL escape char or not).
+
+
 	
 	

@@ -17,7 +17,7 @@ import re
 # Example: "GateCrasher v1.77,   Server On-Line..."
 
 
-def utf8_to_raw(input:str) -> str:
+def utf8_to_raw(input: str) -> str:
     """
     Converts a UTF-8 encoded string to its raw representation.
 
@@ -29,7 +29,8 @@ def utf8_to_raw(input:str) -> str:
 
     return raw_string
 
-def utf8_to_ascii(input:str) -> list:
+
+def utf8_to_ascii(input: str) -> list:
     """
     Converts a UTF-8 encoded string to its ASCII values.
     
@@ -41,8 +42,8 @@ def utf8_to_ascii(input:str) -> list:
 
     return ascii_values
 
-new_var = (str, list)
-def utf8_to_raw_and_ascii(input_string: str) -> new_var:
+
+def utf8_to_raw_and_ascii(input_string: str):
     """
     Converts a UTF-8 encoded string to its raw representation and provides ASCII values.
 
@@ -85,18 +86,24 @@ def extract_exact_matches(regex_pattern: str) -> list:
     :return: A list of sub-strings of non-ambiguous exact matches within the given pcre patten.
     """
     unwanted_pattens = [
-        r'(\/)(\^)?',
-        r'\\[AbBdDfnrsStvwWzZ]\+?',
+        r'\/.{0,3}$',                                   # Removes pcre flags after '/' closure (/ims)
+        r'(\/)(\^)?',                                   # Removes pcre opening flag ('/' or '/^')
         r'(\\)([AbBdDfnrsStvwWzZ])([\+\*])?(\?)?',      # all regex of type \c or \c+ where c is a unique metacharacter.
         r'(\.)([\+\*])?(\?)?',                          # all regex of type '.*?' or '.+?' where ? might appear or not.
-        r'(\(.*)\|(.*\))',                              # all regex of type a | b where a and b could be any symbols.
+        r'\(\?:',                                       # all regex of type '(?:' indicating unwanted match groups.
+        r'\(\?!',                                       # all regex of type '(?!' indicating negative lookahead.
+        # r'(\(.*)\|(.*\))',                  INACTIVE: # all regex of type a | b where a and b could be any symbols.
+        r'\(',                            # Optional:   # Removing capturing groups '(' ')'
+        r'\)',                            # Optional:   # -"-
+        r'\|',                            # Optional:   # Removing Special char '|' for OR operation in regex
         r'\[.*?\]{.*?}',                                # all regex of type [abc]{2,50] where 2,50 are integers.
         r'\[.*?\]([\+\*])?(\?)?',                       # all regex of type [abc] where in [] could be any symbols.
         r'.{(\d+),(\d+)}',                              # all regex of type .{2,50} where . is any symbol and 2,50 ints.
         r'.{(\d+),}',                                   # all regex of type .{2,} where . is any symbol and 2 is int.
         r'.{.*?}',                                      # all regex of type .{2} where . is any symbol and 2 is integer.
         r'\(.*?\)([\+\*])?(\?)?',                       # all regex of type (something)*? where */+/? might appear.
-        r'.\?',                                         # all regex of type c? where c is any symbol.
+        r'\\x..\?',                       # Optional:   # all regex of type \x..? where '.' could be any symbol.
+        r'[^\\]\?',                                     # all regex of type c? where c is any symbol that isn't '\'.
     ]
     # Replaces the unique *exact match* pattern (\w){(\d+)} for example: 'o{2}' in the actual string, for example: 'oo'
     regex_pattern = re.sub(r'(\w){(\d+)}', substitute_pattern, regex_pattern)
@@ -104,15 +111,25 @@ def extract_exact_matches(regex_pattern: str) -> list:
     # Replaces any non-exact match (ambiguous) patterns with an empty space ' '.
     for unwanted_pattern in unwanted_pattens:
         regex_pattern = re.sub(unwanted_pattern, ' ', regex_pattern)
-
+    
     # Cleans the list of sub-strings from empty strings (''), and returns it.
-    return [s for s in regex_pattern.split(' ') if s.strip()]
+    exact_matches_list = []
+    for s in regex_pattern.split(' '):
+        if s.strip():
+            # TODO: fix case when matching '\/' as '\' without any special encoding (\x2E or \\).
+            print(s)
+            exact_matches_list.append(bytes(s, 'utf-8').decode('unicode-escape'))
+    return exact_matches_list
+
+
 
 
 # TODO: Delete this part.
+'''
 pcre_strings = [
     r'/^\bTest:p{3}[abcd-zA-Z\?]o{2,3}d{2,}\b',
     r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims',
+    r'/^[0-9]{1,5}\\x00/'
     r'/^Connection:[^\\r\\n]*?X-F5-Auth/im',
     r'/\\x24\\x7b(jndi|[^\\x7d\\x80-\\xff]*?\\x24\\x7b[^\\x7d]*?\\x3a[^\\x7d]*?\\x7d)/i',
     r'/\\x24\\x7b.{0,200}\\x24\\x7b.{0,200}\\x3a[\\x27\\x22\\x2d\\x5c]*([jndi\\x7d\\x3a\\x2d]|\\x5cu00\[a-f0-9]{2}){1,4}[\\x22\\x27]?[\\x3a\\x7djndi]/i',
@@ -150,6 +167,7 @@ for i, pcre_string in enumerate(pcre_strings):
     print(raw_strings_list)
     print(ascii_values_list)
     print()
+'''
 
 # TODO: figure out how to deal with ims flag.
 # TODO: finish implementing run function and call it correctly in SnortRulesParser.
@@ -163,6 +181,7 @@ def run(pcre_string: str, flag='ascii') -> list:
         flag == 'raw': A list of raw sub-strings of the exact matches.
     """
     matches = extract_exact_matches(pcre_string)
+    print(matches)
     if flag == 'ascii':
         return [utf8_to_ascii(sub_match) for sub_match in matches]
     elif flag == 'raw':
