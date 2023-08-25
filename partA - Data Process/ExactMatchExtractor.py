@@ -87,22 +87,22 @@ def extract_exact_matches(regex_pattern: str) -> list:
     """
     unwanted_pattens = [
         r'\/.{0,3}$',                                   # Removes pcre flags after '/' closure (/ims)
-        r'(\/)(\^)?',                                   # Removes pcre opening flag ('/' or '/^')
+        r'(\\)(\^)?',                                   # Removes pcre opening flag ('/' or '/^')
         r'(\\)([AbBdDfnrsStvwWzZ])([\+\*])?(\?)?',      # all regex of type \c or \c+ where c is a unique metacharacter.
         r'(\.)([\+\*])?(\?)?',                          # all regex of type '.*?' or '.+?' where ? might appear or not.
         r'\(\?:',                                       # all regex of type '(?:' indicating unwanted match groups.
         r'\(\?!',                                       # all regex of type '(?!' indicating negative lookahead.
-        # r'(\(.*)\|(.*\))',                  INACTIVE: # all regex of type a | b where a and b could be any symbols.
-        r'\(',                            # Optional:   # Removing capturing groups '(' ')'
-        r'\)',                            # Optional:   # -"-
-        r'\|',                            # Optional:   # Removing Special char '|' for OR operation in regex
+        # r'(\(.*)\|(.*\))',                INACTIVE:   # all regex of type a | b where a and b could be any symbols.
+        r'\(',                            # OPTIONAL:   # Removing capturing groups '(' ')'
+        r'\)',                            # OPTIONAL:   # -"-
+        r'\|',                            # OPTIONAL:   # Removing Special char '|' for OR operation in regex
         r'\[.*?\]{.*?}',                                # all regex of type [abc]{2,50] where 2,50 are integers.
         r'\[.*?\]([\+\*])?(\?)?',                       # all regex of type [abc] where in [] could be any symbols.
         r'.{(\d+),(\d+)}',                              # all regex of type .{2,50} where . is any symbol and 2,50 ints.
         r'.{(\d+),}',                                   # all regex of type .{2,} where . is any symbol and 2 is int.
         r'.{.*?}',                                      # all regex of type .{2} where . is any symbol and 2 is integer.
         r'\(.*?\)([\+\*])?(\?)?',                       # all regex of type (something)*? where */+/? might appear.
-        r'\\x..\?',                       # Optional:   # all regex of type \x..? where '.' could be any symbol.
+        r'\\x..\?',                       # OPTIONAL:   # all regex of type \x..? where '.' could be any symbol.
         r'[^\\]\?',                                     # all regex of type c? where c is any symbol that isn't '\'.
     ]
     # Replaces the unique *exact match* pattern (\w){(\d+)} for example: 'o{2}' in the actual string, for example: 'oo'
@@ -116,11 +116,10 @@ def extract_exact_matches(regex_pattern: str) -> list:
     exact_matches_list = []
     for s in regex_pattern.split(' '):
         if s.strip():
-            # TODO: fix case when matching '\/' as '\' without any special encoding (\x2E or \\).
-            print(s)
-            exact_matches_list.append(bytes(s, 'utf-8').decode('unicode-escape'))
+            if s != '/':
+                print(s)
+                exact_matches_list.append(bytes(s, 'utf-8').decode('unicode-escape'))
     return exact_matches_list
-
 
 
 
@@ -171,21 +170,19 @@ for i, pcre_string in enumerate(pcre_strings):
 
 # TODO: figure out how to deal with ims flag.
 # TODO: finish implementing run function and call it correctly in SnortRulesParser.
-def run(pcre_string: str, flag='ascii') -> list:
+def run(pcre_string: str, flag='raw') -> list:
     """
     Runs the Exact Match Extractor functions on a snort rule (represented in a pcre string).
     :param pcre_string: A Perl Compatible Regular Expression (pcre) string.
-    :param flag: A flag string indicating the wanted representation ('ascii' / 'str') of the output list.
+    :param flag: A flag string indicating the wanted representation ('ascii' / 'raw') of the output list.
     :return: A list of extracted sub-strings of exact matches (non-ambiguous Regex patterns) as:
         flag == 'ascii': A list of arrays of integers representing the ASCII values of the sub-strings.
         flag == 'raw': A list of raw sub-strings of the exact matches.
     """
     matches = extract_exact_matches(pcre_string)
-    print(matches)
     if flag == 'ascii':
         return [utf8_to_ascii(sub_match) for sub_match in matches]
     elif flag == 'raw':
         return [utf8_to_raw(sub_match) for sub_match in matches]
-    # TODO: fix the issue with utf8_to_raw function 
     else:
-        raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "str".')
+        raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "raw".')

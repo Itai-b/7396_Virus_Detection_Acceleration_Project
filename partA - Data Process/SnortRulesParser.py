@@ -5,6 +5,7 @@
 from codecs import utf_8_encode
 import re
 import os
+import json
 import sys
 import ExactMatchExtractor as ExactMatchExtracter
 
@@ -47,18 +48,26 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
                     if pattern_name == 'pcre':
                         print(data)
                         data = ExactMatchExtracter.run(data, 'raw')
-                    rule = (line_num, pattern_name, data)
+                    rule = (line_num+1, pattern_name, data)
                     rules.append(rule)
 
     return rules
 
 
-def print_rules(rules: list(tuple([int, str, str]))):
+def save_rules_as_json(exact_matches: list(tuple([int, str, str]))):
     """
-        An auxiliary function used to print rules in new lines.
+        An auxiliary function used to save exact_matches to a json file.
     """
-    for rule in rules:
-        print(rule)
+    with open('exact_matches.json', 'w') as file:
+        json.dump(exact_matches, file)
+           
+
+def print_rules(exact_matches: list(tuple([int, str, str]))):
+    """
+        An auxiliary function used to print exact_matches in new lines.
+    """
+    for exact_match in exact_matches:
+        print(exact_match)
 
 
 def main():
@@ -69,15 +78,16 @@ def main():
     file_path = 'snort3-community.rules'
     patterns = {'content': EXACT_MATCH_RULE_PATTERN,
                 'pcre': REGEX_RULE_PATTERN}
-    rules = parse_file(file_path, patterns)
-    print_rules(rules)
+    exact_matches = parse_file(file_path, patterns)
+    if __debug__:
+        print_rules(exact_matches)
+    else:
+        save_rules_as_json(exact_matches)
     # TODO: split all 'pcre' rules to exact match (=ignore special regex characters)
     # TODO: discuss how to store content of type: |00 00 00 28 72 24|
-    # TODO: save all findings to a file
-
 
 if __name__ == "__main__":
-    # Change working directory to script's directory.
+    # +md  Change working directory to script's directory.
     abspath = os.path.abspath(__file__)
     dirname = os.path.dirname(abspath)
     os.chdir(dirname)
