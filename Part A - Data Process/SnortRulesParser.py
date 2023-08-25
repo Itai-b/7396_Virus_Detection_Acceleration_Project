@@ -2,17 +2,17 @@
 # Rules are taken from: https://www.snort.org/downloads/#rule-downloads
 # Rule = tuple (line# in src rule file, pattern_type, rule)
 
-from codecs import utf_8_encode
-import re
-import os
-import json
 import sys
+import os
+import re
+import json
 import ExactMatchExtractor as ExactMatchExtracter
 
 # the () signs separates the string that matched the regex into different groups
 # the (?:) indicates a matched group that won't be counted, hence, only groups without '?:' will be counted,
 #   but the regex will still match (and discard) the rest.
 # group(1) is the first matching groups (regex pattern in '()'), ignoring groups with '(?:)'
+
 EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
@@ -37,16 +37,20 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
     """
     with open(file_name, 'r') as file:
         lines = file.readlines()
-
+    
     rules = []
+    previous_data = []
+    
     for line_num, line in enumerate(lines):
         for pattern_name, pattern in patterns.items():
             matches = re.finditer(pattern, line)
             if matches:
-                for match in matches:
+                for match in matches:                       
                     data = match.group(1)
+                    if (data in previous_data):
+                        continue
+                    previous_data.append(data)
                     if pattern_name == 'pcre':
-                        print(data)
                         data = ExactMatchExtracter.run(data, 'raw')
                     rule = (line_num+1, pattern_name, data)
                     rules.append(rule)
@@ -74,17 +78,21 @@ def main():
     """
         Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
     """
-    #file_path = sys.argv[1]
-    file_path = 'snort3-community.rules'
+    file_path = ""
+    if (__debug__):
+        file_path = 'snort3-community.rules'    
+    else:
+        file_path = sys.argv[1]
+    
     patterns = {'content': EXACT_MATCH_RULE_PATTERN,
                 'pcre': REGEX_RULE_PATTERN}
     exact_matches = parse_file(file_path, patterns)
+    
     if __debug__:
         print_rules(exact_matches)
     else:
         save_rules_as_json(exact_matches)
-    # TODO: split all 'pcre' rules to exact match (=ignore special regex characters)
-    # TODO: discuss how to store content of type: |00 00 00 28 72 24|
+
 
 if __name__ == "__main__":
     # +md  Change working directory to script's directory.
