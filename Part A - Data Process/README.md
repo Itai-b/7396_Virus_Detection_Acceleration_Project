@@ -11,11 +11,11 @@ This repository contains two Python scripts: `SnortRuleParser.py` and `ExactMatc
 Run the script from the terminal using the following command: `python SnortRulesParser.py snort3-community.rules`
 
 The script takes the following arguments:
-	* `snort3-community.rules`: the path to the Snort rule set file. 
-	If the file is not in the same directory as the script, the full path must be provided.
+- `snort3-community.rules`: the path to the Snort rule set file. 
+If the file is not in the same directory as the script, the full path must be provided.
 
 The script supports the following flags:
-	* `-json`: saves the extracted rules as a JSON file. Otherwise, if not specified, the rules are printed to the console.
+- `-json`: saves the extracted rules as a JSON file. Otherwise, if not specified, the rules are printed to the console.
 
 ## ExactMatchExtractor.py
 
