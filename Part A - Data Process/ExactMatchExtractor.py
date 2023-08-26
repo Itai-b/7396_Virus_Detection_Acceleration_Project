@@ -1,4 +1,37 @@
+"""
+Exact Match Extractor
+
+This module provides functions for extracting exact match sub-strings from Perl Compatible Regular Expressions (pcre).
+
+Authors:
+    Idan Baruch (idan-b@campus.technion.ac.il)
+    Itai Benyamin (itai.b@campus.technion.ac.il)
+
+Functions:
+    - char_to_utf8(character):
+        Converts a character to its UTF-8 representation.
+    
+    - utf8_to_raw(input: str) -> str:
+        Converts a UTF-8 encoded string to its raw representation.
+    
+    - utf8_to_ascii(input: str) -> list:
+        Converts a UTF-8 encoded string to its ASCII values.
+    
+    - substitute_pattern(match: re.Match):
+        Replaces a regex pattern of type 'c{2}' with the exact match string (e.g., 'cc').
+    
+    - replace_special_metacharacters(regex_pattern: str) -> str:
+        Replaces special meta-characters in a Perl Compatible Regular Expression (pcre) with their UTF-8 representation.
+    
+    - extract_exact_matches(regex_pattern: str) -> list:
+        Returns a list of non-ambiguous exact match sub-strings within a given pcre pattern.
+    
+    - run(pcre_string: str, flag='raw') -> list:
+        Runs the Exact Match Extractor functions on a snort rule (pcre string) and returns a list of extracted sub-strings.
+"""
+
 import re
+
 # regex_string_example = r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims'
 # the r'' indicated raw string in python (so that it won't replace \n with new line and so on).
 # the '/' in the beginning and end represents the beginning and end of a regex expression in JavaScript / Perl.
@@ -23,6 +56,8 @@ def char_to_utf8(character):
     :param character: A character.
     :return: A string representing the UTF-8 representation of the input character.
     """
+
+    # Convert the character to its UTF-8 representation
     code_point = ord(character)
     utf8_hex = "\\x{:02X}".format(code_point)
     
@@ -52,6 +87,7 @@ def utf8_to_ascii(input: str) -> list:
     :param input: The input string encoded in UTF-8.
     :return: A string representing the raw representation of the input string.
     """
+    
     # Get ASCII values of each character in the input string
     ascii_values = [ord(char) for char in input]
 
@@ -69,6 +105,8 @@ def substitute_pattern(match: re.Match):
     :return: A string resulting from repeating the captured character 'char' a number of times specified by the captured
         integer 'num', for example in c{2} the return string will be 'cc'.
     """
+    
+    # Get the character and number of repetitions from the match
     char, num = match.groups()
     
     return char * int(num)
@@ -155,6 +193,7 @@ def run(pcre_string: str, flag='raw') -> list:
         flag == 'ascii': A list of arrays of integers representing the ASCII values of the sub-strings.
         flag == 'raw': A list of raw sub-strings of the exact matches.
     """
+    
     matches = extract_exact_matches(pcre_string)
     if flag == 'ascii':
         return [utf8_to_ascii(sub_match) for sub_match in matches]

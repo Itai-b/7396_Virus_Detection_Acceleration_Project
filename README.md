@@ -18,4 +18,4 @@ Nowadays, numerous online algorithms are available for identifying virus-infecte
 
 - [Idan Baruch](https://github.com/idanbaru)  - Idan-b@campus.technion.ac.il
 - [Itai Benyamin](https://github.com/Itai-b) - Itai.b@campus.technion.ac.il
-
+- This project is under the supervision of Alon Rashelbach in the ACSL lab at the Technion.
