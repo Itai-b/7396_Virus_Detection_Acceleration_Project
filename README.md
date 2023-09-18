@@ -9,7 +9,7 @@ Nowadays, numerous online algorithms are available for identifying virus-infecte
 
 2) Insert the processed data into a Cuckoo Hashtable while optimizing the table size and its utilization according to the length of each substring and the gap between two substrings.
 
-3) Given that stage 2 results are not satisfying enough, the data will be processed by the Aho-Carsick algorithm. 
+3) Given that stage 2 results are not satisfying enough, the data will be processed by the Aho-Corasick algorithm. 
 
 4) Given that stage 3 results are not satisfying enough, the data will be processed by a dedicated algorithm that was developed in the ACSL lab.
 

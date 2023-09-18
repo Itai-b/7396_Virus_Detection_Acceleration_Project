@@ -49,7 +49,8 @@ import sys
 import os
 import re
 import json
-import ExactMatchExtractor as ExactMatchExtracter
+import ExactMatchExtractor as ExactMatchExtractor
+import ContentProcessor as ContentProcessor
 
 
 EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
@@ -87,11 +88,14 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
             if matches:
                 for match in matches:                       
                     data = match.group(1)
-                    if (data in previous_data):
+                    if data in previous_data:
                         continue
                     previous_data.append(data)
                     if pattern_name == 'pcre':
-                        data = ExactMatchExtracter.run(data, 'raw')
+                        data = ExactMatchExtractor.run(data, 'raw')
+                    else:   # pattern_name == 'content':
+                        data = data.lower()
+                        #TODO: data = ContentProcessor.run(data)
                     rule = (line_num+1, pattern_name, data)
                     rules.append(rule)
 

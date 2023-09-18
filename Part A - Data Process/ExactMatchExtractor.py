@@ -49,6 +49,7 @@ import re
 # Wanted: 'GateCrasher', 'v', '.', ',', 'Server', 'On-Line...' (50%+ exact match, count base on num of chars?)
 # Example: "GateCrasher v1.77,   Server On-Line..."
 
+MINIMAL_EXACT_MATCH_LENGTH = 2
 
 def char_to_utf8(character):
     """
@@ -94,7 +95,7 @@ def utf8_to_ascii(input: str) -> list:
     return ascii_values
 
 
-def substitute_pattern(match: re.Match):
+def substitute_pattern(match: re.match):
     """
     Given a regex pattern of type: c{2} where 'c' is any character and '2' is any integer,
     the function replaces it with the exact match string (here for example it will be 'cc').
@@ -123,7 +124,7 @@ def replace_special_metacharacters(regex_pattern: str) -> str:
     representation.
     """
     
-    meta_characters = ['.', '^', '$', '*', '+', '?', '{', '}', '[', ']', '(', ')', '|', '\\', '/']
+    meta_characters = ['.', '^', '$', '*', '+', '?', '{', '}', '[', ']', '(', ')', '|', '\\', '/', 'r', 'n', 't']
     utf8_metha_characters = [char_to_utf8(char) for char in meta_characters]
     
     for i, char in enumerate(meta_characters):
@@ -146,7 +147,8 @@ def extract_exact_matches(regex_pattern: str) -> list:
     
     unwanted_pattens = [
         r'\/.{0,3}$',                                   # Removes pcre flags after '/' closure (/ims)
-        r'(\\)([AbBdDfnrsStvwWzZ])([\+\*])?(\?)?',      # all regex of type \c or \c+ where c is a unique metacharacter.
+        r'(\\)([AbBdDfsStvwWzZ])([\+\*])?(\?)?',        # all regex of type \c or \c+ where c is a unique metacharacter.
+        # r'(\\)([AbBdDfrnsStvwWzZ])([\+\*])?(\?)?'     # INACTIVE: also removes \r\n
         r'(\/)(\^)?',                                   # Removes pcre opening flag ('\' of '^')
         r'(\.)([\+\*])?(\?)?',                          # all regex of type '.*?' or '.+?' where ? might appear or not.
         r'\(\?:',                                       # all regex of type '(?:' indicating unwanted match groups.
@@ -177,8 +179,8 @@ def extract_exact_matches(regex_pattern: str) -> list:
     
     # Cleans the list of sub-strings from empty strings (''), and returns it.
     exact_matches_list = []
-    for sub_string in regex_pattern.split(' '):
-        if sub_string.strip():
+    for sub_string in regex_pattern.lower().split(' '):
+        if sub_string.strip() and len(sub_string) > MINIMAL_EXACT_MATCH_LENGTH:
             exact_matches_list.append(bytes(sub_string, 'utf-8').decode('unicode-escape'))
     
     return exact_matches_list
