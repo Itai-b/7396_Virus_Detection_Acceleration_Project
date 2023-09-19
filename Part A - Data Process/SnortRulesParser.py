@@ -51,13 +51,13 @@ import re
 import json
 import ExactMatchExtractor as ExactMatchExtractor
 import ContentProcessor as ContentProcessor
-
+from config import config
 
 EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
 
-def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
+def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
     """
         Parse a file for specified patterns and extract matching data.
 
@@ -81,7 +81,8 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
     
     rules = []
     previous_data = []
-    
+    global relevant_content, total_content, relevant_pcre, total_pcre, special_R_rules
+
     for line_num, line in enumerate(lines):
         for pattern_name, pattern in patterns.items():
             matches = re.finditer(pattern, line)
@@ -92,17 +93,53 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, str])):
                         continue
                     previous_data.append(data)
                     if pattern_name == 'pcre':
-                        data = ExactMatchExtractor.run(data, 'raw')
+                        total_pcre += 1
+                        data = ExactMatchExtractor.run(data, 'char') # TODO: function records \R rules.
                     else:   # pattern_name == 'content':
+                        total_content += 1
                         data = data.lower()
-                        #TODO: data = ContentProcessor.run(data)
-                    rule = (line_num+1, pattern_name, data)
-                    rules.append(rule)
+                        data = ContentProcessor.run(data)
+                    #TODO: add config.THRESHOLD for a minimal char length of a substring.
+                    #TODO: USE HERE RETURN VALUE FROM FUNCTION (EMPTY LIST = DISCARD RULE)
+                    data = analyze_and_threshold(data)
+                    if data:
+                        rule = (line_num+1, pattern_name, data) # TODO: add max substring length
+                        rules.append(rule)
+                        if pattern_name == 'pcre':
+                            relevant_pcre += 1
+                        else:   # content
+                            relevant_content += 1
+                    else:   # data was either empty or thresholded
+                        # TODO: add to json log of discarded rules
+                        continue
+
 
     return rules
 
 
-def save_exact_matches_as_json(exact_matches: list(tuple([int, str, str]))):
+#TODO: make statistic class instead of using global params
+def analyze_and_threshold(data: list) -> list:
+    thresholded_data = []
+    global total_sub_strings, relevant_sub_strings, length_histogram
+
+    for char_list in data:
+        # print(f"char_list = {char_list}: length = {len(char_list)}")
+        total_sub_strings += 1
+        length = len(char_list)
+
+        if length in length_histogram:
+            length_histogram[length] += 1
+        else:
+            length_histogram[length] = 1
+
+        if length > config.MINIMAL_EXACT_MATCH_LENGTH:
+            relevant_sub_strings += 1
+            thresholded_data.append(char_list)
+
+    return thresholded_data
+
+
+def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list]))):
     """
         An auxiliary function used to save exact_matches to a json file.
     """
@@ -115,19 +152,50 @@ def save_exact_matches_as_json(exact_matches: list(tuple([int, str, str]))):
     print(f"saved the exact-matches as .json file under the path {os.getcwd()}\exact_matches.json")
            
 
-def print_exact_matches(exact_matches: list(tuple([int, str, str]))):
+def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
     """
         An auxiliary function used to print exact_matches in new lines.
     """
+    # print(f"char_list = {char_list}: length = {len(char_list)}")
     for exact_match in exact_matches:
         print(exact_match)
+
+
+total_sub_strings = 0
+relevant_sub_strings = 0
+
+total_pcre = 0
+relevant_pcre = 0
+special_R_rules = 0
+
+total_content = 0
+relevant_content = 0
+
+length_histogram = {}
 
 
 def main():
     """
         Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
     """
-    
+    global total_sub_strings,\
+        relevant_sub_strings, \
+        total_pcre, \
+        relevant_pcre, \
+        special_R_rules, \
+        total_content, \
+        relevant_content, \
+        length_histogram
+
+    total_sub_strings = 0
+    relevant_sub_strings = 0
+    total_pcre = 0
+    relevant_pcre = 0
+    special_R_rules = 0
+    total_content = 0
+    relevant_content = 0
+    length_histogram = {}
+
     save_as_json = False  # Initialize the flag
 
     if '-json' in sys.argv:
@@ -152,6 +220,15 @@ def main():
         save_exact_matches_as_json(exact_matches)
     else:
         print_exact_matches(exact_matches)
+
+    length_histogram = sorted(length_histogram.items(), key=lambda x:x[0])
+    for item in length_histogram:
+        print(f"Length {item[0]}: {item[1]} strings.")
+    print(f"{relevant_sub_strings/total_sub_strings * 100 :.2f}% substrings remained after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.")
+    print(f"{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% rules remained.")
+    print(f"{relevant_pcre / total_pcre * 100 :.2f}% pcre rules remained.")
+    print(f"{relevant_content / total_content * 100 :.2f}% content rules remained.")
+    # print(f"{special_R_rules} out of {total_pcre} pcre rules were \\R rules.")
 
 
 if __name__ == "__main__":

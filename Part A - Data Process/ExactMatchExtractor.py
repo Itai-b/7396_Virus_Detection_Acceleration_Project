@@ -31,6 +31,7 @@ Functions:
 """
 
 import re
+from config import config
 
 # regex_string_example = r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims'
 # the r'' indicated raw string in python (so that it won't replace \n with new line and so on).
@@ -49,7 +50,6 @@ import re
 # Wanted: 'GateCrasher', 'v', '.', ',', 'Server', 'On-Line...' (50%+ exact match, count base on num of chars?)
 # Example: "GateCrasher v1.77,   Server On-Line..."
 
-MINIMAL_EXACT_MATCH_LENGTH = 2
 
 def char_to_utf8(character):
     """
@@ -65,33 +65,32 @@ def char_to_utf8(character):
     return utf8_hex  
 
 
-def utf8_to_raw(input: str) -> str:
+def utf8_to_raw(input_string: str) -> str:
     """
     Converts a UTF-8 encoded string to its raw representation.
 
-    :param input: The input string encoded in UTF-8.
+    :param input_string: The input string encoded in UTF-8.
     :return: A string representing the raw representation of the input string.
     """
     # Convert the input string to raw representation
-    raw_string = input
+    raw_string = input_string
     
-    if ('\\' not in input):
-        raw_string = bytes(input, 'utf-8').decode('unicode-escape')
+    if '\\' not in input_string:
+        raw_string = bytes(input_string, 'utf-8').decode('unicode-escape') #'unicode-escape'
 
     return raw_string
 
 
-def utf8_to_ascii(input: str) -> list:
+def utf8_to_ascii(input_string: str) -> list:
     """
     Converts a UTF-8 encoded string to its ASCII values.
     
-    :param input: The input string encoded in UTF-8.
+    :param input_string: The input string encoded in UTF-8.
     :return: A string representing the raw representation of the input string.
     """
     
     # Get ASCII values of each character in the input string
-    ascii_values = [ord(char) for char in input]
-
+    ascii_values = [ord(char) for char in input_string]
     return ascii_values
 
 
@@ -123,14 +122,14 @@ def replace_special_metacharacters(regex_pattern: str) -> str:
     :return: A string representing the pcre pattern with all special meta-characters replaced with their UTF-8
     representation.
     """
-    
-    meta_characters = ['.', '^', '$', '*', '+', '?', '{', '}', '[', ']', '(', ')', '|', '\\', '/', 'r', 'n', 't']
-    utf8_metha_characters = [char_to_utf8(char) for char in meta_characters]
-    
-    for i, char in enumerate(meta_characters):
-        regex_pattern = regex_pattern.replace('\\' + char, utf8_metha_characters[i])
+
+    utf8_meta_characters = [char_to_utf8(char) for char in config.meta_characters]
+
+    for i, char in enumerate(config.meta_characters):
+        regex_pattern = regex_pattern.replace('\\' + char, utf8_meta_characters[i])
     
     return regex_pattern    
+
 
 def extract_exact_matches(regex_pattern: str) -> list:
     """
@@ -145,28 +144,6 @@ def extract_exact_matches(regex_pattern: str) -> list:
         :return: A list of sub-strings of non-ambiguous exact matches within the given pcre patten.
     """
     
-    unwanted_pattens = [
-        r'\/.{0,3}$',                                   # Removes pcre flags after '/' closure (/ims)
-        r'(\\)([AbBdDfsStvwWzZ])([\+\*])?(\?)?',        # all regex of type \c or \c+ where c is a unique metacharacter.
-        # r'(\\)([AbBdDfrnsStvwWzZ])([\+\*])?(\?)?'     # INACTIVE: also removes \r\n
-        r'(\/)(\^)?',                                   # Removes pcre opening flag ('\' of '^')
-        r'(\.)([\+\*])?(\?)?',                          # all regex of type '.*?' or '.+?' where ? might appear or not.
-        r'\(\?:',                                       # all regex of type '(?:' indicating unwanted match groups.
-        r'\(\?!',                                       # all regex of type '(?!' indicating negative lookahead.
-        # r'(\(.*)\|(.*\))',              # INACTIVE:   # all regex of type a | b where a and b could be any symbols.
-        r'\(',                            # OPTIONAL:   # Removing capturing groups '(' ')'
-        r'\)',                            # OPTIONAL:   # -"-
-        r'\|',                            # OPTIONAL:   # Removing Special char '|' for OR operation in regex
-        r'\[.*?\]{\d+,?\d+?}',                          # all regex of type [abc]{2,50} where 2,50 are integers.
-        r'\[.*?\]([\+\*])?(\?)?',                       # all regex of type [abc] where in [] could be any symbols.
-        r'.{(\d+),(\d+)}',                              # all regex of type .{2,50} where . is any symbol and 2,50 ints.
-        r'.{(\d+),}',                                   # all regex of type .{2,} where . is any symbol and 2 is int.
-        r'.{\d+}',                                      # all regex of type .{2} where . is any symbol and 2 is integer.
-        r'\(.*?\)([\+\*])?(\?)?',                       # all regex of type (something)*? where */+/? might appear.
-        r'\\x..\?',                       # OPTIONAL:   # all regex of type \x..? where '.' could be any symbol.
-        r'[^\\]\?',                                     # all regex of type c? where c is any symbol that isn't '\'.
-    ]
-    
     # Replaces all "canceled" ('\'+) special meta-characters with their UTF-8 representation.
     regex_pattern = replace_special_metacharacters(regex_pattern)
     
@@ -174,19 +151,19 @@ def extract_exact_matches(regex_pattern: str) -> list:
     regex_pattern = re.sub(r'(\w){(\d+)}', substitute_pattern, regex_pattern)
 
     # Replaces any non-exact match (ambiguous) patterns with an empty space ' '.
-    for unwanted_pattern in unwanted_pattens:
+    for unwanted_pattern in config.unwanted_pattens:
         regex_pattern = re.sub(unwanted_pattern, ' ', regex_pattern)
     
     # Cleans the list of sub-strings from empty strings (''), and returns it.
     exact_matches_list = []
     for sub_string in regex_pattern.lower().split(' '):
-        if sub_string.strip() and len(sub_string) > MINIMAL_EXACT_MATCH_LENGTH:
-            exact_matches_list.append(bytes(sub_string, 'utf-8').decode('unicode-escape'))
-    
+        if sub_string.strip():
+            exact_matches_list.append(bytes(sub_string, 'utf-8').decode('unicode-escape')) #'unicode-escape'
+
     return exact_matches_list
 
 
-def run(pcre_string: str, flag='raw') -> list:
+def run(pcre_string: str, flag=config.RESULTS_FORM) -> list:
     """
     Runs the Exact Match Extractor functions on a snort rule (represented in a pcre string).
     :param pcre_string: A Perl Compatible Regular Expression (pcre) string.
@@ -201,5 +178,11 @@ def run(pcre_string: str, flag='raw') -> list:
         return [utf8_to_ascii(sub_match) for sub_match in matches]
     elif flag == 'raw':
         return [utf8_to_raw(sub_match) for sub_match in matches]
+    elif flag == 'char':
+        return [[char for char in sub_string] for sub_string in matches]
+        #char_array = [char for char in sub_string]
+        #if len(char_array) > MINIMAL_EXACT_MATCH_LENGTH:
+        #    exact_matches_list.append(char_array)
+
     else:
         raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "raw".')

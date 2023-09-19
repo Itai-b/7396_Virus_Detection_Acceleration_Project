@@ -1,4 +1,5 @@
 import re
+from config import config as config
 
 
 def substitute_pipe_patterns(match: re.match):
@@ -9,26 +10,26 @@ def substitute_pipe_patterns(match: re.match):
     :param match: A matched pattern from a regular expression containing capturing groups for pipes ('|')
         with sequences of numbers within, for example |00 72 38|
 
-    :return: A string resulting from
+    :return: A string consisting of characters represented by the configured character encoding of the given hex values.
     """
 
     # Get only the hex sequence without the pipe symbols ('|')
     hex_sequence = match.groups(1)[0]
-    print(hex_sequence)
-    decoded_string = bytes.fromhex(hex_sequence.strip()).decode('utf-8')
+    # using ISO-8859-1 ('Latin-1') which, unlike utf-8 and utf-16, does *NOT* support multibyte characters.
+    decoded_string = bytes.fromhex(hex_sequence.strip()).decode(config.CHARACTER_ENCODING)
+    # TODO: python seems to not be able to print characters like \x00 or \x05 (but it still counts them)
+    #   resulting an "empty" lists of content [] which have indeed characters inside and have length > 0.
+    #   solve it by either find a better encoding format or by presenting all characters as HEX values.
 
     return decoded_string
 
 
 def run(content_string: str) -> str:
     """
-    Runs the Exact Match Extractor functions on a snort rule (represented in a pcre string).
+    Runs the Content Processor functions on a snort content rule.
     :param content_string: A snort content rule.
-    :return:
+    :return: A list of chars of the given processed content rule.
     """
     content_string = content_string.lower()
-    content_string = re.sub(r'B4', '00', content_string)
-    content_string = re.sub(r'85', '00', content_string)
     content_string = re.sub(r'(?:\|)(.*?)(?:\|)', substitute_pipe_patterns, content_string)
-    print(content_string)
-    return content_string
+    return [[char for char in content_string]]
