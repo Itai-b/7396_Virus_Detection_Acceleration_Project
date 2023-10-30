@@ -1,11 +1,12 @@
+import logging
 # Configurations & Constants definitions
 
-"""___________________________________GENERAL___________________________________"""
+"""___________________________________GENERAL______________________________________"""
 CHARACTER_ENCODING = 'iso-8859-1'
-MINIMAL_EXACT_MATCH_LENGTH = 0
+MINIMAL_EXACT_MATCH_LENGTH = 2
 RESULTS_FORM = 'char'
 
-"""_____________________________EXACT MATCH EXTRACTOR_____________________________"""
+"""_____________________________EXACT MATCH EXTRACTOR______________________________"""
 meta_characters = ['.', '^', '$', '*', '+', '?', '{', '}', '[', ']', '(', ')', '|', '\\', '/', 'r', 'n', 't']
 
 unwanted_pattens = [

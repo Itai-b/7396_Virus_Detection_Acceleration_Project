@@ -1,6 +1,6 @@
 # Snort Rule Set Extractor
 
-This repository contains two Python scripts: `SnortRuleParser.py` and `ExactMatchExtractor.py`, which are designed to extract rules and exact match sub-strings from Snort's rule set, respectively.
+This repository contains three Python scripts: `SnortRuleParser.py`, `ExactMatchExtractor.py` and `ContentProccessor.py`, which are designed to extract rules and exact match sub-strings from Snort's rule set, respectively.
 
 ## SnortRuleParser.py
 
@@ -31,6 +31,15 @@ The script supports the following flags:
 - `extract_exact_matches(regex_pattern: str) -> list`: Returns a list of non-ambiguous exact match sub-strings within a pcre pattern.
 - `run(pcre_string: str, flag='raw') -> list`: Runs the Exact Match Extractor functions on a pcre string.
 
+## ContentProccessor.py
+
+### Description
+`ContentProccessor.py` is a custom module designed to process content modifiers in Snort rules. It provides functions to extract content modifiers from a Snort rule, and to extract exact match sub-strings from content modifiers.
+
+### Functions
+- `substitute_pipe_patterns (match: re.Match)`: Replaces a regex pattern of type 'c{2}' with the exact match string.
+- `run(content: str) -> list`: Runs the Exact Match Extractor functions on a content modifier string.
+ 
 ## Authors
 - [Idan Baruch](https://github.com/idanbaru)  - Idan-b@campus.technion.ac.il
 - [Itai Benyamin](https://github.com/Itai-b) - Itai.b@campus.technion.ac.il

@@ -180,9 +180,5 @@ def run(pcre_string: str, flag=config.RESULTS_FORM) -> list:
         return [utf8_to_raw(sub_match) for sub_match in matches]
     elif flag == 'char':
         return [[char for char in sub_string] for sub_string in matches]
-        #char_array = [char for char in sub_string]
-        #if len(char_array) > MINIMAL_EXACT_MATCH_LENGTH:
-        #    exact_matches_list.append(char_array)
-
     else:
         raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "raw".')
