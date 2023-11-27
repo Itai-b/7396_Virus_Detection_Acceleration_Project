@@ -63,6 +63,10 @@ import re
 import logging
 import time
 import json
+
+from matplotlib import pyplot as plt
+from matplotlib.ticker import FuncFormatter
+
 import ExactMatchExtractor as ExactMatchExtractor
 import ContentProcessor as ContentProcessor
 from datetime import datetime
@@ -111,7 +115,7 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
     
     rules = []
     previous_data = []
-    global relevant_content, total_content, relevant_pcre, total_pcre, special_R_rules
+    global relevant_content, total_content, removed_content, relevant_pcre, total_pcre, removed_pcre, special_R_rules
 
     for line_num, line in enumerate(lines):
         for pattern_name, pattern in patterns.items():
@@ -120,6 +124,10 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
                 for match in matches:                       
                     data = match.group(1)
                     if data in previous_data:
+                        if pattern_name == 'pcre':
+                            removed_pcre += 1
+                        else:  # pattern_name == 'content':
+                            removed_content += 1
                         continue
                     previous_data.append(data)
                     if pattern_name == 'pcre':
@@ -145,7 +153,7 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
                                 logger.info(f"the following {pattern_name} pattern with special R rule in line {line_num+1} was discarded: {match.group(1)}")
                             else:
                                 logger.debug(f"the following {pattern_name} pattern in line {line_num+1} was discarded: {match.group(1)}")
-
+    draw_graphs(length_histogram)
     return rules
 
 def analyze_and_threshold(data: list) -> list:
@@ -192,6 +200,8 @@ def log_info(start_time, end_time, length_histogram):
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     logger.info(f'There are {total_content} content rules and {total_pcre} pcre rules in the file.')
     logger.info(f'There are {special_R_rules} special R rules in the file.')
+    logger.info(f'There were {removed_pcre} special case pcre rules that were removed.')
+    logger.info(f'There were {removed_content} special case content rules that were removed.')
 
     logger.info('General information after the script\'s execution:')
     logger.info(f'{relevant_sub_strings/total_sub_strings * 100 :.2f}% of the substrings remained after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
@@ -202,6 +212,38 @@ def log_info(start_time, end_time, length_histogram):
     logger.info(f'Length histogram of the substrings:')
     for item in length_histogram:
         logger.info(f"There are {item[1]} string with Length {item[0]}.")
+
+
+def draw_graphs(length_histogram):
+    bins = [2, 4, 8, 16, 32, 64, float('inf')]
+    counts = [0] * len(bins)
+
+    for length, num_sub_strings in length_histogram.items():
+        for i, bin_value in enumerate(bins):
+            if length <= bin_value:
+                counts[i] += num_sub_strings
+                # break
+
+    plt.bar(range(len(bins)), counts, align='center')
+    plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
+    plt.xlabel('Length')
+    plt.ylabel('Number of Substrings with Length chars or less')
+    plt.title('Number of Substrings with Length chars or less\nfor sub exact matches extracted from Snort rules')
+    plt.show()
+
+    max_count = max(counts)
+    #plt.yticks([0, 25, 50, 75, 100])
+
+    #plt.bar(range(len(bins)), percentages, align='center')
+    plt.bar(range(len(bins)), counts, align='center')
+    plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
+    #plt.yticks(range(len(percentages)), [f"{percentages[i]:.2f}%" for i in range(len(percentages))])
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{(x / max_count) * 100:.2f}%'))
+    #plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
+    plt.ylabel('% of Substrings with Length chars or less')
+    plt.title('Percentage of Substrings with Length chars or less\nfor sub exact matches extracted from Snort rules')
+    plt.tight_layout()
+    plt.show()
 
 def main():
     """
@@ -221,18 +263,22 @@ def main():
         relevant_sub_strings, \
         total_pcre, \
         relevant_pcre, \
+        removed_pcre, \
         special_R_rules, \
         total_content, \
         relevant_content, \
+        removed_content, \
         length_histogram
 
     total_sub_strings = 0
     relevant_sub_strings = 0
     total_pcre = 0
     relevant_pcre = 0
+    removed_pcre = 0
     special_R_rules = 0
     total_content = 0
     relevant_content = 0
+    removed_content = 0
     length_histogram = {}
 
     if args.info:
