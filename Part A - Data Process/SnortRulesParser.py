@@ -55,7 +55,7 @@ Functions:
         The main function that orchestrates the parsing and processing of rules.
 """
 
-from math import e
+from itertools import count
 import sys
 import os
 import argparse
@@ -63,6 +63,7 @@ import re
 import logging
 import time
 import json
+from turtle import color
 
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
@@ -153,7 +154,6 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
                                 logger.info(f"the following {pattern_name} pattern with special R rule in line {line_num+1} was discarded: {match.group(1)}")
                             else:
                                 logger.debug(f"the following {pattern_name} pattern in line {line_num+1} was discarded: {match.group(1)}")
-    draw_graphs(length_histogram)
     return rules
 
 def analyze_and_threshold(data: list) -> list:
@@ -197,6 +197,8 @@ def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
         print(exact_match)
         
 def log_info(start_time, end_time, length_histogram):
+    length_histogram = sorted(length_histogram.items())
+    
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     logger.info(f'There are {total_content} content rules and {total_pcre} pcre rules in the file.')
     logger.info(f'There are {special_R_rules} special R rules in the file.')
@@ -215,6 +217,36 @@ def log_info(start_time, end_time, length_histogram):
 
 
 def draw_graphs(length_histogram):
+    lengths = sorted(length_histogram.keys())
+    counts = [0] * len(lengths)
+
+    for length, num_sub_strings in length_histogram.items():
+        for i, value in enumerate(lengths):
+            if length <= value:
+                counts[i] += num_sub_strings
+    
+    total_strings = sum(counts)
+    cumulative_counts = [sum(counts[:i+1]) / total_strings * 100 for i in range(len(counts))]
+
+    plt.plot(lengths, cumulative_counts, color='green', marker='o')
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
+    plt.yticks([0, 25, 50, 75, 100])
+    plt.xlabel('Max String Length')
+    plt.ylabel('Strings Presentage')
+    plt.title('String Length Histogram')
+    plt.show()
+    
+
+
+    lengths = list(length_histogram.keys())
+    frequencies = list(length_histogram.values())
+
+    plt.hist(lengths, bins=len(lengths), weights=frequencies, edgecolor='black', alpha=0.7)
+    plt.xlabel('String Length')
+    plt.ylabel('Frequency')
+    plt.title('String Length Histogram')
+    plt.show()
+
     bins = [2, 4, 8, 16, 32, 64, float('inf')]
     counts = [0] * len(bins)
 
@@ -222,7 +254,6 @@ def draw_graphs(length_histogram):
         for i, bin_value in enumerate(bins):
             if length <= bin_value:
                 counts[i] += num_sub_strings
-                # break
 
     plt.bar(range(len(bins)), counts, align='center')
     plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
@@ -232,18 +263,16 @@ def draw_graphs(length_histogram):
     plt.show()
 
     max_count = max(counts)
-    #plt.yticks([0, 25, 50, 75, 100])
-
-    #plt.bar(range(len(bins)), percentages, align='center')
-    plt.bar(range(len(bins)), counts, align='center')
+    percentages = [(x / max_count) * 100 for x in counts]
+    
+    plt.bar(range(len(bins)), percentages, align='center', color='orange')
     plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
-    #plt.yticks(range(len(percentages)), [f"{percentages[i]:.2f}%" for i in range(len(percentages))])
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{(x / max_count) * 100:.2f}%'))
-    #plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
+    plt.yticks([0, 25, 50, 75, 100])
     plt.ylabel('% of Substrings with Length chars or less')
     plt.title('Percentage of Substrings with Length chars or less\nfor sub exact matches extracted from Snort rules')
-    plt.tight_layout()
     plt.show()
+
 
 def main():
     """
@@ -312,8 +341,8 @@ def main():
     else:
         print_exact_matches(exact_matches)
     
-    length_histogram = sorted(length_histogram.items(), key=lambda x:x[0])
-
+    
+    draw_graphs(length_histogram)
     logger.info(f'Finished parsing the file.')
     end_time = time.time()
     log_info(start_time, end_time, length_histogram)
