@@ -62,11 +62,8 @@ import argparse
 import re
 import logging
 import time
+import csv
 import json
-from turtle import color
-
-from matplotlib import pyplot as plt
-from matplotlib.ticker import FuncFormatter
 
 import ExactMatchExtractor as ExactMatchExtractor
 import ContentProcessor as ContentProcessor
@@ -181,12 +178,12 @@ def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list]))):
         An auxiliary function used to save exact_matches to a json file.
     """
     
-    with open('exact_matches.json', 'w') as file:
+    with open('..\Data\exact_matches.json', 'w') as file:
         for exact_match in exact_matches:
             json.dump(exact_match, file, indent=None)
             file.write('\n')
             
-    logger.info(f"Saved the exact-matches as .json file under the path {os.getcwd()}\exact_matches.json.")
+    logger.info(f"Saved the exact-matches as .json file under the path {os.pardir}\Data\exact_matches.json.")
            
 
 def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
@@ -196,8 +193,7 @@ def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
     for exact_match in exact_matches:
         print(exact_match)
         
-def log_info(start_time, end_time, length_histogram):
-    length_histogram = sorted(length_histogram.items())
+def log_info(start_time, end_time):
     
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     logger.info(f'There are {total_content} content rules and {total_pcre} pcre rules in the file.')
@@ -211,67 +207,7 @@ def log_info(start_time, end_time, length_histogram):
     logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre rules remained remained after thresholding.')
     logger.info(f'{relevant_content / total_content * 100 :.2f}% content rules remained after thresholding.')
     
-    logger.info(f'Length histogram of the substrings:')
-    for item in length_histogram:
-        logger.info(f"There are {item[1]} string with Length {item[0]}.")
 
-
-def draw_graphs(length_histogram):
-    lengths = sorted(length_histogram.keys())
-    counts = [0] * len(lengths)
-
-    for length, num_sub_strings in length_histogram.items():
-        for i, value in enumerate(lengths):
-            if length <= value:
-                counts[i] += num_sub_strings
-    
-    total_strings = sum(counts)
-    cumulative_counts = [sum(counts[:i+1]) / total_strings * 100 for i in range(len(counts))]
-
-    plt.plot(lengths, cumulative_counts, color='green', marker='o')
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
-    plt.yticks([0, 25, 50, 75, 100])
-    plt.xlabel('Max String Length')
-    plt.ylabel('Strings Presentage')
-    plt.title('String Length Histogram')
-    plt.show()
-    
-
-
-    lengths = list(length_histogram.keys())
-    frequencies = list(length_histogram.values())
-
-    plt.hist(lengths, bins=len(lengths), weights=frequencies, edgecolor='black', alpha=0.7)
-    plt.xlabel('String Length')
-    plt.ylabel('Frequency')
-    plt.title('String Length Histogram')
-    plt.show()
-
-    bins = [2, 4, 8, 16, 32, 64, float('inf')]
-    counts = [0] * len(bins)
-
-    for length, num_sub_strings in length_histogram.items():
-        for i, bin_value in enumerate(bins):
-            if length <= bin_value:
-                counts[i] += num_sub_strings
-
-    plt.bar(range(len(bins)), counts, align='center')
-    plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
-    plt.xlabel('Length')
-    plt.ylabel('Number of Substrings with Length chars or less')
-    plt.title('Number of Substrings with Length chars or less\nfor sub exact matches extracted from Snort rules')
-    plt.show()
-
-    max_count = max(counts)
-    percentages = [(x / max_count) * 100 for x in counts]
-    
-    plt.bar(range(len(bins)), percentages, align='center', color='orange')
-    plt.xticks(range(len(bins)), [f"<{bins[i]}" if i < len(bins)-1 else f"ALL" for i in range(len(bins))])
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:.0f}%'))
-    plt.yticks([0, 25, 50, 75, 100])
-    plt.ylabel('% of Substrings with Length chars or less')
-    plt.title('Percentage of Substrings with Length chars or less\nfor sub exact matches extracted from Snort rules')
-    plt.show()
 
 
 def main():
@@ -340,12 +276,19 @@ def main():
         save_exact_matches_as_json(exact_matches)
     else:
         print_exact_matches(exact_matches)
-    
-    
-    draw_graphs(length_histogram)
+        
+    with open('../Data/length_histogram.csv', 'w') as csvfile:
+        headers = ['String Length', 'Count']
+        result_list = []
+        for length, count in length_histogram.items():
+            result_list.append({'String Length': length, 'Count': count})
+        writer = csv.DictWriter(csvfile, headers)
+        writer.writeheader()
+        writer.writerows(result_list)
+        
     logger.info(f'Finished parsing the file.')
     end_time = time.time()
-    log_info(start_time, end_time, length_histogram)
+    log_info(start_time, end_time)
 
 
 if __name__ == "__main__":
