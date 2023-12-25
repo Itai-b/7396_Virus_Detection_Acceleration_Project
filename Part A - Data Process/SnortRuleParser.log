@@ -2600,3 +2600,340 @@
 2023-12-08 16:34:38,343 - root - INFO - 95.47% of the rules remained after thresholding.
 2023-12-08 16:34:38,343 - root - INFO - 91.48% pcre rules remained remained after thresholding.
 2023-12-08 16:34:38,343 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-25 20:59:22,097 - root - INFO - Started parsing.
+2023-12-25 20:59:22,147 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 20:59:22,161 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 20:59:22,176 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 20:59:22,177 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 20:59:22,199 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 20:59:22,227 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 20:59:22,229 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 20:59:22,240 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 20:59:22,259 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 20:59:22,268 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 20:59:22,571 - root - INFO - Finished parsing the file.
+2023-12-25 20:59:22,571 - root - INFO - The script's execution took 0.473 seconds.
+2023-12-25 20:59:22,571 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-25 20:59:22,571 - root - INFO - There are 10 special R rules in the file.
+2023-12-25 20:59:22,571 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-25 20:59:22,571 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-25 20:59:22,571 - root - INFO - General information after the script's execution:
+2023-12-25 20:59:22,571 - root - INFO - The total number of substrings is 8681.
+2023-12-25 20:59:22,571 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-25 20:59:22,571 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-25 20:59:22,571 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-25 20:59:22,571 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-25 20:59:22,572 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-25 21:08:34,029 - root - INFO - Started parsing.
+2023-12-25 21:08:34,063 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:08:34,075 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:08:34,090 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:08:34,091 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:08:34,110 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:08:34,134 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:08:34,135 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:08:34,148 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:08:34,166 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:08:34,175 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:08:34,831 - root - INFO - Finished parsing the file.
+2023-12-25 21:08:34,831 - root - INFO - The script's execution took 0.801 seconds.
+2023-12-25 21:08:34,831 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-25 21:08:34,831 - root - INFO - There are 10 special R rules in the file.
+2023-12-25 21:08:34,832 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-25 21:08:34,832 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-25 21:08:34,832 - root - INFO - General information after the script's execution:
+2023-12-25 21:08:34,832 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-25 21:08:34,832 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-25 21:08:34,832 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-25 21:08:34,832 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-25 21:08:34,832 - root - INFO - Length histogram of the substrings:
+2023-12-25 21:08:34,832 - root - INFO - There are 2185 string with Length 1.
+2023-12-25 21:08:34,832 - root - INFO - There are 642 string with Length 2.
+2023-12-25 21:08:34,832 - root - INFO - There are 406 string with Length 3.
+2023-12-25 21:08:34,832 - root - INFO - There are 655 string with Length 4.
+2023-12-25 21:08:34,832 - root - INFO - There are 483 string with Length 5.
+2023-12-25 21:08:34,832 - root - INFO - There are 381 string with Length 6.
+2023-12-25 21:08:34,832 - root - INFO - There are 256 string with Length 7.
+2023-12-25 21:08:34,832 - root - INFO - There are 334 string with Length 8.
+2023-12-25 21:08:34,832 - root - INFO - There are 328 string with Length 9.
+2023-12-25 21:08:34,832 - root - INFO - There are 255 string with Length 10.
+2023-12-25 21:08:34,832 - root - INFO - There are 260 string with Length 11.
+2023-12-25 21:08:34,833 - root - INFO - There are 254 string with Length 12.
+2023-12-25 21:08:34,833 - root - INFO - There are 223 string with Length 13.
+2023-12-25 21:08:34,833 - root - INFO - There are 185 string with Length 14.
+2023-12-25 21:08:34,833 - root - INFO - There are 144 string with Length 15.
+2023-12-25 21:08:34,833 - root - INFO - There are 190 string with Length 16.
+2023-12-25 21:08:34,833 - root - INFO - There are 107 string with Length 17.
+2023-12-25 21:08:34,833 - root - INFO - There are 105 string with Length 18.
+2023-12-25 21:08:34,833 - root - INFO - There are 104 string with Length 19.
+2023-12-25 21:08:34,833 - root - INFO - There are 82 string with Length 20.
+2023-12-25 21:08:34,834 - root - INFO - There are 82 string with Length 21.
+2023-12-25 21:08:34,834 - root - INFO - There are 52 string with Length 22.
+2023-12-25 21:08:34,834 - root - INFO - There are 62 string with Length 23.
+2023-12-25 21:08:34,834 - root - INFO - There are 64 string with Length 24.
+2023-12-25 21:08:34,834 - root - INFO - There are 49 string with Length 25.
+2023-12-25 21:08:34,834 - root - INFO - There are 43 string with Length 26.
+2023-12-25 21:08:34,834 - root - INFO - There are 33 string with Length 27.
+2023-12-25 21:08:34,834 - root - INFO - There are 37 string with Length 28.
+2023-12-25 21:08:34,834 - root - INFO - There are 35 string with Length 29.
+2023-12-25 21:08:34,834 - root - INFO - There are 35 string with Length 30.
+2023-12-25 21:08:34,835 - root - INFO - There are 39 string with Length 31.
+2023-12-25 21:08:34,835 - root - INFO - There are 41 string with Length 32.
+2023-12-25 21:08:34,835 - root - INFO - There are 28 string with Length 33.
+2023-12-25 21:08:34,835 - root - INFO - There are 40 string with Length 34.
+2023-12-25 21:08:34,835 - root - INFO - There are 36 string with Length 35.
+2023-12-25 21:08:34,835 - root - INFO - There are 24 string with Length 36.
+2023-12-25 21:08:34,835 - root - INFO - There are 27 string with Length 37.
+2023-12-25 21:08:34,835 - root - INFO - There are 31 string with Length 38.
+2023-12-25 21:08:34,835 - root - INFO - There are 16 string with Length 39.
+2023-12-25 21:08:34,835 - root - INFO - There are 35 string with Length 40.
+2023-12-25 21:08:34,835 - root - INFO - There are 17 string with Length 41.
+2023-12-25 21:08:34,835 - root - INFO - There are 23 string with Length 42.
+2023-12-25 21:08:34,835 - root - INFO - There are 21 string with Length 43.
+2023-12-25 21:08:34,835 - root - INFO - There are 17 string with Length 44.
+2023-12-25 21:08:34,835 - root - INFO - There are 15 string with Length 45.
+2023-12-25 21:08:34,835 - root - INFO - There are 19 string with Length 46.
+2023-12-25 21:08:34,835 - root - INFO - There are 12 string with Length 47.
+2023-12-25 21:08:34,835 - root - INFO - There are 10 string with Length 48.
+2023-12-25 21:08:34,835 - root - INFO - There are 17 string with Length 49.
+2023-12-25 21:08:34,836 - root - INFO - There are 13 string with Length 50.
+2023-12-25 21:08:34,836 - root - INFO - There are 6 string with Length 51.
+2023-12-25 21:08:34,836 - root - INFO - There are 6 string with Length 52.
+2023-12-25 21:08:34,836 - root - INFO - There are 3 string with Length 53.
+2023-12-25 21:08:34,836 - root - INFO - There are 4 string with Length 54.
+2023-12-25 21:08:34,836 - root - INFO - There are 6 string with Length 55.
+2023-12-25 21:08:34,836 - root - INFO - There are 1 string with Length 56.
+2023-12-25 21:08:34,836 - root - INFO - There are 3 string with Length 57.
+2023-12-25 21:08:34,836 - root - INFO - There are 2 string with Length 59.
+2023-12-25 21:08:34,836 - root - INFO - There are 3 string with Length 60.
+2023-12-25 21:08:34,836 - root - INFO - There are 3 string with Length 61.
+2023-12-25 21:08:34,836 - root - INFO - There are 6 string with Length 62.
+2023-12-25 21:08:34,836 - root - INFO - There are 5 string with Length 63.
+2023-12-25 21:08:34,836 - root - INFO - There are 6 string with Length 64.
+2023-12-25 21:08:34,836 - root - INFO - There are 2 string with Length 65.
+2023-12-25 21:08:34,836 - root - INFO - There are 2 string with Length 66.
+2023-12-25 21:08:34,836 - root - INFO - There are 2 string with Length 67.
+2023-12-25 21:08:34,836 - root - INFO - There are 3 string with Length 68.
+2023-12-25 21:08:34,836 - root - INFO - There are 5 string with Length 69.
+2023-12-25 21:08:34,836 - root - INFO - There are 4 string with Length 70.
+2023-12-25 21:08:34,836 - root - INFO - There are 1 string with Length 71.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 72.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 73.
+2023-12-25 21:08:34,837 - root - INFO - There are 2 string with Length 74.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 75.
+2023-12-25 21:08:34,837 - root - INFO - There are 2 string with Length 76.
+2023-12-25 21:08:34,837 - root - INFO - There are 3 string with Length 77.
+2023-12-25 21:08:34,837 - root - INFO - There are 2 string with Length 78.
+2023-12-25 21:08:34,837 - root - INFO - There are 6 string with Length 80.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 81.
+2023-12-25 21:08:34,837 - root - INFO - There are 2 string with Length 83.
+2023-12-25 21:08:34,837 - root - INFO - There are 3 string with Length 84.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 88.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 90.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 93.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 96.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 97.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 100.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 101.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 103.
+2023-12-25 21:08:34,837 - root - INFO - There are 1 string with Length 105.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 106.
+2023-12-25 21:08:34,838 - root - INFO - There are 2 string with Length 107.
+2023-12-25 21:08:34,838 - root - INFO - There are 2 string with Length 113.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 115.
+2023-12-25 21:08:34,838 - root - INFO - There are 2 string with Length 118.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 122.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 124.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 132.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 136.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 139.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 141.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 146.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 149.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 151.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 156.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 158.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 162.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 165.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 167.
+2023-12-25 21:08:34,838 - root - INFO - There are 1 string with Length 214.
+2023-12-25 21:12:06,153 - root - INFO - Started parsing.
+2023-12-25 21:12:06,210 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:12:06,228 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:12:06,249 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:12:06,250 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:12:06,277 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:12:06,302 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:12:06,304 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:12:06,317 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:12:06,339 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:12:06,352 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:12:55,411 - root - INFO - Started parsing.
+2023-12-25 21:12:55,477 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:12:55,496 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:12:55,517 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:12:55,519 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:12:55,548 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:12:55,581 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:12:55,583 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:12:55,596 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:12:55,619 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:12:55,631 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:14:29,566 - root - INFO - Started parsing.
+2023-12-25 21:14:29,626 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:14:29,645 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:14:29,667 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:14:29,671 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:14:29,698 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:14:29,730 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:14:29,732 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:14:29,746 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:14:29,770 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:14:29,783 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:15:45,002 - root - INFO - Started parsing.
+2023-12-25 21:15:45,068 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:15:45,089 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:15:45,109 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:15:45,111 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:15:45,138 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:15:45,162 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:15:45,164 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:15:45,177 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:15:45,200 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:15:45,212 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:17:54,915 - root - INFO - Started parsing.
+2023-12-25 21:17:54,993 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:17:55,014 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:17:55,041 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:17:55,043 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:17:55,069 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:17:55,093 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:17:55,094 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:17:55,107 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:17:55,129 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:17:55,141 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:18:31,531 - root - INFO - Started parsing.
+2023-12-25 21:18:31,595 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:18:31,616 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:18:31,640 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:18:31,642 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:18:31,667 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:18:31,694 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:18:31,695 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:18:31,708 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:18:31,729 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:18:31,741 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:20:27,353 - root - INFO - Started parsing.
+2023-12-25 21:20:27,423 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:20:27,444 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:20:27,465 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:20:27,467 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:20:27,494 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:20:27,519 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:20:27,521 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:20:27,534 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:20:27,557 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:20:27,570 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:23:34,285 - root - INFO - Started parsing.
+2023-12-25 21:23:34,319 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:23:34,333 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:23:34,347 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:23:34,348 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:23:34,370 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:23:34,400 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:23:34,402 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:23:34,414 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:23:34,437 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:23:34,448 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:23:34,732 - root - INFO - Finished parsing the file.
+2023-12-25 21:23:34,732 - root - INFO - The script's execution took 0.447 seconds.
+2023-12-25 21:23:34,732 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-25 21:23:34,732 - root - INFO - There are 10 special R rules in the file.
+2023-12-25 21:23:34,732 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-25 21:23:34,732 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-25 21:23:34,732 - root - INFO - General information after the script's execution:
+2023-12-25 21:23:34,732 - root - INFO - The total number of substrings is 8681.
+2023-12-25 21:23:34,732 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-25 21:23:34,732 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-25 21:23:34,732 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-25 21:23:34,732 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-25 21:23:34,732 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-25 21:34:49,651 - root - INFO - Started parsing.
+2023-12-25 21:34:49,685 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:34:49,709 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:34:49,727 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:34:49,729 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:34:49,763 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:34:49,799 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:34:49,800 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:34:49,814 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:34:49,832 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:34:49,841 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:35:02,199 - root - INFO - Started parsing.
+2023-12-25 21:35:02,243 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:35:02,257 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:35:02,272 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:35:02,274 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:35:02,295 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:35:02,322 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:35:02,324 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:35:02,337 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:35:02,355 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:35:02,364 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:37:45,195 - root - INFO - Started parsing.
+2023-12-25 21:37:45,239 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:37:45,252 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:37:45,268 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:37:45,269 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:37:45,292 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:37:45,321 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:37:45,322 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:37:45,333 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:37:45,352 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:37:45,361 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:38:10,512 - root - INFO - Started parsing.
+2023-12-25 21:38:10,562 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:38:10,576 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:38:10,592 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:38:10,593 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:38:10,614 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:38:10,641 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:38:10,642 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:38:10,653 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:38:10,671 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:38:10,682 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:38:46,087 - root - INFO - Started parsing.
+2023-12-25 21:38:46,130 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:38:46,144 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:38:46,159 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:38:46,160 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:38:46,184 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:38:46,212 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:38:46,213 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:38:46,225 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:38:46,242 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:38:46,251 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:39:43,252 - root - INFO - Started parsing.
+2023-12-25 21:39:43,286 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-25 21:39:43,299 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-25 21:39:43,319 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-25 21:39:43,321 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:39:43,341 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-25 21:39:43,368 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-25 21:39:43,370 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-25 21:39:43,382 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-25 21:39:43,400 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-25 21:39:43,409 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-25 21:39:43,699 - root - INFO - Finished parsing the file.
+2023-12-25 21:39:43,699 - root - INFO - The script's execution took 0.447 seconds.
+2023-12-25 21:39:43,700 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-25 21:39:43,700 - root - INFO - There are 10 special R rules in the file.
+2023-12-25 21:39:43,700 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-25 21:39:43,700 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-25 21:39:43,700 - root - INFO - General information after the script's execution:
+2023-12-25 21:39:43,700 - root - INFO - The total number of substrings is 8681.
+2023-12-25 21:39:43,700 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-25 21:39:43,700 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-25 21:39:43,700 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-25 21:39:43,700 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-25 21:39:43,700 - root - INFO - 96.08% content rules remained after thresholding.

@@ -202,6 +202,8 @@ def log_info(start_time, end_time):
     logger.info(f'There were {removed_content} special case content rules that were removed.')
 
     logger.info('General information after the script\'s execution:')
+    logger.info(f'The total number of substrings is {total_sub_strings}.')
+    logger.info(f'{total_sub_strings - relevant_sub_strings} were removed after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
     logger.info(f'{relevant_sub_strings/total_sub_strings * 100 :.2f}% of the substrings remained after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
     logger.info(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the rules remained after thresholding.')
     logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre rules remained remained after thresholding.')
@@ -277,15 +279,33 @@ def main():
     else:
         print_exact_matches(exact_matches)
         
-    with open('../Data/length_histogram.csv', 'w') as csvfile:
+    with open('../Data/length_histogram.csv', 'w', newline='') as csvfile:
         headers = ['String Length', 'Count']
         result_list = []
         for length, count in length_histogram.items():
             result_list.append({'String Length': length, 'Count': count})
+        result_list.sort(key=lambda x: x['String Length'])
         writer = csv.DictWriter(csvfile, headers)
         writer.writeheader()
         writer.writerows(result_list)
-        
+
+    with open('../Data/threshold_histogram.csv', 'w', newline='') as csvfile:
+        bins = [2, 4, 8, 16, 32, 64, float('inf')]
+        counts = [0] * len(bins)
+        for length, num_sub_strings in length_histogram.items():
+            for i, bin_value in enumerate(bins):
+                if length <= bin_value:
+                    counts[i] += num_sub_strings
+        bins = ['<' + str(bins[i]) if i < len(bins) - 1 else 'ALL' for i in range(len(bins))]
+
+        headers = ['Threshold Size', 'Count']
+        result_list = []
+        for index, bin in enumerate(bins):
+            result_list.append({'Threshold Size':  bin, 'Count': counts[index]})
+        writer = csv.DictWriter(csvfile, headers)
+        writer.writeheader()
+        writer.writerows(result_list)
+
     logger.info(f'Finished parsing the file.')
     end_time = time.time()
     log_info(start_time, end_time)
