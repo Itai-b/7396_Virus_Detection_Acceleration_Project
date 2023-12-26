@@ -1,0 +1,133 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "libcuckoo",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-libcuckoo-Debug-17d86e7eae05f7ad3086.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "libcuckoo"
+				},
+				{
+					"build" : "libcuckoo/libcuckoo",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-libcuckoo.libcuckoo-Debug-14ee477329fb3e31517a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "libcuckoo/libcuckoo"
+				},
+				{
+					"build" : "libcuckoo/libcuckoo-c",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-libcuckoo.libcuckoo-c-Debug-2e2da2ffa1a811f6b9a1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "libcuckoo/libcuckoo-c"
+				},
+				{
+					"build" : "libcuckoo/tests",
+					"jsonFile" : "directory-libcuckoo.tests-Debug-14da213896ce53c6a471.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1.0"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "libcuckoo/tests"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Part B - Cuckoo Hash",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4
+					],
+					"name" : "libcuckoo",
+					"parentIndex" : 0
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "CMakeTarget::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CMakeTarget-Debug-f0d679cbd923ffe8d9b4.json",
+					"name" : "CMakeTarget",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "F:/Technion/Project_b/code/7396_Virus_Detection_Acceleration_Project/Part B - Cuckoo Hash/out/build/x64-debug",
+		"source" : "F:/Technion/Project_b/code/7396_Virus_Detection_Acceleration_Project/Part B - Cuckoo Hash"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
