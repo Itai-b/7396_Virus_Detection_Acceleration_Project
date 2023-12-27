@@ -1,24 +1,15 @@
-﻿# CMakeList.txt : CMake project for Part B - Cuckoo Hash, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
+project(YourProjectName)
 
-project ("Part B - Cuckoo Hash")
+# Set the C++ standard to C++11 (or any other version you prefer)
+set(CMAKE_CXX_STANDARD 11)
 
-# Add source to this project's executable.
-add_executable (CMakeTarget "test.cpp")
+# Link microsoft/Kuku library
+find_package(Kuku 2.1 REQUIRED)
 
-# Add subdirectory for LibCuckoo implementation
-add_subdirectory(./libcuckoo)
+# Add our source files
+add_executable(kukuEXE test.cpp)
 
-# Include directories for libcuckoo headers
-target_include_directories(CMakeTarget PRIVATE libcuckoo)
+# Link our executable with the Kuku library
+target_link_libraries(kukuEXE Kuku::kuku)
 
-# Link with libcuckoo library
-target_link_libraries(CMakeTarget cuckoohash_map)
-
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET CMakeTarget PROPERTY CXX_STANDARD 20)
-endif()
-
-# TODO: Add tests and install targets if needed.

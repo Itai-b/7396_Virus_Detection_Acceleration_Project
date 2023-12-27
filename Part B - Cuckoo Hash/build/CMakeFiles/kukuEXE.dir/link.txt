@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/kukuEXE.dir/test.cpp.o  -o kukuEXE  /usr/local/lib/libkuku-2.1.a 
