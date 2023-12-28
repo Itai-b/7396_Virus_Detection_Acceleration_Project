@@ -6,14 +6,3 @@ Threshold Size,Count
 <32,8151
 <64,8606
 ALL,8681
-,
-,
-,
-Threshold Size,Precentage
-<2,32.6%
-<4,44.8%
-<8,61.5%
-<16,82.7%
-<32,93.9%
-<64,99.1%
-ALL,100.0%

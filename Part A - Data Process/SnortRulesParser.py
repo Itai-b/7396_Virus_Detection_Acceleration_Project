@@ -172,13 +172,26 @@ def analyze_and_threshold(data: list) -> list:
 
     return thresholded_data
 
+def translate_exact_matches_to_hex(exact_matches: list(tuple([int, str, list]))):
+    """
+        An auxiliary function used to translate exact_matches to hex.
+    """
+    
+    for exact_match in exact_matches:
+        for i, char_list in enumerate(exact_match[2]):
+            for j, char in enumerate(char_list):
+                exact_match[2][i][j] = hex(ord(char))
+    
+    return exact_matches
+        
+    logger.info(f"Translated the exact-matches to hex.")
 
 def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list]))):
     """
         An auxiliary function used to save exact_matches to a json file.
     """
     
-    with open('..\Data\exact_matches.json', 'w') as file:
+    with open("../Data/exact_matches.json", 'w') as file:
         for exact_match in exact_matches:
             json.dump(exact_match, file, indent=None)
             file.write('\n')
@@ -208,9 +221,6 @@ def log_info(start_time, end_time):
     logger.info(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the rules remained after thresholding.')
     logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre rules remained remained after thresholding.')
     logger.info(f'{relevant_content / total_content * 100 :.2f}% content rules remained after thresholding.')
-    
-
-
 
 def main():
     """
@@ -273,6 +283,7 @@ def main():
                 'pcre': REGEX_RULE_PATTERN}
     
     exact_matches = parse_file(file_path, patterns)
+    exact_matches = translate_exact_matches_to_hex(exact_matches)
     
     if save_as_json:
         save_exact_matches_as_json(exact_matches)

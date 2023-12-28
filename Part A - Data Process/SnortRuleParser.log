@@ -2937,3 +2937,128 @@
 2023-12-25 21:39:43,700 - root - INFO - 95.47% of the rules remained after thresholding.
 2023-12-25 21:39:43,700 - root - INFO - 91.48% pcre rules remained remained after thresholding.
 2023-12-25 21:39:43,700 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-27 23:38:35,195 - root - INFO - Started parsing.
+2023-12-27 23:38:35,255 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-27 23:38:35,264 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-27 23:38:35,275 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-27 23:38:35,277 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:38:35,291 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-27 23:38:35,309 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:38:35,311 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-27 23:38:35,320 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-27 23:38:35,331 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-27 23:38:35,339 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-27 23:38:35,626 - root - INFO - Saved the exact-matches as .json file under the path ..\Data\exact_matches.json.
+2023-12-27 23:38:35,641 - root - INFO - Finished parsing the file.
+2023-12-27 23:38:35,642 - root - INFO - The script's execution took 0.445 seconds.
+2023-12-27 23:38:35,642 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-27 23:38:35,643 - root - INFO - There are 10 special R rules in the file.
+2023-12-27 23:38:35,643 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-27 23:38:35,644 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-27 23:38:35,644 - root - INFO - General information after the script's execution:
+2023-12-27 23:38:35,644 - root - INFO - The total number of substrings is 8681.
+2023-12-27 23:38:35,645 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-27 23:38:35,645 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-27 23:38:35,646 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-27 23:38:35,646 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-27 23:38:35,647 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-27 23:39:31,844 - root - INFO - Started parsing.
+2023-12-27 23:39:31,906 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-27 23:39:31,915 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-27 23:39:31,927 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-27 23:39:31,928 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:39:31,942 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-27 23:39:31,956 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:39:31,958 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-27 23:39:31,968 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-27 23:39:31,982 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-27 23:39:31,992 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-27 23:39:32,328 - root - INFO - Saved the exact-matches as .json file under the path ..\Data\exact_matches.json.
+2023-12-27 23:39:32,342 - root - INFO - Finished parsing the file.
+2023-12-27 23:39:32,343 - root - INFO - The script's execution took 0.497 seconds.
+2023-12-27 23:39:32,343 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-27 23:39:32,344 - root - INFO - There are 10 special R rules in the file.
+2023-12-27 23:39:32,345 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-27 23:39:32,346 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-27 23:39:32,347 - root - INFO - General information after the script's execution:
+2023-12-27 23:39:32,348 - root - INFO - The total number of substrings is 8681.
+2023-12-27 23:39:32,349 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-27 23:39:32,350 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-27 23:39:32,350 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-27 23:39:32,351 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-27 23:39:32,352 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-27 23:40:52,110 - root - INFO - Started parsing.
+2023-12-27 23:40:52,200 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-27 23:40:52,208 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-27 23:40:52,219 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-27 23:40:52,221 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:40:52,236 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-27 23:40:52,250 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:40:52,252 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-27 23:40:52,259 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-27 23:40:52,273 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-27 23:40:52,280 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-27 23:40:52,589 - root - INFO - Saved the exact-matches as .json file under the path ..\Data\exact_matches.json.
+2023-12-27 23:40:52,600 - root - INFO - Finished parsing the file.
+2023-12-27 23:40:52,601 - root - INFO - The script's execution took 0.489 seconds.
+2023-12-27 23:40:52,601 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-27 23:40:52,601 - root - INFO - There are 10 special R rules in the file.
+2023-12-27 23:40:52,602 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-27 23:40:52,602 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-27 23:40:52,603 - root - INFO - General information after the script's execution:
+2023-12-27 23:40:52,603 - root - INFO - The total number of substrings is 8681.
+2023-12-27 23:40:52,604 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-27 23:40:52,604 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-27 23:40:52,605 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-27 23:40:52,606 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-27 23:40:52,606 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-27 23:41:28,205 - root - INFO - Started parsing.
+2023-12-27 23:41:28,294 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-27 23:41:28,306 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-27 23:41:28,316 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-27 23:41:28,318 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:41:28,334 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-27 23:41:28,351 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:41:28,352 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-27 23:41:28,361 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-27 23:41:28,373 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-27 23:41:28,381 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-27 23:41:28,688 - root - INFO - Saved the exact-matches as .json file under the path ..\Data\exact_matches.json.
+2023-12-27 23:41:28,703 - root - INFO - Finished parsing the file.
+2023-12-27 23:41:28,703 - root - INFO - The script's execution took 0.497 seconds.
+2023-12-27 23:41:28,704 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-27 23:41:28,705 - root - INFO - There are 10 special R rules in the file.
+2023-12-27 23:41:28,706 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-27 23:41:28,707 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-27 23:41:28,708 - root - INFO - General information after the script's execution:
+2023-12-27 23:41:28,708 - root - INFO - The total number of substrings is 8681.
+2023-12-27 23:41:28,709 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-27 23:41:28,710 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-27 23:41:28,710 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-27 23:41:28,711 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-27 23:41:28,712 - root - INFO - 96.08% content rules remained after thresholding.
+2023-12-27 23:42:17,288 - root - INFO - Started parsing.
+2023-12-27 23:42:17,348 - root - INFO - the following pcre pattern with special R rule in line 1155 was discarded: /(&|#|\+|!)/R
+2023-12-27 23:42:17,358 - root - INFO - the following pcre pattern with special R rule in line 1484 was discarded: /^.{27}/Rs
+2023-12-27 23:42:17,368 - root - INFO - the following pcre pattern with special R rule in line 1723 was discarded: /^.{27}/R
+2023-12-27 23:42:17,371 - root - INFO - the following pcre pattern with special R rule in line 1739 was discarded: /^(\x75|\x2d|\x2f|\x73|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:42:17,386 - root - INFO - the following pcre pattern with special R rule in line 1927 was discarded: /^.{0,100}\xFF[\xE1\xE2\xED\xFE]\x00[\x00\x01]/Rs
+2023-12-27 23:42:17,406 - root - INFO - the following pcre pattern with special R rule in line 2149 was discarded: /^(\x75|\x2d|\x2f|\xa2|\x2e|\x24|\x74)/Rs
+2023-12-27 23:42:17,408 - root - INFO - the following pcre pattern with special R rule in line 2166 was discarded: /^.{4}/R
+2023-12-27 23:42:17,417 - root - INFO - the following pcre pattern with special R rule in line 2279 was discarded: /T.*?T.*?Y.*?P.*?R.*?O.*?M.*?P.*?T/Ri
+2023-12-27 23:42:17,431 - root - INFO - the following pcre pattern with special R rule in line 2472 was discarded: /^[^>]*\x2f\x2f\d{1,3}\x2e\d{1,3}\x2e\d{1,3}\x2e\d{1,3}/Rs
+2023-12-27 23:42:17,439 - root - INFO - the following pcre pattern with special R rule in line 2556 was discarded: /[^\x0d\x0a\x09\x20-\x7e]{4}/R
+2023-12-27 23:42:17,701 - root - INFO - Saved the exact-matches as .json file under the path ..\Data\exact_matches.json.
+2023-12-27 23:42:17,713 - root - INFO - Finished parsing the file.
+2023-12-27 23:42:17,714 - root - INFO - The script's execution took 0.425 seconds.
+2023-12-27 23:42:17,714 - root - INFO - There are 4645 content rules and 716 pcre rules in the file.
+2023-12-27 23:42:17,715 - root - INFO - There are 10 special R rules in the file.
+2023-12-27 23:42:17,716 - root - INFO - There were 371 special case pcre rules that were removed.
+2023-12-27 23:42:17,716 - root - INFO - There were 2406 special case content rules that were removed.
+2023-12-27 23:42:17,717 - root - INFO - General information after the script's execution:
+2023-12-27 23:42:17,717 - root - INFO - The total number of substrings is 8681.
+2023-12-27 23:42:17,718 - root - INFO - 2827 were removed after thresholding t = 2.
+2023-12-27 23:42:17,718 - root - INFO - 67.43% of the substrings remained after thresholding t = 2.
+2023-12-27 23:42:17,719 - root - INFO - 95.47% of the rules remained after thresholding.
+2023-12-27 23:42:17,720 - root - INFO - 91.48% pcre rules remained remained after thresholding.
+2023-12-27 23:42:17,720 - root - INFO - 96.08% content rules remained after thresholding.
