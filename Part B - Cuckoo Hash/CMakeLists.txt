@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(Kuku 2.1 REQUIRED)
 
 # Add our source files
-add_executable(kukuEXE test.cpp)
+add_executable(kukuEXE test.cpp utilities.cpp)
 
 # Link our executable with the Kuku library
 target_link_libraries(kukuEXE Kuku::kuku)

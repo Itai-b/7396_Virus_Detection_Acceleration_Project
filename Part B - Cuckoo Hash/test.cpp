@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <iostream>
 #include <kuku/kuku.h>
+#include <utilities.h>
 
 using namespace std;
 using namespace kuku;
@@ -23,7 +24,7 @@ void print_table(const KukuTable& table)
     {
         const auto& item = table.table(i);
         cout << setw(5)
-            << i << ": " << setw(5) << std::to_string(get_high_word(item)) << "," << std::to_string(get_low_word(item))
+            << i << ": " << setw(5) << Utilities::uint64ToString(get_high_word(item)) << "," << Utilities::uint64ToString(get_low_word(item))
             << ((i % col_count == col_count - 1) ? "\n" : "\t");
     }
 
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
 
         for (uint64_t i = 0; i < 20; i++)
         {
-            if (!table.insert(make_item("aaa", "bb")))
+            if (!table.insert(make_item(Utilities::stringToUint64("aaa"), Utilities::stringToUint64("bb"))))
             {
                 cout << "Insertion failed: round_counter = " << round_counter << ", i = " << i << endl;
                 cout << "Inserted successfully " << round_counter * 20 + i << " items" << endl;
