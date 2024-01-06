@@ -1,0 +1,24 @@
+Basic Set-up:
+	Open an empty Directory
+	Write "wsl" in folder route
+	In WSL screen:
+		git clone https://github.com/Itai-b/7396_Virus_Detection_Acceleration_Project
+
+Running Part A:
+	### FILL HERE
+
+Running Part B:
+	WINDOWS:
+		install_libcuckoo.bat
+	
+	WSL / LINUX:
+		chmod +x install_libcuckoo.sh
+		./install_libcuckoo.sh
+		
+		# if doesn't work:
+			sudo apt-get install dos2unix 
+			dos2unix install_libcuckoo_unix.sh
+			./install_libcuckoo_unix.sh
+			
+		# if doesn't work:
+			sudo apt-get install ninja-build
