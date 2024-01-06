@@ -36,3 +36,8 @@
 /partA - Data Process/__pycache__/ExactMatchExtractor.cpython-311.pyc
 *.pyc
 Part A - Data Process/SnortRulesParsercp.py
+Part B - libcuckoo version/cuckoohash/.vs
+Part B - libcuckoo version/cuckoohash/install
+Part B - libcuckoo version/cuckoohash/libcuckoo
+Part B - libcuckoo version/cuckoohash/out
+

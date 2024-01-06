@@ -1,0 +1,67 @@
+################INSTALL LIBCUCKOO################
+VS 2022 ->  Create a new project (cmake project)
+winkey (search): x64 Native Tools C Ommand Prompt (for VS <relevant_year>)
+cd <relevant_folder> (if in a different DISC then C:// use: 'cd /d <relevant_folder>'
+git clone github.com/efficient/libcuckoo
+mkdir install
+cd libcuckoo
+cmake -DCMAKE_INSTALL_PREFIX=../install -G Ninja ..
+# until here we configured the the build configurations
+
+################## CMakeLists.txt in main project directory ##################
+
+# CMakeList.txt : Top-level CMake project file, do global configuration
+# and include sub-projects here.
+#
+cmake_minimum_required (VERSION 3.8)
+
+# Enable Hot Reload for MSVC compilers if supported.
+if (POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif()
+
+project ("<project_name>")
+
+add_executable (<project_name> "<main>.cpp")
+target_include_directories(<project_name> PRIVATE ${CMAKE_SOURCE_DIR}/libcuckoo)
+# FOR LATER: target_include_directories(<project_name> PRIVATE ${CMAKE_LIBRARY_PATH}/include)
+
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET <project_name> PROPERTY CXX_STANDARD 20)
+endif()
+
+# Include sub-projects.
+add_subdirectory ("libcuckoo")
+# FOR LATER: add_subdirectory ("src")
+
+
+################CMakePresets.json################
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "cacheVariables": {
+              "CMAKE_C_COMPILER": "cl.exe",
+              "CMAKE_CXX_COMPILER": "cl.exe",
+              "CMAKE_LIBRARY_PATH": "${sourceDir}/install" ######ADD THIS#####
+            },
+            # ... file continues ... #
+
+
+################IN x64 Native Command Prompt################
+cd libcuckoo
+cmake -DCMAKE_INSTALL_PREFIX=../install -G Ninja ..
+cmake --build . --config Release --target install
+
+################RUN LIBCUCKOO WITH main.cpp################
+Open the alledged project in Visual Studio
+Configure compiler regularly (next to the run icon) <project_name>.exe
+Build all
+RUN.
