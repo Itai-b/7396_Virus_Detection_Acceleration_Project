@@ -8,17 +8,27 @@ Running Part A:
 	### FILL HERE
 
 Running Part B:
-	WINDOWS:
-		install_libcuckoo.bat
+	WITH VS 2022:
+		Open x64 Native Tools Command Prompt for Visual Studio 2022
+		Navigate to the workdir with 'cd /d <path>'
+		Run in cmd: 'install_libcuckoo.bat'
+		Open the cuckoohash folder in VS 2022 (right click -> open with Visual Studio)
+		in 'src/CMakeLists.txt', comment the following line(s):
+			'# NECESSARY TO RUN WITH UNIX SCRIPT, REMOVE IF USING VS 2022.'
+			'target_link_libraries(cuckoohash pthread)'
+		If Intelisese suggests to generate cache, press Generate
+		Choose 'cuckoohash.exe' (src\cuckoohash.exe) as Start-up item
+		Build and run
 	
 	WSL / LINUX:
-		chmod +x install_libcuckoo.sh
-		./install_libcuckoo.sh
+		Open WSL in workdir (cuckoohash)
+		sudo ./run_partb_unix.sh
 		
 		# if doesn't work:
 			sudo apt-get install dos2unix 
-			dos2unix install_libcuckoo_unix.sh
-			./install_libcuckoo_unix.sh
+			chmod +x run_partb_unix.sh
+			sudo dos2unix run_partb_unix.sh
+			sudo ./run_partb_unix.sh
 			
 		# if doesn't work:
 			sudo apt-get install ninja-build

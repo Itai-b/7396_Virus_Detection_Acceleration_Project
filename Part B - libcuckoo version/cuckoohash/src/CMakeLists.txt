@@ -6,6 +6,8 @@
 add_executable (cuckoohash "cuckoohash.cpp")
 #target_include_directories(cuckoohash PRIVATE ${CMAKE_SOURCE_DIR}/libcuckoo)
 target_include_directories(cuckoohash PRIVATE ${CMAKE_LIBRARY_PATH}/include)
+
+# NECESSARY TO RUN WITH UNIX SCRIPT, REMOVE IF USING VS 2022.
 target_link_libraries(cuckoohash pthread)
 
 
