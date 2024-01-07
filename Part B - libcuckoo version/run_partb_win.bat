@@ -9,13 +9,14 @@ REM Run the libcuckoo installation script
 .\install_libcuckoo_win.bat
 
 REM Set up variables
-	REM set "WORK_DIR=%~dp0"
-	REM set "SUBDIR=cuckoohash"
-	REM set "LIBDIR=libcuckoo"
-	REM set "INSTALLDIR=install"
+set "WORK_DIR=%~dp0"
+set "SUBDIR=cuckoohash"
+set "LIBDIR=libcuckoo"
+set "INSTALLDIR=install"
 
 REM Prepare the build folder
 cd /d "%WORK_DIR%\%SUBDIR%" || exit /b 1
+rmdir -rf build
 mkdir build
 cd build
 
