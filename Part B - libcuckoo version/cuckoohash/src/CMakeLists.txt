@@ -3,12 +3,12 @@
 #
 
 # Add source to this project's executable.
-add_executable (cuckoohash "cuckoohash.cpp")
+add_executable (cuckoohash "main.cpp" "ExactMatches.h" "Substring.h")
 #target_include_directories(cuckoohash PRIVATE ${CMAKE_SOURCE_DIR}/libcuckoo)
 target_include_directories(cuckoohash PRIVATE ${CMAKE_LIBRARY_PATH}/include)
 
 # NECESSARY TO RUN WITH UNIX SCRIPT, REMOVE IF USING VS 2022.
-target_link_libraries(cuckoohash pthread)
+#target_link_libraries(cuckoohash pthread)
 
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
