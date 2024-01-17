@@ -1,18 +1,23 @@
 #!/bin/bash
 
-# Set up the libcuckoo installation script for running
-chmod +x install_libcuckoo_unix.sh
-dos2unix install_libcuckoo_unix.sh
-
-# Run the libcuckoo installation script, which sets up the following:
+# Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SUBDIR=cuckoohash
-LIBDIR=libcuckoo
 INSTALLDIR=install
 JSONNAME = exact_matches_hex.json
 COPYJSONFROM = ../Data
 CPYJSONTO = cuckoohash/src
+
+# Set up the installation scripts for running
+chmod +x install_libcuckoo_unix.sh
+dos2unix install_libcuckoo_unix.sh
+chmod +x install_nlohmann_json_unix.sh
+dos2unix install_nlohmann_json_unix.sh
+
+
+# Run the installation scripts:
 ./install_libcuckoo_unix.sh
+./install_nlohmann_json_unix.sh
 
 if [ -d "$WORK_DIR/$SUBDIR" ]; then
 	echo "$WORK_DIR/$SUBDIR not found."
@@ -35,7 +40,7 @@ rm -rf build
 mkdir build
 cd build
 
-# Configure cmake
+# Configure cmake library path, which is shown on CMakePresets.json
 cmake -DCMAKE_LIBRARY_PATH=../install ..
 
 # Build and run the project

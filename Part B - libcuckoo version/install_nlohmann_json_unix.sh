@@ -4,18 +4,18 @@
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # Set the GitHub repository URL
-REPO_URL=https://github.com/efficient/libcuckoo.git
+REPO_URL=https://github.com/nlohmann/json
 
 # Set the subdirectory name
 SUBDIR=cuckoohash
 
 # Set the library and installation directories (in subdirectory)
-LIBDIR=libcuckoo
+LIBDIR=nlohmann_json
 INSTALLDIR=install
 
 # Check if the installation directory exists
-if [ -d "$WORK_DIR/$SUBDIR/$INSTALLDIR/include/libcuckoo" ]; then
-    echo "libcuckoo is already installed in $WORK_DIR/$SUBDIR/$INSTALLDIR. Skipping installation."
+if [ -d "$WORK_DIR/$SUBDIR/$INSTALLDIR/include/nlohmann" ]; then
+    echo "nlohmann::json is already installed in $WORK_DIR/$SUBDIR/$INSTALLDIR. Skipping installation."
 else
     # Create the subdirectory if it doesn't exist
     mkdir -p "$WORK_DIR/$SUBDIR"
@@ -42,5 +42,5 @@ else
     # Delete CMake cache after installation
     rm -f CMakeCache.txt
 
-    echo "libcuckoo has been successfully cloned and installed."
+    echo "nlohmann::json has been successfully cloned and installed."
 fi
