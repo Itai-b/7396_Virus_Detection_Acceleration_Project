@@ -1,5 +1,5 @@
 Questions for Alon:
-
+(PART A)
 	Q1: How should we represent the exact match string(s)?
 		For example: In content we may have: |00 00 72 ...|, should we keep an array of each char ([' ', ',',...]),
 			including special chars like '00'? Or should we keep them in an array of int ([00, 72, ...]).
@@ -53,4 +53,17 @@ Questions for Alon:
 		after the previous content match in the rule. It enforces that the two content matches are adjacent to each other in the payload.
 		Should we take that into consideration when creating the exact-matches list or just ignore it?
 	A:	Ignore that.
+	
+===============================================================================================================================================
+(PART B)	
+	Q1: What exactly should we store in the hash table? Can we store our selfmade 'Substring' class that also includes the type & line number of the relevant rule?
+		Or should we keep it as small as possible and keep just the substring bytes chunks (memory saving, but then we can't say which rule was detected).
+	A:
+	
+	Q2: What do we do with strings.len() < L? Should we pad with 0's (*but then how should we match it with the incoming input stream that isn't buffed? should we keep a pointer to where we started buffing?)
+		Should we just ignore all substrings.len() < L? but then we miss a lot of rules.
+	A:
+	
+	Q3: Which sizes of hashtable should we pre-define? we thought N * exact_matches, where N = {1, 2, 4, 8, 16}
+	A:
 	
