@@ -41,7 +41,7 @@ mkdir build
 cd build
 
 # Configure cmake library path, which is shown on CMakePresets.json
-cmake -DCMAKE_LIBRARY_PATH=../install ..
+cmake -DCMAKE_LIBRARY_PATH="../install" ..
 
 # Build and run the project
 make all

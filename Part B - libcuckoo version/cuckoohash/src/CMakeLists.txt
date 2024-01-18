@@ -2,6 +2,8 @@
 # project specific logic here.
 # find_package(nlohmann_json 3.2.0 REQUIRED) #TO CHECK
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+
 # Add source to this project's executable.
 add_executable (cuckoohash "main.cpp" "ExactMatches.h" "Substring.h")
 #target_include_directories(cuckoohash PRIVATE ${CMAKE_SOURCE_DIR}/libcuckoo)

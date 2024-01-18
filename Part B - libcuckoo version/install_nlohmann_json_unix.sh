@@ -35,7 +35,7 @@ else
 
     # Build and install libcuckoo
     cd "$WORK_DIR/$SUBDIR/$LIBDIR"
-    cmake -DCMAKE_INSTALL_PREFIX="$WORK_DIR/$SUBDIR/$INSTALLDIR"
+    cmake -DCMAKE_INSTALL_PREFIX="$WORK_DIR/$SUBDIR/$INSTALLDIR" -DJSON_BuildTests=OFF
     make all
     make install
 
