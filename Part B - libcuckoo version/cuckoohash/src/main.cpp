@@ -10,7 +10,7 @@
 #include <chrono>
 #include "ExactMatches.h"
 #include "Parser.h"
-//#include "Substring.h"
+#include "Substring.h"
 
 //using namespace std;
 using json = nlohmann::json;
@@ -25,25 +25,29 @@ using Substring8 = Substring<uint8_t>;
 //       //std::string line = "[12, \"pcre\", [[\"0x00\", \"0x00\", \"0x00\", \"0x65\", \"0x63\", \"0x72\", \"0x61\", \"0x73\", \"0x68\", \"0x65\", \"0x00\"], [\"0x73\", \"0x65\", \"0x72\", \"0x76\", \"0x65\", \"0x72\"], [\"0x6f\", \"0x6e\", \"0x2d\", \"0x6c\", \"0x69\", \"0x6e\", \"0x65\", \"0x2e\", \"0x2e\", \"0x2e\"]]]";
 // 2) From each line (/rule) extract exact matches
 // 3) For each desired L = {2, 4, 8}:
-//      A) For each desi`red G = {1, 2, 4, L}:
+//      A) For each desired G = {1, 2, 4, L}:
 //      B) Make 100 trials of inserting RANDOMALLY to the cuckoohash and check throughput
 // 4) Store data and plot graphs
 
+template <typename T>
+void insertToCuckoo(const std::vector<Substring<T>>& substrings, libcuckoo::cuckoohash_map<T, std::size_t>& cuckoo_hash) {
+	for (const auto& iter : substrings) {
+		cuckoo_hash.insert(iter.substring, 1);
+	}
+}
 
-int main() {
+int main(int argc, char* argv[]) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    // TODO: when writing the unix_script, main will take argv argc of the full file path, GIVEN BY THE UNIX SCRIPT (bash: ./main_exe "$WORKDIR/$SUBDIR/...")
-    std::string filename = "exact_matches_hex.json";
+    std::string file_path = "exact_matches_hex.json";
+    if (argc >= 2) {
+		file_path = argv[1];
+	}
+    
     ExactMatches exact_matches;
-    parseFile(filename, exact_matches);
-
+    parseFile(file_path, exact_matches);
 
     std::set<Substring64> substrings;
-    //TODO: write an iterator for class ExactMatches
-    //  OR: GET RID OF EXACTMATCHE*S* class, change name to ExactMatch.h because EXACTMATCHE*S* is just a vector (redundant implementation)
-    // if so, change also parser accordingly (or should we keep it that way for eNcApSuLatIon
-    // i mean, vector already allocates and frees what it uses...
     for (auto it = exact_matches.exact_matches->begin(); it != exact_matches.exact_matches->end(); ++it)
     {
         std::string hexString = (*it)->getExactMatch().substr(2); // clean "0x"
@@ -67,6 +71,12 @@ int main() {
 
     std::cout << std::dec << shuffledSubstrings.size() << " Substring(s) have been produced." << std::endl;
 
+    // Create cuckoo hash map
+    libcuckoo::cuckoohash_map<uint64_t, std::size_t> cuckoo_hash;
+    cuckoo_hash.reserve(shuffledSubstrings.size());
+    insertToCuckoo(shuffledSubstrings, cuckoo_hash);
+
+    std::cout << "The capacity of the hash is: " << cuckoo_hash.load_factor() << std::endl;
 
     auto end_time = std::chrono::high_resolution_clock::now();
 

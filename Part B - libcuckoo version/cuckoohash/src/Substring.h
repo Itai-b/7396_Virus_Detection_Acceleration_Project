@@ -80,7 +80,6 @@ public:
 		return os;
 	}
 
-	template <typename T>
 	static void extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, \
 		size_t G = _SUBSTRING_DEFAULT_GAP, size_t L = sizeof(T)) {
 		size_t len = hexString.size();

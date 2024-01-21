@@ -36,7 +36,7 @@ void parseLine(std::string line, ExactMatches& exact_matches) {
     }
 }
 
-int parseFile(std::string file_path, ExactMatches& exact_matches) {
+void parseFile(std::string file_path, ExactMatches& exact_matches) {
     try {
         std::ifstream input_file(file_path);
 

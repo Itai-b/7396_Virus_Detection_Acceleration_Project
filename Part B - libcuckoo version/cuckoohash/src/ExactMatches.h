@@ -1,13 +1,12 @@
 #ifndef _EXACTMATCHES_H
 #define _EXACTMATCHES_H
 
-#include "Substring.h"
 #include <vector>
 #include <string>
 #include <iostream>
 
 
-typedef enum RuleType {CONTENT = 1, PCRE = 2, OTHER = 0} rule_type;
+enum RuleType {CONTENT = 1, PCRE = 2, OTHER = 0};
 
 // ExactMatch class
 class ExactMatch {
@@ -19,7 +18,7 @@ public:
 		: rule_id(rule_id), exact_match(exact_match) {
 		setRuleType(rule_type);
 	};
-	ExactMatch(int rule_id, rule_type rule_type, std::string exact_match) 
+	ExactMatch(int rule_id, RuleType rule_type, std::string exact_match) 
 		: rule_id(rule_id), rule_type(rule_type), exact_match(exact_match) {};
 	~ExactMatch() = default;
 
@@ -32,7 +31,7 @@ public:
 	
 private:
 	int rule_id;
-	rule_type rule_type;
+	RuleType rule_type;
 	std::string exact_match;
 };
 
