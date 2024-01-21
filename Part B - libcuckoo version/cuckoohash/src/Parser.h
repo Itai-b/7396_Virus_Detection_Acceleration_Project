@@ -2,47 +2,59 @@
 #define _PARSER_H
 
 #include "ExactMatches.h"
+#include <nlohmann/json.hpp>
 #include <string>
 #include <cstdint>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 
-//template <typename T, std::size_t G>
-//Substring<T> ExtractSubstring(std::vector<std::string> values) {
-//    for (const auto& value : values) {
-//        if 
-//    }
-//}
+void parseLine(std::string line, ExactMatches& exact_matches) {
+    nlohmann::json parsed_line = nlohmann::json::parse(line);
+    int rule_id = parsed_line[0];
+    std::string rule_type = parsed_line[1];
+    std::vector<std::vector<std::string>> signatures = parsed_line[2];
 
-template <typename T, std::size_t G>
-void parseLine(std::string line, ExactMatches* exact_matches) {
-    int rule_id;
-    std::string rule_type;
-    vector<std::string> raw_matches;
+    std::string match = "0x";
 
-    // clean '[' and ']' marks.
-    line = line.substr(1, line.size() - 2);
-
-    // parsing the line as a stringstream.
-    std::stringstream ss(line);
-    std::vector<std::string> values;
-
-    while (std::getline(ss, line, ',')) {
-        size_t start = line.find_first_not_of(" \t\n\r\f\v");
-        size_t end = line.find_last_not_of(" \t\n\r\f\v");
-        if (start != std::string::npos && end != std::string::npos) {
-            values.push_back(line.substr(start, end - start + 1));
+    int i = 0;
+    for (const auto& signature : signatures ) {
+        // for every exact match string
+        int j = 0;
+        for (const auto& hex : signature) {
+            std::string value_to_concat = "";
+            if ((hex.substr(0,2) == "0x")) {
+                value_to_concat = hex.substr(2); 
+            }
+            match = match + value_to_concat;
+            ++j;
         }
-    }
-    
-    rule_id = values[0];
-    rule_type = values[1].substr(1, values[1].size() - 2);
-
-
-    // Print the split values
-    for (const auto& value : values) {
-        std::cout << value << std::endl;
+        //insert exact_match to ExactMatches.
+        exact_matches.insert(ExactMatch(rule_id, rule_type, match));
+        ++i;
+        match = "0x";
     }
 }
+
+int parseFile(std::string file_path, ExactMatches& exact_matches) {
+    try {
+        std::ifstream input_file(file_path);
+
+        if (!input_file.is_open()) {
+            throw std::runtime_error("Error opening the file.");
+        }
+
+        std::string line;
+        while(std::getline(input_file, line)) {
+            parseLine(line, exact_matches);
+        }
+
+        input_file.close();
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
+}
+
 
 #endif // !_PARSER_H
