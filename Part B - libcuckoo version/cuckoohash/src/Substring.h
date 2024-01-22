@@ -9,6 +9,13 @@
 
 #define _SUBSTRING_DEFAULT_GAP 1
 
+/**
+ * A string of L=sizeof(T) chars, represented as an unsigned int
+ *
+ * @tparam T the type of the unsigned int which will represent the substring,
+ * the caller must use an unsigned int which correlates to the L chosen,
+ * i.e., T = {uint8_t, uint16_t, uint32_t, uint64_t,...} for L = {1, 2, 4, 8,...} respectively.
+ */
 template <typename T>
 class Substring {
 public:

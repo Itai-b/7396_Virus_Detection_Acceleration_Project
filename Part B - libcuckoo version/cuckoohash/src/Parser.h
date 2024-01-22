@@ -9,6 +9,13 @@
 #include <fstream>
 #include <iomanip>
 
+/**
+ * Parse a line in 'exact_matches_hex.json' to extract items of class ExactMatch.
+ *
+ * @param line string representing a line in the parsed .json file
+ * @param exact_matches reference to a member of class ExactMaches,
+ * that the results of the parsing will be inserted to
+ */
 void parseLine(std::string line, ExactMatches& exact_matches) {
     nlohmann::json parsed_line = nlohmann::json::parse(line);
     int rule_id = parsed_line[0];
@@ -36,6 +43,13 @@ void parseLine(std::string line, ExactMatches& exact_matches) {
     }
 }
 
+ /**
+  * Parse a line in 'exact_matches_hex.json' to extract items of class ExactMatch.
+  *
+  * @param line string representing a line in the parsed .json file
+  * @param exact_matches reference to a member of class ExactMaches,
+  * that the results of the parsing will be inserted to
+  */
 void parseFile(std::string file_path, ExactMatches& exact_matches) {
     try {
         std::ifstream input_file(file_path);
@@ -55,6 +69,5 @@ void parseFile(std::string file_path, ExactMatches& exact_matches) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 }
-
 
 #endif // !_PARSER_H
