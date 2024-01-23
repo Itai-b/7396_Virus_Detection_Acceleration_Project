@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Should fix clock skews
+# sudo ntpdate -s time.nist.gov
+
 # Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SUBDIR=cuckoohash
