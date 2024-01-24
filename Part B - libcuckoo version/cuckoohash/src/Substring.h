@@ -7,7 +7,7 @@
 #include <iostream>
 #include <iomanip>
 
-#define _SUBSTRING_DEFAULT_GAP 1
+#define SUBSTRING_DEFAULT_GAP 1
 
 /**
  * A string of L=sizeof(T) chars, represented as an unsigned int
@@ -29,7 +29,7 @@ public:
 	T getSubstring() { return this->substring; }
 	void setSubstring(T substring) { this->substring = substring; }
 	
-	Substring <T> operator=(const Substring<T>& other);
+	Substring<T> operator=(const Substring<T>& other);
 	bool operator<(const Substring<T>& other) const;
 	bool operator>(const Substring<T>& other) const;
 	bool operator>=(const Substring<T>& other) const;
@@ -40,7 +40,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Substring<T>& substring);
 
 	static void extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, \
-		size_t G = _SUBSTRING_DEFAULT_GAP, size_t L = sizeof(T));
+		std::size_t G = SUBSTRING_DEFAULT_GAP, std::size_t L = sizeof(T));
 
 private:
 	static uint8_t hexCharToInt(char hexChar);
@@ -63,8 +63,8 @@ private:
 template<typename T>
 Substring<T>::Substring(std::string hexString) {
 	substring = 0;
-	size_t len = hexString.size();
-	for (size_t i = 0; i < len; i++) {
+	std::size_t len = hexString.size();
+	for (std::size_t i = 0; i < len; i++) {
 		// since a char in hexString is only 1 hex, it is half a byte => 4 bits shift only
 		substring = (substring << 4) | hexCharToInt(hexString[i]);
 	}
@@ -110,8 +110,8 @@ Substring<T> Substring<T>::operator=(const Substring<T>& other) {
 
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
-	size_t iterations = sizeof(T);
-	for (size_t i = iterations; i > 0; --i) {
+	std::size_t iterations = sizeof(T);
+	for (std::size_t i = iterations; i > 0; --i) {
 		uint8_t current_byte = (substring.substring >> ((i - 1) * 8)) & 0xFF;
 		os << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(current_byte) << " ('";
 		if (isprint(current_byte)) {
@@ -127,9 +127,9 @@ std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
 }
 
 template <typename T>
-void Substring<T>::extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, size_t G, size_t L) {
-	size_t len = hexString.size();
-	for (size_t i = 0; i < len; i += G * 2) {
+void Substring<T>::extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, std::size_t G, std::size_t L) {
+	std::size_t len = hexString.size();
+	for (std::size_t i = 0; i < len; i += G * 2) {
 		std::string substring = hexString.substr(i, L * 2);
 
 		// Pad with zeros if needed
