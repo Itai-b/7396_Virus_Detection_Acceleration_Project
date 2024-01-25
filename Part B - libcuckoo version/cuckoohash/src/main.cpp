@@ -16,6 +16,7 @@
 #include "Substring.h"
 
 #define NUMBER_OF_TESTS 5
+#define FIXED_SEED 2847354110
 
 using json = nlohmann::json;
 
@@ -37,6 +38,7 @@ int insertToCuckoo(const std::vector<Substring<T>>& substrings, libcuckoo::cucko
     double max_lf = 0.0;
     for (const auto& iter : substrings) {
         //std::cout << "Hashed key value is: " << cuckoo_hash.hash_function()(iter.substring) << std::endl;
+        //if (cuckoo_hash.size())
         try { 
             cuckoo_hash.insert(iter.substring, iter.substring); 
         }
@@ -106,6 +108,7 @@ int main(int argc, char* argv[]) {
     constexpr std::size_t SLOTS = TABLE_SIZE / sizeof(CuckooItem64);
     Cuckoo64 cuckoo_hash(SLOTS);
     cuckoo_hash.maximum_hashpower(log2(TABLE_SIZE));
+    cuckoo_hash.max_num_worker_threads(0);
     cuckoo_hash.reserve(SLOTS);
     double sum_load_factors = 0;
     double sum_size = 0;
@@ -117,7 +120,8 @@ int main(int argc, char* argv[]) {
         << "---------------------------------------------------" << std::endl;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
         std::cout << "Run " << i << " out of " << NUMBER_OF_TESTS << " :" << std::endl;
-        std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(std::random_device()()));
+        //std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(std::random_device()()));
+        std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(FIXED_SEED ^ static_cast<unsigned int>(i)));
         int inserted = insertToCuckoo(shuffled_substrings, cuckoo_hash);
         sum_load_factors += cuckoo_hash.load_factor();
         sum_size += cuckoo_hash.size();

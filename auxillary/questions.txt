@@ -4,14 +4,16 @@ Questions for Alon:
 		For example: In content we may have: |00 00 72 ...|, should we keep an array of each char ([' ', ',',...]),
 			including special chars like '00'? Or should we keep them in an array of int ([00, 72, ...]).
 	A:	Our decision.
+	Solution: Implemented as what we call 'hexString', as string of hex chunks of bytes from the exact match.
+			  For example: 
 	
 	Q2: Given a pcre pattern splitted into string(s) of exact match, should we set a threshold for minimum chars?
 		For example: in the pcre pattern: r'/^GateCrasher\s+v\d+\x2E\d+\x2C\s+Server\s+On-Line\x2E\x2E\x2E/ims',
 			the exact matches would be: ['GateCrasher', 'v', '.', ',', 'Server', 'On-Line...']. Should single
 			char string(s) count? Wouldn't it be too spamy (even if we check 50%+ strings exact matched?).
 	A:	Single chars are irrelevant, our decision on how many chars are relevant.
-		TODO: Add all rules that were deleted to the log file.
-
+	Solution: Added all rules that were deleted to the log file (<5% of the rules), the raw data for the graphs is before thresholding.
+	
 	Q3a: Given special options in the pcre (i.e., '/ims' for case-insensitivity and more), should we take that into
 		consideration when creating the exact match automaton?
 		For example: in the pcre patten: r'/GateCrasher/ims' could be any of:
