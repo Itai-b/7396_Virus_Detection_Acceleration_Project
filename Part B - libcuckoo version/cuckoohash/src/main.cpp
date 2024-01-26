@@ -16,6 +16,7 @@
 #include "Substring.h"
 
 #define NUMBER_OF_TESTS 5
+#define MAX_LOAD_FACTOR 0.95
 #define FIXED_SEED 2847354110
 
 using json = nlohmann::json;
@@ -33,18 +34,28 @@ using CuckooItem32 = std::pair<uint32_t, uint32_t>;
 using CuckooItem16 = std::pair<uint16_t, uint16_t>;
 
 template <typename T>
-int insertToCuckoo(const std::vector<Substring<T>>& substrings, libcuckoo::cuckoohash_map<T, T>& cuckoo_hash) {
+int insertToCuckoo(const std::vector<Substring<T>>& substrings, libcuckoo::cuckoohash_map<T, T>& cuckoo_hash,
+        std::size_t slots, std::size_t max_table_size, double max_load_factor = MAX_LOAD_FACTOR) {
     int inserted = 0;
     double max_lf = 0.0;
     for (const auto& iter : substrings) {
         //std::cout << "Hashed key value is: " << cuckoo_hash.hash_function()(iter.substring) << std::endl;
         //if (cuckoo_hash.size())
+        /*
         try { 
             cuckoo_hash.insert(iter.substring, iter.substring); 
         }
         catch (libcuckoo::maximum_hashpower_exceeded) {
             return inserted;
         }
+        */
+        if (cuckoo_hash.capacity() * sizeof(std::pair<T,T>) >= max_table_size && cuckoo_hash.load_factor() >= max_load_factor) {
+            std::cout << "table size: " << cuckoo_hash.capacity() * sizeof(std::pair<T, T>) << " , load factor: " << cuckoo_hash.load_factor() \
+                << " , buckets: " << cuckoo_hash.bucket_count() << " , slots per bucket: " << cuckoo_hash.slot_per_bucket() << std::endl;
+            
+            return inserted;
+        }
+        cuckoo_hash.insert(iter.substring, iter.substring);
         inserted++;
         //std::cout << "Load Factor is: " << cuckoo_hash.load_factor() << "." << std::endl; // TO CHECK WHAT IS THE HASH(KEY), ARE ALL SORTED TO SAME BUCKET(?)
         if (cuckoo_hash.load_factor() > max_lf) {
@@ -104,11 +115,11 @@ int main(int argc, char* argv[]) {
     std::vector<Substring64> shuffled_substrings(substrings.begin(), substrings.end());
    
     // Make NUMBER_OF_TESTS random shuffles of the vector, for each, insert to a new cuckoohash and calculate the capacity
-    constexpr std::size_t TABLE_SIZE = 8 * 1024;   // 8KB
-    constexpr std::size_t SLOTS = TABLE_SIZE / sizeof(CuckooItem64);
+    constexpr std::size_t MAX_TABLE_SIZE = 256 * 1024;   // 8KB
+    constexpr std::size_t SLOTS = MAX_TABLE_SIZE / sizeof(CuckooItem64);
     Cuckoo64 cuckoo_hash(SLOTS);
-    cuckoo_hash.maximum_hashpower(log2(TABLE_SIZE));
-    cuckoo_hash.max_num_worker_threads(0);
+    //cuckoo_hash.maximum_hashpower(log2(MAX_TABLE_SIZE));
+    //cuckoo_hash.max_num_worker_threads(0);
     cuckoo_hash.reserve(SLOTS);
     double sum_load_factors = 0;
     double sum_size = 0;
@@ -122,7 +133,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Run " << i << " out of " << NUMBER_OF_TESTS << " :" << std::endl;
         //std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(std::random_device()()));
         std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(FIXED_SEED ^ static_cast<unsigned int>(i)));
-        int inserted = insertToCuckoo(shuffled_substrings, cuckoo_hash);
+        int inserted = insertToCuckoo(shuffled_substrings, cuckoo_hash, SLOTS, MAX_TABLE_SIZE);
         sum_load_factors += cuckoo_hash.load_factor();
         sum_size += cuckoo_hash.size();
         sum_inserted += inserted;
