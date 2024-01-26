@@ -128,14 +128,11 @@ std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
 
 template <typename T>
 void Substring<T>::extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, std::size_t G, std::size_t L) {
+	// Defaults for G and L are provided in function's declaration.
 	std::size_t len = hexString.size();
-	for (std::size_t i = 0; i < len; i += G * 2) {
-		std::string substring = hexString.substr(i, L * 2);
-
-		// Pad with zeros if needed
-		//substring.insert(substring.begin(), L * 2 - substring.size(), '0'); // TODO: check if padding is in the right place (for 0x01, should it be 0x000001 or 0x010000 ?)
-
-		substrings.insert(Substring<T>(substring));
+	for (std::size_t i = 0; (i < len) && (i + L*2 <= len); i += G * 2) {
+		std::string hexSubstring = hexString.substr(i, L * 2);
+		substrings.insert(Substring<T>(hexSubstring));	// c'tor of Substring<T> creates a substring (represted as typename T) from string hexSubstring.
 	}
 }
 

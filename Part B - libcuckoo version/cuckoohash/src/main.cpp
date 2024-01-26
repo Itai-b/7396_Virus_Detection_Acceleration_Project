@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
     std::vector<Substring64> shuffled_substrings(substrings.begin(), substrings.end());
    
     // Make NUMBER_OF_TESTS random shuffles of the vector, for each, insert to a new cuckoohash and calculate the capacity
-    constexpr std::size_t MAX_TABLE_SIZE = 256 * 1024;   // 8KB
+    constexpr std::size_t MAX_TABLE_SIZE = 256 * 1024;   // 256KB
     constexpr std::size_t SLOTS = MAX_TABLE_SIZE / sizeof(CuckooItem64);
     Cuckoo64 cuckoo_hash(SLOTS);
     //cuckoo_hash.maximum_hashpower(log2(MAX_TABLE_SIZE));
