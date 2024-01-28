@@ -37,7 +37,7 @@ public:
 	bool operator==(const Substring<T>& other) const;
 	bool operator!=(const Substring<T>& other) const;
 
-	friend std::ostream& operator<<(std::ostream& os, const Substring<T>& substring);
+	template<class S> friend std::ostream& operator<<(std::ostream& os, const Substring<S>& substring);
 
 	static void extractSubstrings(const std::string& hexString, std::set<Substring<T>>& substrings, \
 		std::size_t G = SUBSTRING_DEFAULT_GAP, std::size_t L = sizeof(T));
