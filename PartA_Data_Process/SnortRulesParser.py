@@ -55,8 +55,7 @@ Functions:
         The main function that orchestrates the parsing and processing of rules.
 """
 
-from itertools import count
-from operator import le, length_hint
+from multiprocessing.reduction import duplicate
 import sys
 import os
 import argparse
@@ -93,71 +92,87 @@ logger.addHandler(log_file_handler)
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
-
-def parse_file(file_name: str, signatures: dict) -> list(tuple([int, str, list])):
+def check_duplicate_signatures(signature, signature_type, rule_number, signatures_hist):
     """
-        Parse a file for specified signatures and extract matching data.
+        Check if the substring was already extracted from the file.
 
-        :param file_name: A string represents the name of the file to parse.
-        :param signatures: A dictionary of signature names and corresponding regex signatures.
+        :param substring: A string represents the substring to check.
+        :param rule_number: An integer represents the rule number.
+        :param substrings: A list of tuples containing line number, matched signature key,
+                            and the extracted value.
 
-        :return: A list of tuples containing line number, matched signature key,
-                    and the extracted value. If no match, the entire list value is None.
-
-        Example:
-            signatures = {
-                "Version": r'\d+\.\d+',
-                "Name": r'Name:\s+(.*)'
-            }
-            result = parse_file('data.txt', signatures)
-            # Sample output: [(1, 'Version', '1.2'), (2, 'Name', 'John Doe'), ...]
+        :return: A boolean value represents whether the substring was already extracted.
     """
+    if not signatures_hist:
+        signatures_hist.append([signature, signature_type, [rule_number]])
+        return False
+    
+    for data in signatures_hist:
+        if signature == data[0]:
+            data[2].append(rule_number)
+            return True
+    signatures_hist.append([signature, signature_type, [rule_number]])
+    return False
+
+def add_exact_matches_to_hist(signature, exact_matches, signatures_hist):
+    for data in signatures_hist:
+        if signature == data[0]:
+            data.append(exact_matches)
+            return
+
+def save_signature_hist_as_json(signatures_hist, save_path):
+    """
+        An auxiliary function used to save exact_matches to a json file.
+    """
+    json_path = os.path.join(save_path, 'signatures_hist.json')
+    with open(json_path, 'w') as file:
+        for signature in signatures_hist:
+            json.dump(signature, file, indent=None)
+            file.write('\n')
+             
+    logger.info(f"Saved the signatures_hist as .json files under the path {save_path}")
+
+def parse_file(file_name: str, signatures: dict, save_path):
     
     with open(file_name, 'r') as file:
-        lines = file.readlines()
+        rules = file.readlines()
     
-    rules = []
-    previous_data = []
-    global relevant_content, total_content, removed_content, relevant_pcre, total_pcre, removed_pcre, special_R_signature
+    substrings_by_rule_num = []
+    signatures_hist = []
+    global relevant_content, total_content, relevant_pcre, total_pcre
 
-    for line_num, line in enumerate(lines):
-        for signature_name, signature in signatures.items():
-            matches = re.finditer(signature, line)
+    for rule_num, rule in enumerate(rules):
+        for signature_type, signature in signatures.items():
+            matches = re.finditer(signature, rule)
             if matches:
                 for match in matches:                       
                     data = match.group(1)
+                    
                     # Check if the was already extracted
-                    if data in previous_data:
-                        if signature_name == 'pcre':
-                            removed_pcre += 1
-                        else:  # signature_name == 'content':
-                            removed_content += 1
+                    if check_duplicate_signatures(data, signature_type, rule_num+1, signatures_hist):
                         continue
-                    previous_data.append(data)
-                    if signature_name == 'pcre':
+                    
+                    if signature_type == 'pcre':
                         total_pcre += 1
                         data = ExactMatchExtractor.run(data, 'char')
                     else:   # signature_name == 'content':
                         total_content += 1
                         data = data.lower()
                         data = ContentProcessor.run(data)
+                    
                     data = analyze_and_threshold(data)
+                    
                     if data:
-                        rule = (line_num+1, signature_name, data)
-                        rules.append(rule)
-                        if signature_name == 'pcre':
+                        add_exact_matches_to_hist(match.group(1), data, signatures_hist)
+                        substring = (rule_num+1, signature_type, data)
+                        substrings_by_rule_num.append(substring)
+                        if signature_type == 'pcre':
                             relevant_pcre += 1
                         else:   # content
                             relevant_content += 1
-                    else:   # data was either empty or thresholded
-                        if signature_name == 'pcre':
-                            special_R_rule = r'\/R[ims]{0,3}$'
-                            if re.search(special_R_rule, match.group(1)):
-                                special_R_signature += 1
-                                logger.info(f"the following {signature_name} signature with special R signature in line {line_num+1} was discarded: {match.group(1)}")
-                            else:
-                                logger.debug(f"the following {signature_name} signature in line {line_num+1} was discarded: {match.group(1)}")
-    return rules
+    
+    save_signature_hist_as_json(signatures_hist, save_path)
+    return substrings_by_rule_num
 
 def analyze_and_threshold(data: list) -> list:
     thresholded_data = []
@@ -224,8 +239,6 @@ def log_info(start_time, end_time):
     logger.info('General information after the script\'s execution:')
     logger.info(f'There are {total_content} content signatures and {total_pcre} pcre signatures the file.')
     logger.info(f'There are {special_R_signature} special R signatures in the file.')
-    logger.info(f'There were {removed_pcre} special case pcre signatures that were removed.')
-    logger.info(f'There were {removed_content} special case content signatures that were removed.')
 
     logger.info(f'The total number of exactmatches is {total_exactmatches}.')
     logger.info(f'{total_exactmatches - relevant_exactmatches} were removed after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
@@ -320,7 +333,7 @@ def main():
     signatures = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
     
-    exact_matches = parse_file(file_path, signatures)
+    exact_matches = parse_file(file_path, signatures, abs_save_path)
     exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
     
     if args.json:

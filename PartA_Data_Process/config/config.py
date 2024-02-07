@@ -10,7 +10,7 @@ RESULTS_FORM = 'char'
 meta_characters = ['.', '^', '$', '*', '+', '?', '{', '}', '[', ']', '(', ')', '|', '\\', '/', 'r', 'n', 't']
 
 unwanted_pattens = [
-        r'\/.{0,3}$',                                   # Removes pcre flags after '/' closure (/ims)
+        r'\/.{0,4}$',                                   # Removes pcre flags after '/' closure (/ims)
         r'(\\)([AbBdDfsStvwWzZ])([\+\*])?(\?)?',        # all regex of type \c or \c+ where c is a unique metacharacter.
         # r'(\\)([AbBdDfrnsStvwWzZ])([\+\*])?(\?)?'     # INACTIVE: also removes \r\n
         r'(\/)(\^)?',                                   # Removes pcre opening flag ('\' of '^')
