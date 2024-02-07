@@ -33,22 +33,15 @@
 /.vs
 *.xml
 *.iml
-/partA - Data Process/__pycache__/ExactMatchExtractor.cpython-311.pyc
 *.pyc
-Part A - Data Process/SnortRulesParsercp.py
-Part B - libcuckoo version/cuckoohash/.vs
-Part B - libcuckoo version/cuckoohash/install
-Part B - libcuckoo version/cuckoohash/libcuckoo
-Part B - libcuckoo version/cuckoohash/nlohmann_json
-Part B - libcuckoo version/cuckoohash/out
-
-/PartB_CuckooHash/CuckooHash/.vs
-/PartB_CuckooHash/CuckooHash/install
-/PartB_CuckooHash/CuckooHash/out/build/x64-debug
-/Part B - Cuckoo Hash/cuckoohash/.vs
-/Part B - Cuckoo Hash/cuckoohash/build
-/Part B - Cuckoo Hash/cuckoohash/install
-/Part B - Cuckoo Hash/cuckoohash/out/build/x64-debug
-/Part B - libcuckoo version/cuckoohash/build
 
 /.vscode/settings.json
+/PartA_Data_Process/.idea
+/PartA_Data_Process/.vs
+
+/PartB_Hash/cuckoohash/.vs
+/PartB_Hash/cuckoohash/build
+/PartB_Hash/cuckoohash/install
+/PartB_Hash/cuckoohash/out/
+/PartB_Hash/cuckoohash/libcuckoo
+/PartB_Hash/cuckoohash/nlohmann_json

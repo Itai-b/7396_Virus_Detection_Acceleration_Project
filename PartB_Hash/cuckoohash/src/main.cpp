@@ -17,7 +17,7 @@
 
 #define NUMBER_OF_TESTS 5
 #define TABLE_SIZE 256              // in KB
-#define MAX_LOAD_FACTOR 0.92        // in [0,1]
+#define MAX_LOAD_FACTOR 0.98        // in [0,1]
 #define SHUFFLE_SEED 2847354131     // prime!
 
 // Use for reducing CuckooItem from 2*sizeof(T) bytes, to sizeof(T) + 1 bytes.
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
         << "L = " << sizeof(Substring64) << " and G = " << SUBSTRING_DEFAULT_GAP << "." << std::endl                    \
         << "---------------------------------------------------" << std::endl;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        std::cout << "Run " << i << " out of " << NUMBER_OF_TESTS << " :" << std::endl;
+        std::cout << "Run " << (i+1) << " out of " << NUMBER_OF_TESTS << " :" << std::endl;
         //std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(std::random_device()()));
         std::shuffle(shuffled_substrings.begin(), shuffled_substrings.end(), std::default_random_engine(SHUFFLE_SEED ^ static_cast<unsigned int>(i)));
         int inserted = insertToCuckoo(shuffled_substrings, cuckoo_hash, SLOTS, MAX_TABLE_SIZE);

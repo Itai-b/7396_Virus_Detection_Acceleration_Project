@@ -1,7 +1,7 @@
 """
 Content Processor
 
-This module is responsible for processing content patterns of a snort rule.
+This module is responsible for processing content signatures of a snort rule.
 
 Authors:
     Idan Baruch (idan-b@campus.technion.ac.il)
@@ -13,7 +13,7 @@ Functions:
         the function replaces it with the respective characters.
     
     - run(content_string: str) -> str:
-        Runs the Content Processor functions on a snort content rule.
+        Runs the Content Processor functions on a snort content signature.
 """
 
 import re

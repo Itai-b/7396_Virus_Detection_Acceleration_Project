@@ -17,7 +17,7 @@ Usage:
     - if -info flag is given, the script will print information about the script's execution to the console.
 
 Description:
-    This script parses a given rule file for specified patterns and extracts matching data.
+    This script parses a given rule file for specified signatures and extracts matching data.
     It supports extracting exact match rules and Perl compatible regular expression rules.
     Extracted rules are saved as a JSON file or printed to the console.
 
@@ -35,12 +35,12 @@ Modules:
     - config (Custom module for configurations and constants)
 
 Constants:
-    - EXACT_MATCH_RULE_PATTERN: Regular expression pattern for exact match rules.
-    - REGEX_RULE_PATTERN: Regular expression pattern for Perl compatible regular expression rules.
+    - EXACT_MATCH_SIGNATURE_signature: Regular expression signature for exact match rules.
+    - REGEX_SIGNATURE_signature: Regular expression signature for Perl compatible regular expression rules.
 
 Functions:
-    - parse_file(file_name: str, patterns: dict) -> list[tuple(int, str, str)]:
-        Parse a file for specified patterns and extract matching data.
+    - parse_file(file_name: str, signatures: dict) -> list[tuple(int, str, str)]:
+        Parse a file for specified signatures and extract matching data.
         
     - save_rules_as_json(exact_matches: list[tuple(int, str, str)]):
         An auxiliary function to save exact_matches to a JSON file.
@@ -56,6 +56,7 @@ Functions:
 """
 
 from itertools import count
+from operator import le, length_hint
 import sys
 import os
 import argparse
@@ -75,6 +76,10 @@ logging.basicConfig(level=logging.INFO)
 # Create a FileHandler to save log messages to a file
 log_file_handler = logging.FileHandler('SnortRuleParser.log')
 
+# Clear the log file
+with open('SnortRuleParser.log', 'w') as file:
+    pass
+
 # Create a formatter to specify the format of log messages
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 log_file_handler.setFormatter(formatter)
@@ -85,26 +90,26 @@ logger = logging.getLogger('')
 # Add both handlers to the root logger
 logger.addHandler(log_file_handler)
 
-EXACT_MATCH_RULE_PATTERN = r'(?:content:")(.*?)(?:")'  # exact match rules
-REGEX_RULE_PATTERN = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
+EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
+REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
 
-def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
+def parse_file(file_name: str, signatures: dict) -> list(tuple([int, str, list])):
     """
-        Parse a file for specified patterns and extract matching data.
+        Parse a file for specified signatures and extract matching data.
 
         :param file_name: A string represents the name of the file to parse.
-        :param patterns: A dictionary of pattern names and corresponding regex patterns.
+        :param signatures: A dictionary of signature names and corresponding regex signatures.
 
-        :return: A list of tuples containing line number, matched pattern key,
+        :return: A list of tuples containing line number, matched signature key,
                     and the extracted value. If no match, the entire list value is None.
 
         Example:
-            patterns = {
+            signatures = {
                 "Version": r'\d+\.\d+',
                 "Name": r'Name:\s+(.*)'
             }
-            result = parse_file('data.txt', patterns)
+            result = parse_file('data.txt', signatures)
             # Sample output: [(1, 'Version', '1.2'), (2, 'Name', 'John Doe'), ...]
     """
     
@@ -113,52 +118,53 @@ def parse_file(file_name: str, patterns: dict) -> list(tuple([int, str, list])):
     
     rules = []
     previous_data = []
-    global relevant_content, total_content, removed_content, relevant_pcre, total_pcre, removed_pcre, special_R_rules
+    global relevant_content, total_content, removed_content, relevant_pcre, total_pcre, removed_pcre, special_R_signature
 
     for line_num, line in enumerate(lines):
-        for pattern_name, pattern in patterns.items():
-            matches = re.finditer(pattern, line)
+        for signature_name, signature in signatures.items():
+            matches = re.finditer(signature, line)
             if matches:
                 for match in matches:                       
                     data = match.group(1)
+                    # Check if the was already extracted
                     if data in previous_data:
-                        if pattern_name == 'pcre':
+                        if signature_name == 'pcre':
                             removed_pcre += 1
-                        else:  # pattern_name == 'content':
+                        else:  # signature_name == 'content':
                             removed_content += 1
                         continue
                     previous_data.append(data)
-                    if pattern_name == 'pcre':
+                    if signature_name == 'pcre':
                         total_pcre += 1
                         data = ExactMatchExtractor.run(data, 'char')
-                    else:   # pattern_name == 'content':
+                    else:   # signature_name == 'content':
                         total_content += 1
                         data = data.lower()
                         data = ContentProcessor.run(data)
                     data = analyze_and_threshold(data)
                     if data:
-                        rule = (line_num+1, pattern_name, data)
+                        rule = (line_num+1, signature_name, data)
                         rules.append(rule)
-                        if pattern_name == 'pcre':
+                        if signature_name == 'pcre':
                             relevant_pcre += 1
                         else:   # content
                             relevant_content += 1
                     else:   # data was either empty or thresholded
-                        if pattern_name == 'pcre':
+                        if signature_name == 'pcre':
                             special_R_rule = r'\/R[ims]{0,3}$'
                             if re.search(special_R_rule, match.group(1)):
-                                special_R_rules += 1
-                                logger.info(f"the following {pattern_name} pattern with special R rule in line {line_num+1} was discarded: {match.group(1)}")
+                                special_R_signature += 1
+                                logger.info(f"the following {signature_name} signature with special R signature in line {line_num+1} was discarded: {match.group(1)}")
                             else:
-                                logger.debug(f"the following {pattern_name} pattern in line {line_num+1} was discarded: {match.group(1)}")
+                                logger.debug(f"the following {signature_name} signature in line {line_num+1} was discarded: {match.group(1)}")
     return rules
 
 def analyze_and_threshold(data: list) -> list:
     thresholded_data = []
-    global total_sub_strings, relevant_sub_strings, length_histogram
+    global total_exactmatches, relevant_exactmatches, length_histogram
 
     for char_list in data:
-        total_sub_strings += 1
+        total_exactmatches += 1
         length = len(char_list)
 
         if length in length_histogram:
@@ -167,7 +173,7 @@ def analyze_and_threshold(data: list) -> list:
             length_histogram[length] = 1
 
         if length > config.MINIMAL_EXACT_MATCH_LENGTH:
-            relevant_sub_strings += 1
+            relevant_exactmatches += 1
             thresholded_data.append(char_list)
 
     return thresholded_data
@@ -186,18 +192,23 @@ def translate_exact_matches_to_hex(exact_matches: list(tuple([int, str, list])))
         
     logger.info(f"Translated the exact-matches to hex.")
 
-def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list]))):
+def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list])), exact_matches_hex: list(tuple([int, str, list])), save_path):
     """
         An auxiliary function used to save exact_matches to a json file.
     """
-    
-    with open("../Data/exact_matches.json", 'w') as file:
+    json_path = os.path.join(save_path, 'exact_matches.json')
+    with open(json_path, 'w') as file:
         for exact_match in exact_matches:
             json.dump(exact_match, file, indent=None)
             file.write('\n')
             
-    logger.info(f"Saved the exact-matches as .json file under the path {os.pardir}\Data\exact_matches.json.")
-           
+    json_path_hex = os.path.join(save_path, 'exact_matches_hex.json')
+    with open(json_path_hex, 'w') as file:
+        for exact_match_hex in exact_matches_hex:
+            json.dump(exact_match_hex, file, indent=None)
+            file.write('\n')
+             
+    logger.info(f"Saved the exact-matches as .json files under the path {save_path}")       
 
 def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
     """
@@ -209,88 +220,24 @@ def print_exact_matches(exact_matches: list(tuple([int, str, list]))):
 def log_info(start_time, end_time):
     
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
-    logger.info(f'There are {total_content} content rules and {total_pcre} pcre rules in the file.')
-    logger.info(f'There are {special_R_rules} special R rules in the file.')
-    logger.info(f'There were {removed_pcre} special case pcre rules that were removed.')
-    logger.info(f'There were {removed_content} special case content rules that were removed.')
-
+    # TODO: add information about the number of rules.
     logger.info('General information after the script\'s execution:')
-    logger.info(f'The total number of substrings is {total_sub_strings}.')
-    logger.info(f'{total_sub_strings - relevant_sub_strings} were removed after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
-    logger.info(f'{relevant_sub_strings/total_sub_strings * 100 :.2f}% of the substrings remained after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
-    logger.info(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the rules remained after thresholding.')
-    logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre rules remained remained after thresholding.')
-    logger.info(f'{relevant_content / total_content * 100 :.2f}% content rules remained after thresholding.')
+    logger.info(f'There are {total_content} content signatures and {total_pcre} pcre signatures the file.')
+    logger.info(f'There are {special_R_signature} special R signatures in the file.')
+    logger.info(f'There were {removed_pcre} special case pcre signatures that were removed.')
+    logger.info(f'There were {removed_content} special case content signatures that were removed.')
 
-def main():
-    """
-        Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
-    """
-    parser = argparse.ArgumentParser(description="Snort Rule Set Extractor")
-    parser.add_argument('file_name', metavar='file_name', type=str, nargs='?', default='snort3-community.rules')
-    parser.add_argument('-info', action='store_true', help='Prints information about the script\'s execution.')
-    parser.add_argument('-json', action='store_true', help='Saves the exact matches as a .json file.')
+    logger.info(f'The total number of exactmatches is {total_exactmatches}.')
+    logger.info(f'{total_exactmatches - relevant_exactmatches} were removed after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
+    logger.info(f'{relevant_exactmatches/total_exactmatches * 100 :.2f}% of the exactmatches remained after thresholding t = {config.MINIMAL_EXACT_MATCH_LENGTH}.')
+    # TODO: remove the following check and add the information about the number of rules.
+    logger.info(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the signatures remained after thresholding.')
+    logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre signatures remained remained after thresholding.')
+    logger.info(f'{relevant_content / total_content * 100 :.2f}% content signatures remained after thresholding.')
     
-    args = parser.parse_args()
-
-    logger.info(f'Started parsing.')
-    start_time = time.time()
-
-    global total_sub_strings,\
-        relevant_sub_strings, \
-        total_pcre, \
-        relevant_pcre, \
-        removed_pcre, \
-        special_R_rules, \
-        total_content, \
-        relevant_content, \
-        removed_content, \
-        length_histogram
-
-    total_sub_strings = 0
-    relevant_sub_strings = 0
-    total_pcre = 0
-    relevant_pcre = 0
-    removed_pcre = 0
-    special_R_rules = 0
-    total_content = 0
-    relevant_content = 0
-    removed_content = 0
-    length_histogram = {}
-
-    if args.info:
-        logging.basicConfig(level=logging.DEBUG)
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-        logger.addHandler(console_handler)
-
-    save_as_json = False  # Initialize the flag
-
-    if args.json:
-        save_as_json = True
-        sys.argv.remove('-json')  # Remove the flag from the arguments list
-
-    file_path = ""
-    if args.file_name:
-        file_path = 'snort3-community.rules'    
-    else:
-        for arg in sys.argv:
-            if arg.endswith('.rules'):
-                file_path = arg
-                break
-    
-    patterns = {'content': EXACT_MATCH_RULE_PATTERN,
-                'pcre': REGEX_RULE_PATTERN}
-    
-    exact_matches = parse_file(file_path, patterns)
-    exact_matches = translate_exact_matches_to_hex(exact_matches)
-    
-    if save_as_json:
-        save_exact_matches_as_json(exact_matches)
-    else:
-        print_exact_matches(exact_matches)
-        
-    with open('../Data/length_histogram.csv', 'w', newline='') as csvfile:
+def save_data(length_histogram, save_path):
+    length_hint_path = os.path.join(save_path, 'length_histogram.csv')
+    with open(length_hint_path, 'w', newline='') as csvfile:
         headers = ['String Length', 'Count']
         result_list = []
         for length, count in length_histogram.items():
@@ -299,8 +246,9 @@ def main():
         writer = csv.DictWriter(csvfile, headers)
         writer.writeheader()
         writer.writerows(result_list)
-
-    with open('../Data/threshold_histogram.csv', 'w', newline='') as csvfile:
+    
+    threshold_hist_path = os.path.join(save_path, 'threshold_histogram.csv')
+    with open(threshold_hist_path, 'w', newline='') as csvfile:
         bins = [2, 4, 8, 16, 32, 64, float('inf')]
         counts = [0] * len(bins)
         for length, num_sub_strings in length_histogram.items():
@@ -316,6 +264,71 @@ def main():
         writer = csv.DictWriter(csvfile, headers)
         writer.writeheader()
         writer.writerows(result_list)
+
+def main():
+    """
+        Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
+    """
+    parser = argparse.ArgumentParser(description="Snort Rule Set Extractor")
+    parser.add_argument('file_name', metavar='file_name', type=str, nargs='?', default='snort3-community.rules')
+    parser.add_argument('-p', '--path', type=str, default=os.getcwd(), help='The path where to save all the files')
+    parser.add_argument('-d', '--debug', action='store_true', help='Prints debug information about the script\'s execution.')
+    parser.add_argument('-j', '--json', action='store_true', help='Saves the exact matches as a .json file.')
+    
+    args = parser.parse_args()
+
+    logger.info(f'Started parsing.')
+    start_time = time.time()
+
+    global total_exactmatches,\
+        relevant_exactmatches, \
+        total_pcre, \
+        relevant_pcre, \
+        removed_pcre, \
+        special_R_signature, \
+        total_content, \
+        relevant_content, \
+        removed_content, \
+        length_histogram
+
+    total_exactmatches = 0
+    relevant_exactmatches = 0
+    total_pcre = 0
+    relevant_pcre = 0
+    removed_pcre = 0
+    special_R_signature = 0
+    total_content = 0
+    relevant_content = 0
+    removed_content = 0
+    length_histogram = {}
+
+    abs_save_path = os.path.abspath(args.path)
+    logger.info(f'The path where the files will be saved is {abs_save_path}.')
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+        
+    file_path = ""
+    if args.file_name:
+        file_path = 'snort3-community.rules'    
+    else:
+        for arg in sys.argv:
+            if arg.endswith('.rules'):
+                file_path = arg
+                break
+    
+    signatures = {'content': EXACT_MATCH_SIGNATURE,
+                'pcre': REGEX_SIGNATURE}
+    
+    exact_matches = parse_file(file_path, signatures)
+    exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
+    
+    if args.json:
+        save_exact_matches_as_json(exact_matches, exact_matches_hex, abs_save_path)
+    else:
+        print_exact_matches(exact_matches)
+        
+    save_data(length_histogram, abs_save_path)    
 
     logger.info(f'Finished parsing the file.')
     end_time = time.time()

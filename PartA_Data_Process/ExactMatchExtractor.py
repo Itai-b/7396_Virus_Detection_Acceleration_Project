@@ -1,7 +1,7 @@
 """
 Exact Match Extractor
 
-This module provides functions for extracting exact match sub-strings from Perl Compatible Regular Expressions (pcre).
+This module provides functions for extracting exact match exactmatches from Perl Compatible Regular Expressions (pcre).
 
 Authors:
     Idan Baruch (idan-b@campus.technion.ac.il)
@@ -17,17 +17,17 @@ Functions:
     - utf8_to_ascii(input: str) -> list:
         Converts a UTF-8 encoded string to its ASCII values.
     
-    - substitute_pattern(match: re.Match):
-        Replaces a regex pattern of type 'c{2}' with the exact match string (e.g., 'cc').
+    - substitute_signature(match: re.Match):
+        Replaces a regex signature of type 'c{2}' with the exact match string (e.g., 'cc').
     
-    - replace_special_metacharacters(regex_pattern: str) -> str:
+    - replace_special_metacharacters(regex_signature: str) -> str:
         Replaces special meta-characters in a Perl Compatible Regular Expression (pcre) with their UTF-8 representation.
     
-    - extract_exact_matches(regex_pattern: str) -> list:
-        Returns a list of non-ambiguous exact match sub-strings within a given pcre pattern.
+    - extract_exact_matches(regex_signature: str) -> list:
+        Returns a list of non-ambiguous exact match exact-matches within a given pcre signature.
     
     - run(pcre_string: str, flag='raw') -> list:
-        Runs the Exact Match Extractor functions on a snort rule (pcre string) and returns a list of extracted sub-strings.
+        Runs the Exact Match Extractor functions on a pcre string and returns a list of extracted exact-matches.
 """
 
 import re
@@ -94,12 +94,12 @@ def utf8_to_ascii(input_string: str) -> list:
     return ascii_values
 
 
-def substitute_pattern(match: re.match):
+def substitute_signature(match: re.match):
     """
-    Given a regex pattern of type: c{2} where 'c' is any character and '2' is any integer,
+    Given a regex signature of type: c{2} where 'c' is any character and '2' is any integer,
     the function replaces it with the exact match string (here for example it will be 'cc').
 
-    :param match: A matched pattern from a regular expression containing capturing groups for character ('char')
+    :param match: A matched signature from a regular expression containing capturing groups for character ('char')
         and positive integer ('num'), for example in c{2}: char = 'c', num = 2.
 
     :return: A string resulting from repeating the captured character 'char' a number of times specified by the captured
@@ -112,53 +112,53 @@ def substitute_pattern(match: re.match):
     return char * int(num)
 
 
-def replace_special_metacharacters(regex_pattern: str) -> str:
+def replace_special_metacharacters(regex_signature: str) -> str:
     """
     Given a Perl Compatible Regular Expression (pcre), this function will replace all special meta-characters with
     their UTF-8 representation.
     
-    :param regex_pattern: A Perl Compatible Regular Expression (pcre) raw string in the form of r''.
+    :param regex_signature: A Perl Compatible Regular Expression (pcre) raw string in the form of r''.
     
-    :return: A string representing the pcre pattern with all special meta-characters replaced with their UTF-8
+    :return: A string representing the pcre signature with all special meta-characters replaced with their UTF-8
     representation.
     """
 
     utf8_meta_characters = [char_to_utf8(char) for char in config.meta_characters]
 
     for i, char in enumerate(config.meta_characters):
-        regex_pattern = regex_pattern.replace('\\' + char, utf8_meta_characters[i])
+        regex_signature = regex_signature.replace('\\' + char, utf8_meta_characters[i])
     
-    return regex_pattern    
+    return regex_signature    
 
 
-def extract_exact_matches(regex_pattern: str) -> list:
+def extract_exact_matches(regex_signature: str) -> list:
     """
-    Given a Perl Compatible Regular Expression (pcre), this function will return a list of sub-strings laying within
-    the Regex, which aren't ambiguous and matched exactly (exact matches sub-strings).
+    Given a Perl Compatible Regular Expression (pcre), this function will return a list of exactmatches laying within
+    the Regex, which aren't ambiguous and matched exactly (exact matches exactmatches).
     
     For example, for the pcre: r'/^GateCrasher\s+v\d+\x2E\d+x{2}/ims' it will return:
         ['GateCrasher','v','.','xx','ims'] where the last string is specifications (ims for case insensitivity).
     
-        :param regex_pattern: A Perl Compatible Regular Expression (pcre) raw string in the form of r''.
+        :param regex_signature: A Perl Compatible Regular Expression (pcre) raw string in the form of r''.
     
-        :return: A list of sub-strings of non-ambiguous exact matches within the given pcre patten.
+        :return: A list of exactmatches of non-ambiguous exact matches within the given pcre patten.
     """
     
     # Replaces all "canceled" ('\'+) special meta-characters with their UTF-8 representation.
-    regex_pattern = replace_special_metacharacters(regex_pattern)
+    regex_signature = replace_special_metacharacters(regex_signature)
     
-    # Replaces the unique *exact match* pattern (\w){(\d+)} for example: 'o{2}' in the actual string, for example: 'oo'
-    regex_pattern = re.sub(r'(\w){(\d+)}', substitute_pattern, regex_pattern)
+    # Replaces the unique *exact match* signature (\w){(\d+)} for example: 'o{2}' in the actual string, for example: 'oo'
+    regex_signature = re.sub(r'(\w){(\d+)}', substitute_signature, regex_signature)
 
-    # Replaces any non-exact match (ambiguous) patterns with an empty space ' '.
-    for unwanted_pattern in config.unwanted_pattens:
-        regex_pattern = re.sub(unwanted_pattern, ' ', regex_pattern)
+    # Replaces any non-exact match (ambiguous) signatures with an empty space ' '.
+    for unwanted_signature in config.unwanted_pattens:
+        regex_signature = re.sub(unwanted_signature, ' ', regex_signature)
     
-    # Cleans the list of sub-strings from empty strings (''), and returns it.
+    # Cleans the list of exactmatches from empty strings (''), and returns it.
     exact_matches_list = []
-    for sub_string in regex_pattern.lower().split(' '):
-        if sub_string.strip():
-            exact_matches_list.append(bytes(sub_string, 'utf-8').decode('unicode-escape')) #'unicode-escape'
+    for exact_match in regex_signature.lower().split(' '):
+        if exact_match.strip():
+            exact_matches_list.append(bytes(exact_match, 'utf-8').decode('unicode-escape')) #'unicode-escape'
 
     return exact_matches_list
 
@@ -168,9 +168,9 @@ def run(pcre_string: str, flag=config.RESULTS_FORM) -> list:
     Runs the Exact Match Extractor functions on a snort rule (represented in a pcre string).
     :param pcre_string: A Perl Compatible Regular Expression (pcre) string.
     :param flag: A flag string indicating the wanted representation ('ascii' / 'raw') of the output list.
-    :return: A list of extracted sub-strings of exact matches (non-ambiguous Regex patterns) as:
-        flag == 'ascii': A list of arrays of integers representing the ASCII values of the sub-strings.
-        flag == 'raw': A list of raw sub-strings of the exact matches.
+    :return: A list of extracted exactmatches of exact matches (non-ambiguous Regex signatures) as:
+        flag == 'ascii': A list of arrays of integers representing the ASCII values of the exactmatches.
+        flag == 'raw': A list of raw exactmatches of the exact matches.
     """
     
     matches = extract_exact_matches(pcre_string)
@@ -179,6 +179,6 @@ def run(pcre_string: str, flag=config.RESULTS_FORM) -> list:
     elif flag == 'raw':
         return [utf8_to_raw(sub_match) for sub_match in matches]
     elif flag == 'char':
-        return [[char for char in sub_string] for sub_string in matches]
+        return [[char for char in exactmatch] for exactmatch in matches]
     else:
         raise ValueError(f'Invalid flag: {flag}. flag must be either "ascii" or "raw".')
