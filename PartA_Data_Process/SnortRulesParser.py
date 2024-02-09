@@ -200,20 +200,20 @@ def check_lost_rules(signatures_hist, lost_rules):
     else:
         logger.info(f'All rules still exist after the parsing')
 
-def translate_exact_matches_to_hex(signature_hist):
+def translate_exact_matches_to_hex(data):
     """
         An auxiliary function used to translate exact_matches to hex.
     """
     
-    for signature in signature_hist:
-        for exact_match in signature["exact_matches"]:
-            exact_match_hex = []
+    for line in data:
+        exact_match_hex = []
+        for exact_match in line["exact_matches"]:
+            hex_list = []
             for i, char_list in enumerate(exact_match):
-                hex_list = []
                 for char in char_list:
                     hex_list.append(hex(ord(char)))
-                    exact_match_hex.append(hex_list)
-            signature["exact_matches_hex"] = exact_match_hex            
+            exact_match_hex.append(hex_list)
+        line["exact_matches_hex"] = exact_match_hex            
 
 def save_exact_matches_as_json(exact_matches: list(tuple([int, str, list])), exact_matches_hex: list(tuple([int, str, list])), save_path):
     """
@@ -347,7 +347,6 @@ def main():
                 'pcre': REGEX_SIGNATURE}
     
     parta_data = parse_file(file_path, signatures_type)
-    
     
     lost_rules = list(range(1, total_rules + 1))
     
