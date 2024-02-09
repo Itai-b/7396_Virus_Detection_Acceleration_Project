@@ -14,7 +14,6 @@ Usage:
     python SnortRulesParser.py snort3-community.rules
     - if no file name is given, the script will use the default file name: snort3-community.rules
     - if -json flag is given, the script will save the exact matches as a .json file under the path where the script is located.
-    - if -info flag is given, the script will print information about the script's execution to the console.
 
 Description:
     This script parses a given rule file for specified signatures and extracts matching data.
@@ -90,7 +89,7 @@ logger.addHandler(log_file_handler)
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
-def check_duplicate_signatures(signature, signature_type, rule_number, signatures_hist):
+def check_duplicate_signatures(signature, signature_type, rule_number, data):
     """
         Check if the substring was already extracted from the file.
 
@@ -101,41 +100,41 @@ def check_duplicate_signatures(signature, signature_type, rule_number, signature
 
         :return: A boolean value represents whether the substring was already extracted.
     """
-    if not signatures_hist:
-        signatures_hist.append({"signature": signature, "signature_type": signature_type, "rules": [rule_number]})
+    if not data:
+        data.append({"signature": signature, "signature_type": signature_type, "rules": [rule_number]})
         return False
     
-    for data in signatures_hist:
-        if signature == data["signature"]:
-            data["rules"].append(rule_number)
+    for line in data:
+        if signature == line["signature"]:
+            line["rules"].append(rule_number)
             return True
-    signatures_hist.append({"signature": signature,"signature_type": signature_type, "rules": [rule_number]})
+    data.append({"signature": signature,"signature_type": signature_type, "rules": [rule_number]})
     return False
 
-def add_exact_matches_to_hist(signature, exact_matches, signatures_hist):
-    for data in signatures_hist:
-        if signature == data["signature"]:
-            data["exact_matches"] = exact_matches
+def add_exact_matches_to_hist(signature, exact_matches, data):
+    for line in data:
+        if signature == line["signature"]:
+            line["exact_matches"] = exact_matches
             return
 
-def save_signature_hist_as_json(signatures_hist, save_path):
+def save_signature_hist_as_json(data, save_path):
     """
-        An auxiliary function used to save exact_matches to a json file.
+        An auxiliary function used to save part_a data to a json file.
     """
-    json_path = os.path.join(save_path, 'signatures_hist.json')
+    json_path = os.path.join(save_path, 'parta_data.json')
     with open(json_path, 'w') as file:
-        for signature in signatures_hist:
-            json.dump(signature, file, indent=None)
+        for line in data:
+            json.dump(line, file, indent=None)
             file.write('\n')
              
-    logger.info(f"Saved the signatures_hist as .json files under the path {save_path}")
+    logger.info(f"Saved the partA data as .json file under the path {json_path}")
 
 def parse_file(file_name: str, signatures: dict):
     
     with open(file_name, 'r') as file:
         rules = file.readlines()
     
-    signatures_hist = []
+    parta_data = []
     global total_rules, lost_rules, relevant_content, total_content, relevant_pcre, total_pcre
     
     total_rules = len(rules)
@@ -147,7 +146,7 @@ def parse_file(file_name: str, signatures: dict):
                 for match in matches:                       
                     data = match.group(1)
                     
-                    if check_duplicate_signatures(data, signature_type, rule_num+1, signatures_hist):
+                    if check_duplicate_signatures(data, signature_type, rule_num+1, parta_data):
                         continue
                     
                     if signature_type == 'pcre':
@@ -159,7 +158,7 @@ def parse_file(file_name: str, signatures: dict):
                         data = ContentProcessor.run(data)
                     
                     data = analyze_and_threshold(data)
-                    add_exact_matches_to_hist(match.group(1), data, signatures_hist)
+                    add_exact_matches_to_hist(match.group(1), data, parta_data)
                     
                     if data:
                         if signature_type == 'pcre':
@@ -167,7 +166,7 @@ def parse_file(file_name: str, signatures: dict):
                         else:   # content
                             relevant_content += 1
     
-    return signatures_hist
+    return parta_data
 
 def analyze_and_threshold(data: list) -> list:
     thresholded_data = []
@@ -245,21 +244,21 @@ def log_info(start_time, end_time):
     width = os.get_terminal_size().columns
     
     print('-' * width)
-    print('General information after the script\'s execution:')
-    print(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
-    print(f'The script used the following threshold: {config.MINIMAL_EXACT_MATCH_LENGTH} for exact matches.\n')
+    logger.info('General information after the script\'s execution:')
+    logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
+    logger.info(f'The script used the following threshold: {config.MINIMAL_EXACT_MATCH_LENGTH} for exact matches.\n')
     
-    print(f'The snort rule file contains {total_rules} rules.')
-    print(f'{len(lost_rules)} rules were lost during the parsing which is {(len(lost_rules) / total_rules) * 100 :.2f}% of all the rules.\n')
+    logger.info(f'The snort rule file contains {total_rules} rules.')
+    logger.info(f'{len(lost_rules)} rules were lost during the parsing which is {(len(lost_rules) / total_rules) * 100 :.2f}% of all the rules.\n')
     
-    print(f'There are {total_content} content signatures and {total_pcre} pcre signatures in the file.')
-    print(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the signatures remained after thresholding.')
-    print(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre signatures remained remained after thresholding.')
-    print(f'{relevant_content / total_content * 100 :.2f}% content signatures remained after thresholding.\n')
+    logger.info(f'There are {total_content} content signatures and {total_pcre} pcre signatures in the file.')
+    logger.info(f'{(relevant_pcre + relevant_content) / (total_pcre + total_content) * 100 :.2f}% of the signatures remained after thresholding.')
+    logger.info(f'{relevant_pcre / total_pcre * 100 :.2f}% pcre signatures remained remained after thresholding.')
+    logger.info(f'{relevant_content / total_content * 100 :.2f}% content signatures remained after thresholding.\n')
     
-    print(f'The total number of exactmatches is {total_exactmatches}.')
-    print(f'{total_exactmatches - relevant_exactmatches} were removed after thresholding.')
-    print(f'{relevant_exactmatches/total_exactmatches * 100 :.2f}% of the exactmatches remained after thresholding.')
+    logger.info(f'The total number of exactmatches is {total_exactmatches}.')
+    logger.info(f'{total_exactmatches - relevant_exactmatches} were removed after thresholding.')
+    logger.info(f'{relevant_exactmatches/total_exactmatches * 100 :.2f}% of the exactmatches remained after thresholding.')
     print('-' * width + '\n')
     
 def save_data(length_histogram, save_path):
@@ -347,16 +346,16 @@ def main():
     signatures_type = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
     
-    signatures_hist = parse_file(file_path, signatures_type)
+    parta_data = parse_file(file_path, signatures_type)
     
     
     lost_rules = list(range(1, total_rules + 1))
     
-    check_lost_rules(signatures_hist, lost_rules)
-    translate_exact_matches_to_hex(signatures_hist)
+    check_lost_rules(parta_data, lost_rules)
+    translate_exact_matches_to_hex(parta_data)
     
     if args.json:
-        save_signature_hist_as_json(signatures_hist, abs_save_path)
+        save_signature_hist_as_json(parta_data, abs_save_path)
         
     save_data(length_histogram, abs_save_path)    
 
