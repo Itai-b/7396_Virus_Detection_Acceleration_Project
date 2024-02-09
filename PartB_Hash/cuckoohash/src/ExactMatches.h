@@ -6,32 +6,31 @@
 #include <iostream>
 
 
-enum RuleType {CONTENT = 1, PCRE = 2, OTHER = 0};
+enum SignatureType {CONTENT = 1, PCRE = 2, OTHER = 0};
 
 // ExactMatch class
 class ExactMatch {
 public:
-	ExactMatch() : rule_id(0), rule_type(OTHER), exact_match("") {};
+	ExactMatch() : signature_type(OTHER), exact_match("") {};
 	ExactMatch(const ExactMatch& other)
-		: rule_id(other.rule_id), rule_type(other.rule_type), exact_match(other.exact_match) {};
-	ExactMatch(int rule_id, std::string rule_type, std::string exact_match)
-		: rule_id(rule_id), exact_match(exact_match) {
-		setRuleType(rule_type);
+		: rules_number(other.rules_number), signature_type(other.signature_type), exact_match(other.exact_match) {};
+	ExactMatch(std::vector<int> rules_number, std::string signature_type, std::string exact_match)
+		: rules_number(rules_number), exact_match(exact_match) {
+		setSignatureType(signature_type);
 	};
-	ExactMatch(int rule_id, RuleType rule_type, std::string exact_match) 
-		: rule_id(rule_id), rule_type(rule_type), exact_match(exact_match) {};
+	ExactMatch(std::vector<int> rules_number, SignatureType signature_type, std::string exact_match)
+		: rules_number(rules_number), signature_type(signature_type), exact_match(exact_match) {};
 	~ExactMatch() = default;
 
-	int getRuleId() { return rule_id; }
-	std::string getRuleType() { if (rule_type == CONTENT) { return "content"; } else if (rule_type == PCRE) { return "pcre"; } else { return "other"; } }
+	std::vector<int> getRulesNumbers() { return rules_number; }
+	std::string getSignatureType() { if (signature_type == CONTENT) { return "content"; } else if (signature_type == PCRE) { return "pcre"; } else { return "other"; } }
 	std::string getExactMatch() { return exact_match; }
-	void setRuleId(int new_id) { rule_id = new_id; }
-	void setRuleType(std::string new_type) { if (new_type == "content") { rule_type = CONTENT; } else if (new_type == "pcre") { rule_type = PCRE; } else { rule_type = OTHER; } }
+	void setSignatureType(std::string new_type) { if (new_type == "content") { signature_type = CONTENT; } else if (new_type == "pcre") { signature_type = PCRE; } else { signature_type = OTHER; } }
 	void setExactMatch(const std::string& new_exact_match) { exact_match = new_exact_match; }
 	
 private:
-	int rule_id;
-	RuleType rule_type;
+	std::vector<int> rules_number;
+	SignatureType signature_type;
 	std::string exact_match;
 };
 

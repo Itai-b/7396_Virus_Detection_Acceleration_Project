@@ -10,7 +10,7 @@ save_path=$WORK_DIR
 # Parse command line arguments
 while getopts "r:p:" opt; do
   case $opt in
-	r) rules_fil="$OPTARG"
+	r) rules_file="$OPTARG"
 	;;
 	p) save_path="$OPTARG"
 	;;
@@ -29,4 +29,4 @@ chmod +x SnortRulesParser.py
 dos2unix SnortRulesParser.py > /dev/null 2>&1
 
 # Run the python script
-python3 SnortRulesParser.py $rules_fil -p $save_path -j
+python3 SnortRulesParser.py $rules_file -p $save_path -j

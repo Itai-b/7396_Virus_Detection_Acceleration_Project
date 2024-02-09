@@ -7,7 +7,7 @@
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SUBDIR=cuckoohash
 INSTALLDIR=install
-JSONNAME=exact_matches_hex.json
+JSONNAME=parta_data.json
 COPYJSONFROM=../Data
 CPYJSONTO=cuckoohash/src
 

@@ -17,7 +17,7 @@
 
 #define NUMBER_OF_TESTS 5
 #define TABLE_SIZE 256              // in KB
-#define MAX_LOAD_FACTOR 0.98        // in [0,1]
+#define MAX_LOAD_FACTOR 0.92        // in [0,1]
 #define SHUFFLE_SEED 2847354131     // prime!
 
 // Use for reducing CuckooItem from 2*sizeof(T) bytes, to sizeof(T) + 1 bytes.
@@ -80,14 +80,14 @@ int insertToCuckoo(const std::vector<Substring<T>>& substrings, libcuckoo::cucko
 /// <returns></returns>
 int main(int argc, char* argv[]) {
     auto start_time = std::chrono::high_resolution_clock::now();
-    std::string file_path = "exact_matches_hex.json";
+    std::string file_path = "parta_data.json";
     if (argc >= 2) {    // running from console
         file_path = argv[1];
     }
 
     ExactMatches exact_matches;
     parseFile(file_path, exact_matches);
-    
+   
     // Parse the ExactMatches and extract Substrings of L bytes with parsing of G bytes jump gap per substring.
     // Create a vector for shuffling the values (we used set for removing doubles, but it cannot be shuffled directly).
     std::set<Substring64> substrings;
@@ -126,12 +126,12 @@ int main(int argc, char* argv[]) {
     }
 
     // Print Statistics
-    std::cout << "==========================================STATS==========================================" << std::endl   \
-        << std::dec << substrings.size() << " Substring(s) have been produced." << std::endl                                \
-        << sum_inserted / NUMBER_OF_TESTS << " Substring(s) in average have been inserted to the Hash Table." << std::endl  \
-        << "Average load factor is : " << sum_load_factors / NUMBER_OF_TESTS << std::endl                                   \
-        << "Average elements not inserted is: " << substrings.size() - (sum_inserted / NUMBER_OF_TESTS) << std::endl        \
-        << "Data was calculated over " << NUMBER_OF_TESTS << " run(s) of cuckoo hash insertions with L = "                  \
+    std::cout << "==========================================STATS==========================================" << std::endl                         \
+        << std::dec << substrings.size() << " Substring(s) have been produced." << std::endl                                                      \
+        << sum_inserted / NUMBER_OF_TESTS << " Substring(s) in average have been inserted to the Hash Table." << std::endl                        \
+        << "Average load factor is : " << sum_load_factors / NUMBER_OF_TESTS << std::endl                                                         \
+        << "On Average " << ((sum_inserted / NUMBER_OF_TESTS) / substrings.size())*100 << "% of all Substrings were inserted." << std::endl       \
+        << "Data was calculated over " << NUMBER_OF_TESTS << " run(s) of cuckoo hash insertions with L = "                                        \
         << sizeof(Substring64) << " and G = " << SUBSTRING_DEFAULT_GAP << "." << std::endl;
     
     

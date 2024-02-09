@@ -17,34 +17,38 @@
  * that the results of the parsing will be inserted to
  */
 void parseLine(std::string line, ExactMatches& exact_matches) {
-    nlohmann::json parsed_line = nlohmann::json::parse(line);
-    int rule_id = parsed_line[0];
-    std::string rule_type = parsed_line[1];
-    std::vector<std::vector<std::string>> signatures = parsed_line[2];
+    nlohmann::json jsonObj = nlohmann::json::parse(line);
+
+    // Now you can access elements in the JSON object
+    std::string signature = jsonObj["signature"];
+    std::string signature_type = jsonObj["signature_type"];
+    std::vector<int> rules = jsonObj["rules"];
+    std::vector<std::vector<std::string>> exact_matches_str = jsonObj["exact_matches"];
+    std::vector<std::vector<std::string>> exact_matches_hex = jsonObj["exact_matches_hex"];
 
     std::string match = "0x";
 
     int i = 0;
-    for (const auto& signature : signatures ) {
+    for (const auto& exact_match_hex : exact_matches_hex) {
         // for every exact match string
         int j = 0;
-        for (const auto& hex : signature) {
+        for (const auto& hex : exact_match_hex) {
             std::string value_to_concat = "";
-            if ((hex.substr(0,2) == "0x")) {
-                value_to_concat = hex.substr(2); 
+            if ((hex.substr(0, 2) == "0x")) {
+                value_to_concat = hex.substr(2);
             }
             match = match + value_to_concat;
             ++j;
         }
         //insert exact_match to ExactMatches.
-        exact_matches.insert(ExactMatch(rule_id, rule_type, match));
+        exact_matches.insert(ExactMatch(rules, signature_type, match));
         ++i;
         match = "0x";
     }
 }
 
  /**
-  * Parse a line in 'exact_matches_hex.json' to extract items of class ExactMatch.
+  * Parse a line in 'parta_data.json' to extract items of class ExactMatch.
   *
   * @param line string representing a line in the parsed .json file
   * @param exact_matches reference to a member of class ExactMaches,
