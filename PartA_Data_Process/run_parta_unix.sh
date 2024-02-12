@@ -29,4 +29,4 @@ chmod +x SnortRulesParser.py
 dos2unix SnortRulesParser.py > /dev/null 2>&1
 
 # Run the python script
-python3 SnortRulesParser.py $rules_file -p $save_path -j
+python3 SnortRulesParser.py $rules_file -p $save_path -j -d
