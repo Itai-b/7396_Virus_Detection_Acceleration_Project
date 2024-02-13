@@ -104,14 +104,16 @@ def add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_
             line["exact_matches_hex"] = exact_matches_hex
             return
 
-def add_data_by_exactmatch(exact_matches, exact_matches_hex, rule, data_by_exactmatch):
+def add_data_by_exactmatch(exact_matches, exact_matches_hex, rule, signature_type, data_by_exactmatch):
     for i, exact_match in enumerate(exact_matches):
         for line in data_by_exactmatch:
             if (exact_match == line["exact_match"]):
                 if rule not in line["rules"]:
                     line["rules"].append(rule)
+                if signature_type not in line["signature_type"]:
+                    line["signature_type"].append(signature_type)
                 return
-        data_by_exactmatch.append({"exact_match": exact_match, "exact_match_hex": exact_matches_hex[i], "rules": [rule]})
+        data_by_exactmatch.append({"exact_match": exact_match, "exact_match_hex": exact_matches_hex[i], "signature_type": [signature_type], "rules": [rule]})
     
 
 def save_data_as_json(data_by_signature, data_by_exactmatch, save_path):
@@ -162,7 +164,7 @@ def parse_file(file_name, signatures):
                     
                     exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
                     add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature)
-                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num + 1, data_by_exactmatch)
+                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num + 1, signature_type, data_by_exactmatch)
                     ResultsAnalysis.total_exactmatches += len(exact_matches)
 
     return data_by_signature, data_by_exactmatch
