@@ -14,12 +14,14 @@ global  total_rules, \
         total_pcre, \
         total_signatures, \
         total_content, \
-        total_exactmatches
+        total_exactmatches, \
+        unique_exactmatches
         
 total_rules = 0
 total_pcre = 0
 total_content = 0
 total_exactmatches = 0
+unique_exactmatches = 0
 
 def check_rules_with_no_signitures(data_by_signature, logger):
     """
@@ -68,12 +70,13 @@ def log_info(start_time, end_time,logger):
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
     logger.info(f'{len(rules_with_no_signatures)} rules do not have signatures to parse which is {(len(rules_with_no_signatures) / total_rules) * 100 :.2f}% of all the rules.')
-    logger.info(f'{total_rules - len(rules_lost_while_parsing)} rules with signatures left after parsing which is {((total_rules - len(rules_lost_while_parsing)) / total_rules) * 100 :.2f}% of them.\n')
+    logger.info(f'{total_rules - len(rules_lost_while_parsing) - len(rules_with_no_signatures)} rules with signatures left after parsing which is {((total_rules - len(rules_lost_while_parsing) - len(rules_with_no_signatures)) / (total_rules - len(rules_with_no_signatures))) * 100 :.2f}% of them.\n')
 
     
     logger.info(f'There are {total_content} content signatures and {total_pcre} pcre signatures in the file.')
     
     logger.info(f'The total number of exactmatches extracted is {total_exactmatches}.')
+    logger.info(f'{unique_exactmatches} unique exactmatches were extracted which is {(unique_exactmatches/total_exactmatches) * 100 :.2f}% of all exactmatches.')
     print('-' * width + '\n')
 
 def main(data_by_signature, logger):

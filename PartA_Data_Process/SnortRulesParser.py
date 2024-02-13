@@ -1,4 +1,6 @@
 """
+TODO: update documentation.
+
 Snort Rule Set Extractor
 
 This script extracts rules or sub-strings (for exact match) from Snort's rule set.
@@ -103,11 +105,13 @@ def add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_
             return
 
 def add_data_by_exactmatch(exact_matches, exact_matches_hex, rule, data_by_exactmatch):
-    for line in data_by_exactmatch:
-        if (exact_matches == line["exact_matches"]):
-            line["rules"].append(rule)
-            return
-    data_by_exactmatch.append({"exact_matches": exact_matches, "exact_matches_hex": exact_matches_hex, "rules": [rule]})
+    for i, exact_match in enumerate(exact_matches):
+        for line in data_by_exactmatch:
+            if (exact_match == line["exact_match"]):
+                if rule not in line["rules"]:
+                    line["rules"].append(rule)
+                return
+        data_by_exactmatch.append({"exact_match": exact_match, "exact_match_hex": exact_matches_hex[i], "rules": [rule]})
     
 
 def save_data_as_json(data_by_signature, data_by_exactmatch, save_path):
@@ -158,7 +162,7 @@ def parse_file(file_name, signatures):
                     
                     exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
                     add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature)
-                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num, data_by_exactmatch)
+                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num + 1, data_by_exactmatch)
                     ResultsAnalysis.total_exactmatches += len(exact_matches)
 
     return data_by_signature, data_by_exactmatch
@@ -216,7 +220,8 @@ def main():
                 'pcre': REGEX_SIGNATURE}
     
     data_by_signature, data_by_exact_match = parse_file(file_path, signatures_type)
-        
+    ResultsAnalysis.unique_exactmatches = len(data_by_exact_match)    
+
     ResultsAnalysis.main(data_by_signature, logger)
     
     if args.json:
