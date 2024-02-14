@@ -3,7 +3,6 @@ This module is in charge of the data prossesing after parsing the snort rules.
 """
 
 import os
-import SnortRulesParser as SnortRulesParser
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
@@ -23,41 +22,45 @@ total_content = 0
 total_exactmatches = 0
 unique_exactmatches = 0
 
-def create_plots(data_by_signature, data_by_exactmatch, abs_save_path, logger):
+def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path, logger):
     """
         A function used to create the plots for the analysis.
     """
     
     # Plot the cumulative plot of the exact_match lengths.
     exactmatches_lengths = [len(line["exact_match"]) for line in data_by_exactmatch]
-    length_counts = dict(Counter(exactmatches_lengths))
     
-    sorted_lengths = sorted(length_counts.keys())
-    sorted_counts = [length_counts[length] for length in sorted_lengths]
+    length_counts = [exactmatches_lengths.count(i) for i in range(1, max(exactmatches_lengths) + 1)]
+    length = [i for i in range(1, len(length_counts) + 1)]
 
-    cumulative_counts = np.cumsum(sorted_counts)
-
+    cumulative_counts = np.cumsum(length_counts)
     total_count = cumulative_counts[-1]
     cumulative_percentages = (cumulative_counts / total_count) * 100
 
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
-    ax1.set_xlabel('Length of ExactMatch Substring')
+    ax1.set_xlabel('Length of ExactMatch')
     ax1.set_ylabel('Count', color=color)
-    ax1.plot(sorted_lengths, cumulative_counts, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
+    ax1.plot(length, cumulative_counts, color=color)
 
     ax2 = ax1.twinx()
     color = 'tab:red'
     ax2.set_ylabel('Percentage (%)', color=color)
-    ax2.plot(sorted_lengths, cumulative_percentages, color=color)
+    ax2.plot(length, cumulative_percentages, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
+    xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
+    for x_val in xticks:
+        y_val = cumulative_percentages[x_val]
+        plt.plot(x_val, y_val, 'bo')
+        plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
-    plt.title('Cumulative plot of ExactMatch Substrings lengths')
-
+    ax2.tick_params(axis='y', labelcolor=color)
+    
+    plt.title('Cumulative plot of ExactMatch Subsignatures lengths', fontweight='bold')
     plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_exactmatches.png'), dpi=300)
-    logger.info(f'Saved the cumulative plot of exactmatches lengths under the path {abs_save_path}')
+    plt.close()  
     
 def check_rules_with_no_signitures(data_by_signature, logger):
     """
@@ -100,7 +103,7 @@ def log_info(start_time, end_time,logger):
     width = os.get_terminal_size().columns
     
     print('-' * width)
-    logger.info('General information after the script\'s execution:\n')
+    logger.info('General information after the script\'s execution:')
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
@@ -119,5 +122,5 @@ def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
    
     check_rules_with_no_signitures(data_by_signature, logger)
     check_rules_lost_while_parsing(data_by_signature, logger)
-    create_plots(data_by_signature, data_by_exactmatch, abs_save_path, logger)
+    plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path, logger)
     
