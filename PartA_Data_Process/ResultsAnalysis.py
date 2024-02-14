@@ -27,7 +27,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
         A function used to plot the cumulated lost rules by the exactmatch length.
     """
-    lost_rules_by_length = [1 for i in range(1, total_rules + 1)]
+    lost_rules_by_length = [0 for i in range(0, total_rules + 1)]
 
     for line in data_by_exactmatch:
         for rule in line["rules"]:
@@ -38,6 +38,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
     cumulative_counts = np.cumsum(length_counts)
     total_count = cumulative_counts[-1]
+    print(total_count)
     cumulative_percentages = (cumulative_counts / total_count) * 100
     fig, ax1 = plt.subplots()
 
@@ -60,7 +61,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     ax2.tick_params(axis='y', labelcolor=color)
     
-    plt.title('Lost Rules by ExactMatch length threshold', fontweight='bold')
+    plt.title('Lost Rules by ExactMatch length threshold (only rules with signatures)', fontweight='bold', fontsize=10)
     plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_lost_rules.png'), dpi=300)
     plt.close()  
 
