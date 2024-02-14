@@ -17,6 +17,9 @@ dos2unix install_libcuckoo_unix.sh
 chmod +x install_nlohmann_json_unix.sh
 dos2unix install_nlohmann_json_unix.sh
 
+# Fix clock skews (WSL bug)
+sudo hwclock -s
+
 
 # Run the installation scripts:
 ./install_libcuckoo_unix.sh
@@ -40,8 +43,8 @@ cp "$WORK_DIR/../Data/$JSONNAME" "$WORK_DIR/$CPYJSONTO/" || { echo "Error: Copyi
 
 # Prepare the build folder
 cd "$WORK_DIR/$SUBDIR"
-rm -rf build
-mkdir build
+# rm -rf build
+mkdir -p build
 cd build
 
 # Configure cmake library path, which is shown on CMakePresets.json
