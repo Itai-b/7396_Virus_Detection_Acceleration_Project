@@ -221,13 +221,13 @@ def main():
     signatures_type = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
     
-    data_by_signature, data_by_exact_match = parse_file(file_path, signatures_type)
-    ResultsAnalysis.unique_exactmatches = len(data_by_exact_match)    
+    data_by_signature, data_by_exactmatch = parse_file(file_path, signatures_type)
+    ResultsAnalysis.unique_exactmatches = len(data_by_exactmatch)    
 
-    ResultsAnalysis.main(data_by_signature, logger)
+    ResultsAnalysis.main(data_by_signature, data_by_exactmatch, abs_save_path, logger)
     
     if args.json:
-        save_data_as_json(data_by_signature, data_by_exact_match, abs_save_path)
+        save_data_as_json(data_by_signature, data_by_exactmatch, abs_save_path)
         
     logger.info(f'Finished parsing the file.\n')
     end_time = time.time()

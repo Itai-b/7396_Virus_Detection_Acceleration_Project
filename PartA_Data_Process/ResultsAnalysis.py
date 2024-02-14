@@ -2,11 +2,11 @@
 This module is in charge of the data prossesing after parsing the snort rules.
 """
 
-from math import log
 import os
-import csv
-from config import config
-
+import SnortRulesParser as SnortRulesParser
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
 
 """___________________________________GLOBALS______________________________________"""
 
@@ -23,6 +23,42 @@ total_content = 0
 total_exactmatches = 0
 unique_exactmatches = 0
 
+def create_plots(data_by_signature, data_by_exactmatch, abs_save_path, logger):
+    """
+        A function used to create the plots for the analysis.
+    """
+    
+    # Plot the cumulative plot of the exact_match lengths.
+    exactmatches_lengths = [len(line["exact_match"]) for line in data_by_exactmatch]
+    length_counts = dict(Counter(exactmatches_lengths))
+    
+    sorted_lengths = sorted(length_counts.keys())
+    sorted_counts = [length_counts[length] for length in sorted_lengths]
+
+    cumulative_counts = np.cumsum(sorted_counts)
+
+    total_count = cumulative_counts[-1]
+    cumulative_percentages = (cumulative_counts / total_count) * 100
+
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:blue'
+    ax1.set_xlabel('Length of ExactMatch Substring')
+    ax1.set_ylabel('Count', color=color)
+    ax1.plot(sorted_lengths, cumulative_counts, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+    color = 'tab:red'
+    ax2.set_ylabel('Percentage (%)', color=color)
+    ax2.plot(sorted_lengths, cumulative_percentages, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    plt.title('Cumulative plot of ExactMatch Substrings lengths')
+
+    plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_exactmatches.png'), dpi=300)
+    logger.info(f'Saved the cumulative plot of exactmatches lengths under the path {abs_save_path}')
+    
 def check_rules_with_no_signitures(data_by_signature, logger):
     """
         An auxiliary function used to check if there are any rules which do not contain a signature.
@@ -66,7 +102,6 @@ def log_info(start_time, end_time,logger):
     print('-' * width)
     logger.info('General information after the script\'s execution:\n')
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
-    #logger.info(f'The script used the following threshold: {config.MINIMAL_EXACT_MATCH_LENGTH} for exact matches.\n')
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
     logger.info(f'{len(rules_with_no_signatures)} rules do not have signatures to parse which is {(len(rules_with_no_signatures) / total_rules) * 100 :.2f}% of all the rules.')
@@ -78,9 +113,11 @@ def log_info(start_time, end_time,logger):
     logger.info(f'{unique_exactmatches} unique exactmatches were extracted which is {(unique_exactmatches/total_exactmatches) * 100 :.2f}% of all exactmatches.')
     print('-' * width + '\n')
 
-def main(data_by_signature, logger):
+def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
     global rules_with_no_signatures, \
            rules_lost_while_parsing 
-    
+   
     check_rules_with_no_signitures(data_by_signature, logger)
     check_rules_lost_while_parsing(data_by_signature, logger)
+    create_plots(data_by_signature, data_by_exactmatch, abs_save_path, logger)
+    
