@@ -22,12 +22,12 @@ total_content = 0
 total_exactmatches = 0
 unique_exactmatches = 0
 
+
 def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
-        A function used to plot the cumulated lost rules by the length of the exact_match.
+        A function used to plot the cumulated lost rules by the exactmatch length.
     """
     lost_rules_by_length = [1 for i in range(1, total_rules + 1)]
-    print(len(lost_rules_by_length))
 
     for line in data_by_exactmatch:
         for rule in line["rules"]:
@@ -36,12 +36,9 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     length = [i for i in range(1, max(lost_rules_by_length) + 1)]
     length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
-    print(length_counts)
     cumulative_counts = np.cumsum(length_counts)
     total_count = cumulative_counts[-1]
-    
-    cumulative_percentages = (cumulative_counts / total_rules) * 100
-
+    cumulative_percentages = (cumulative_counts / total_count) * 100
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -63,7 +60,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     ax2.tick_params(axis='y', labelcolor=color)
     
-    plt.title('Cumulative plot of Lost Rules by ExactMatch Subsignatures lengths', fontweight='bold')
+    plt.title('Lost Rules by ExactMatch length threshold', fontweight='bold')
     plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_lost_rules.png'), dpi=300)
     plt.close()  
 
@@ -103,7 +100,7 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     ax2.tick_params(axis='y', labelcolor=color)
     
-    plt.title('Cumulative plot of ExactMatch Subsignatures lengths', fontweight='bold')
+    plt.title('Cumulated ExactMatches by length', fontweight='bold')
     plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_exactmatches.png'), dpi=300)
     plt.close()  
     
@@ -123,14 +120,14 @@ def check_rules_with_no_signitures(data_by_signature, logger):
     else:
         logger.info(f'All rules still exist after the parsing')
         
-def check_rules_lost_while_parsing(data_by_signature, logger):
+def check_rules_lost_while_parsing(data_by_exactmatch, logger):
     """
         An auxiliary function used to find which rules where lost during 
     """
     global rules_lost_while_parsing
     rules_lost_while_parsing = list(range(1, total_rules + 1))
-    for line in data_by_signature:
-        if (len(line["exact_matches"]) == 0):
+    for line in data_by_exactmatch:
+        if (len(line["exact_match"]) == 0):
             continue
         for rule in line["rules"]:
             if (rule in rules_lost_while_parsing):
@@ -166,7 +163,7 @@ def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
            rules_lost_while_parsing 
    
     check_rules_with_no_signitures(data_by_signature, logger)
-    check_rules_lost_while_parsing(data_by_signature, logger)
+    check_rules_lost_while_parsing(data_by_exactmatch, logger)
     plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
     plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
     
