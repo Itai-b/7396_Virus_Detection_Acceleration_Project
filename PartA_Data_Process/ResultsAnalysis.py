@@ -6,6 +6,9 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
 
 """___________________________________GLOBALS______________________________________"""
 
@@ -27,19 +30,21 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
         A function used to plot the cumulated lost rules by the exactmatch length.
     """
-    lost_rules_by_length = [0 for i in range(0, total_rules + 1)]
+    lost_rules_by_length = [0 for i in range(0, total_rules)]
 
     for line in data_by_exactmatch:
         for rule in line["rules"]:
             if lost_rules_by_length[rule - 1] <= len(line["exact_match"]):
                 lost_rules_by_length[rule - 1] = (len(line["exact_match"]) + 1)
-
-    length = [i for i in range(1, max(lost_rules_by_length) + 1)]
-    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
+    print(lost_rules_by_length)
+    length = [i for i in range(1, max(lost_rules_by_length))]
+    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length))]
+    print(length_counts)
     cumulative_counts = np.cumsum(length_counts)
+    
     total_count = cumulative_counts[-1]
-    print(total_count)
     cumulative_percentages = (cumulative_counts / total_count) * 100
+
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -55,7 +60,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     ax2.tick_params(axis='y', labelcolor=color)
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
-        y_val = cumulative_percentages[x_val]
+        y_val = cumulative_percentages[x_val-1]
         plt.plot(x_val, y_val, 'bo')
         plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
@@ -95,7 +100,7 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
     ax2.tick_params(axis='y', labelcolor=color)
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
-        y_val = cumulative_percentages[x_val]
+        y_val = cumulative_percentages[x_val-1]
         plt.plot(x_val, y_val, 'bo')
         plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
@@ -122,11 +127,14 @@ def check_rules_with_no_signitures(data_by_signature, logger):
         logger.info(f'All rules still exist after the parsing')
         
 def check_rules_lost_while_parsing(data_by_exactmatch, logger):
+def check_rules_lost_while_parsing(data_by_exactmatch, logger):
     """
         An auxiliary function used to find which rules where lost during 
     """
     global rules_lost_while_parsing
     rules_lost_while_parsing = list(range(1, total_rules + 1))
+    for line in data_by_exactmatch:
+        if (len(line["exact_match"]) == 0):
     for line in data_by_exactmatch:
         if (len(line["exact_match"]) == 0):
             continue
@@ -147,6 +155,7 @@ def log_info(start_time, end_time,logger):
     
     print('-' * width)
     logger.info('General information after the script\'s execution:')
+    logger.info('General information after the script\'s execution:')
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
@@ -160,10 +169,16 @@ def log_info(start_time, end_time,logger):
     print('-' * width + '\n')
 
 def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
+def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
     global rules_with_no_signatures, \
            rules_lost_while_parsing 
    
+   
     check_rules_with_no_signitures(data_by_signature, logger)
+    check_rules_lost_while_parsing(data_by_exactmatch, logger)
+    plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
+    plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
+    
     check_rules_lost_while_parsing(data_by_exactmatch, logger)
     plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
     plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
