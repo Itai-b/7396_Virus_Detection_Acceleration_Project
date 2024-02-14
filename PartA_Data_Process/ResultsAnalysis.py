@@ -6,6 +6,9 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter
 
 """___________________________________GLOBALS______________________________________"""
 
@@ -124,11 +127,14 @@ def check_rules_with_no_signitures(data_by_signature, logger):
         logger.info(f'All rules still exist after the parsing')
         
 def check_rules_lost_while_parsing(data_by_exactmatch, logger):
+def check_rules_lost_while_parsing(data_by_exactmatch, logger):
     """
         An auxiliary function used to find which rules where lost during 
     """
     global rules_lost_while_parsing
     rules_lost_while_parsing = list(range(1, total_rules + 1))
+    for line in data_by_exactmatch:
+        if (len(line["exact_match"]) == 0):
     for line in data_by_exactmatch:
         if (len(line["exact_match"]) == 0):
             continue
@@ -149,6 +155,7 @@ def log_info(start_time, end_time,logger):
     
     print('-' * width)
     logger.info('General information after the script\'s execution:')
+    logger.info('General information after the script\'s execution:')
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
@@ -162,10 +169,16 @@ def log_info(start_time, end_time,logger):
     print('-' * width + '\n')
 
 def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
+def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
     global rules_with_no_signatures, \
            rules_lost_while_parsing 
    
+   
     check_rules_with_no_signitures(data_by_signature, logger)
+    check_rules_lost_while_parsing(data_by_exactmatch, logger)
+    plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
+    plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
+    
     check_rules_lost_while_parsing(data_by_exactmatch, logger)
     plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
     plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
