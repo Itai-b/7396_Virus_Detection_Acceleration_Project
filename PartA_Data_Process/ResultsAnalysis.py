@@ -22,9 +22,54 @@ total_content = 0
 total_exactmatches = 0
 unique_exactmatches = 0
 
-def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path, logger):
+def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
-        A function used to create the plots for the analysis.
+        A function used to plot the cumulated lost rules by the length of the exact_match.
+    """
+    lost_rules_by_length = [1 for i in range(1, total_rules + 1)]
+    print(len(lost_rules_by_length))
+
+    for line in data_by_exactmatch:
+        for rule in line["rules"]:
+            if lost_rules_by_length[rule - 1] <= len(line["exact_match"]):
+                lost_rules_by_length[rule - 1] = (len(line["exact_match"]) + 1)
+
+    length = [i for i in range(1, max(lost_rules_by_length) + 1)]
+    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
+    print(length_counts)
+    cumulative_counts = np.cumsum(length_counts)
+    total_count = cumulative_counts[-1]
+    
+    cumulative_percentages = (cumulative_counts / total_rules) * 100
+
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:blue'
+    ax1.set_xlabel('Length of ExactMatch')
+    ax1.set_ylabel('Lost Rules', color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+    ax1.plot(length, cumulative_counts, color=color)
+
+    ax2 = ax1.twinx()
+    color = 'tab:red'
+    ax2.set_ylabel('Percentage (%)', color=color)
+    ax2.plot(length, cumulative_percentages, color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+    xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
+    for x_val in xticks:
+        y_val = cumulative_percentages[x_val]
+        plt.plot(x_val, y_val, 'bo')
+        plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+
+    ax2.tick_params(axis='y', labelcolor=color)
+    
+    plt.title('Cumulative plot of Lost Rules by ExactMatch Subsignatures lengths', fontweight='bold')
+    plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_lost_rules.png'), dpi=300)
+    plt.close()  
+
+def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
+    """
+        A function used to plot the cumulative plot of the exact_match lengths.
     """
     
     # Plot the cumulative plot of the exact_match lengths.
@@ -122,5 +167,6 @@ def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
    
     check_rules_with_no_signitures(data_by_signature, logger)
     check_rules_lost_while_parsing(data_by_signature, logger)
-    plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path, logger)
+    plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path)
+    plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path)
     

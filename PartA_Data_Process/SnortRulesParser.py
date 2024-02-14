@@ -85,37 +85,45 @@ logger = logging.getLogger('SnortRulesParser')
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
 
-def check_duplicate_signatures(signature, signature_type, rule_number, data):
-    if not data:
-        data.append({"signature": signature, "signature_type": signature_type, "rules": [rule_number]})
-        return False
-    
-    for line in data:
-        if signature == line["signature"]:
-            line["rules"].append(rule_number)
-            return True
-    data.append({"signature": signature,"signature_type": signature_type, "rules": [rule_number]})
-    return False
-
-def add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature):
+def add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule, data_by_signature):
     for line in data_by_signature:
-        if signature == line["signature"]:
-            line["exact_matches"] = exact_matches
-            line["exact_matches_hex"] = exact_matches_hex
+        if (signature == line["signature"]):
+            if rule not in line["rules"]:
+                line["rules"].append(rule)
+            if signature_type not in line["signature_type"]:
+                line["signature_type"].append(signature_type)
             return
+    if signature_type == 'pcre':
+        ResultsAnalysis.total_pcre += 1
+    else:  # signature_type == 'content':
+        ResultsAnalysis.total_content += 1
+    data_by_signature.append({"signature": signature, "signature_type": signature_type, "exact_matches": exact_matches, "exact_matches_hex": exact_matches_hex, "rules": [rule]})
 
 def add_data_by_exactmatch(exact_matches, exact_matches_hex, rule, signature_type, data_by_exactmatch):
-    for i, exact_match in enumerate(exact_matches):
+    if exact_matches == [] and exact_matches_hex == []:
         for line in data_by_exactmatch:
-            if (exact_match == line["exact_match"]):
+            if line["exact_match"] == [] and line["exact_match_hex"] == []:
                 if rule not in line["rules"]:
                     line["rules"].append(rule)
                 if signature_type not in line["signature_type"]:
                     line["signature_type"].append(signature_type)
                 return
-        data_by_exactmatch.append({"exact_match": exact_match, "exact_match_hex": exact_matches_hex[i], "signature_type": [signature_type], "rules": [rule]})
+        data_by_exactmatch.append({"exact_match": [], "exact_match_hex": [], "signature_type": [signature_type], "rules": [rule]})
+        return
     
-
+    for i, exact_match in enumerate(exact_matches):
+        found = False
+        for line in data_by_exactmatch:
+            if (exact_match == line["exact_match"]):
+                found = True
+                if rule not in line["rules"]:
+                    line["rules"].append(rule)
+                if signature_type not in line["signature_type"]:
+                    line["signature_type"].append(signature_type)
+                break
+        if not found:
+            data_by_exactmatch.append({"exact_match": exact_match, "exact_match_hex": exact_matches_hex[i], "signature_type": [signature_type], "rules": [rule]})
+    
 def save_data_as_json(data_by_signature, data_by_exactmatch, save_path):
     """
         An auxiliary function used to save part_a data to a json file.
@@ -150,20 +158,16 @@ def parse_file(file_name, signatures):
             if matches:
                 for match in matches:                       
                     signature = match.group(1)
-                    
-                    if check_duplicate_signatures(signature, signature_type, rule_num+1, data_by_signature):
-                        continue
-                    
-                    exact_matches = ""
+
+                    exact_matches = []
                     if signature_type == 'pcre':
-                        ResultsAnalysis.total_pcre += 1
                         exact_matches = ExactMatchExtractor.run(signature, 'char')
                     else:   # signature_type == 'content':
-                        ResultsAnalysis.total_content += 1
                         exact_matches = ContentProcessor.run(signature.lower())
                     
                     exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
-                    add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature)
+                    #add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature)
+                    add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule_num + 1, data_by_signature)
                     add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num + 1, signature_type, data_by_exactmatch)
                     ResultsAnalysis.total_exactmatches += len(exact_matches)
 
