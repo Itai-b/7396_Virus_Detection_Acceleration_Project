@@ -36,13 +36,13 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
         for rule in line["rules"]:
             if lost_rules_by_length[rule - 1] <= len(line["exact_match"]):
                 lost_rules_by_length[rule - 1] = (len(line["exact_match"]) + 1)
-    length = [i for i in range(1, max(lost_rules_by_length))]
-    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length))]
+
+    length = [i for i in range(1, max(lost_rules_by_length) + 1)]
+    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
     cumulative_counts = np.cumsum(length_counts)
     
     total_count = cumulative_counts[-1]
     cumulative_percentages = (cumulative_counts / total_count) * 100
-
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -151,7 +151,6 @@ def log_info(start_time, end_time,logger):
     
     print('-' * width)
     logger.info('General information after the script\'s execution:')
-    logger.info('General information after the script\'s execution:')
     logger.info(f'The script\'s execution took {end_time - start_time:.3f} seconds.')
     
     logger.info(f'The snort rule file contains {total_rules} rules.')
@@ -167,7 +166,6 @@ def log_info(start_time, end_time,logger):
 def main(data_by_signature, data_by_exactmatch, abs_save_path, logger):
     global rules_with_no_signatures, \
            rules_lost_while_parsing 
-   
    
     check_rules_with_no_signitures(data_by_signature, logger)
     check_rules_lost_while_parsing(data_by_exactmatch, logger)
