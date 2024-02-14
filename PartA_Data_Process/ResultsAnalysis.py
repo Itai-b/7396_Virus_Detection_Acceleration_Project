@@ -27,19 +27,21 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
         A function used to plot the cumulated lost rules by the exactmatch length.
     """
-    lost_rules_by_length = [0 for i in range(0, total_rules + 1)]
+    lost_rules_by_length = [0 for i in range(0, total_rules)]
 
     for line in data_by_exactmatch:
         for rule in line["rules"]:
             if lost_rules_by_length[rule - 1] <= len(line["exact_match"]):
                 lost_rules_by_length[rule - 1] = (len(line["exact_match"]) + 1)
-
-    length = [i for i in range(1, max(lost_rules_by_length) + 1)]
-    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
+    print(lost_rules_by_length)
+    length = [i for i in range(1, max(lost_rules_by_length))]
+    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length))]
+    print(length_counts)
     cumulative_counts = np.cumsum(length_counts)
+    
     total_count = cumulative_counts[-1]
-    print(total_count)
     cumulative_percentages = (cumulative_counts / total_count) * 100
+
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -55,7 +57,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     ax2.tick_params(axis='y', labelcolor=color)
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
-        y_val = cumulative_percentages[x_val]
+        y_val = cumulative_percentages[x_val-1]
         plt.plot(x_val, y_val, 'bo')
         plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
@@ -95,7 +97,7 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
     ax2.tick_params(axis='y', labelcolor=color)
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
-        y_val = cumulative_percentages[x_val]
+        y_val = cumulative_percentages[x_val-1]
         plt.plot(x_val, y_val, 'bo')
         plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
