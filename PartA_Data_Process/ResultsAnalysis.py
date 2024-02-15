@@ -60,7 +60,10 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     for x_val in xticks:
         y_val = cumulative_percentages[x_val-1]
         plt.plot(x_val, y_val, 'bo')
-        plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+        if x_val == 1:
+            plt.text(x_val, y_val-3, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+        else:
+            plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
     ax2.tick_params(axis='y', labelcolor=color)
     
