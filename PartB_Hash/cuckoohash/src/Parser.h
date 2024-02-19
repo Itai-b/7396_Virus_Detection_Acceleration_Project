@@ -2,12 +2,36 @@
 #define _PARSER_H
 
 #include "ExactMatches.h"
+#include "Substring.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <vector>
+#include <set>
 #include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+
+
+/// <summary>
+/// Parse the ExactMatches and extract Substrings of L bytes with parsing of G bytes jump gap per substring.
+/// </summary>
+/// <typeparam name="T">Type of the unsigned int which will represent the substring {uint32_t, uint64_t, ...}</typeparam>
+/// <param name="exact_matches">Element of class ExactMatches, which is a vector of ExactMatch (rules,type,string) for each exact match extracted from the snort rules' signatures</param>
+/// <param name="substrings">The set of Substrings in which the results will be stored</param>
+template<typename T>
+std::size_t parseExactMatches(const ExactMatches& exact_matches, std::vector<Substring<T>>& substrings, std::size_t G = SUBSTRING_DEFAULT_GAP) {
+    std::set<int> total_unique_rules;
+    for (auto it = exact_matches.exact_matches->begin(); it != exact_matches.exact_matches->end(); ++it) {
+        std::string hexString = (*it)->getExactMatch();
+        std::set<int> rules = (*it)->getRulesNumbers();
+        total_unique_rules.insert(rules.begin(), rules.end());
+        Substring<T>::extractSubstrings(hexString, substrings, rules, G);
+    }
+    std::size_t num_of_unique_rules = total_unique_rules.size();
+    return num_of_unique_rules;
+
+}
 
 /**
  * Parse a line in 'exact_matches_hex.json' to extract items of class ExactMatch.
@@ -20,31 +44,28 @@ void parseLine(std::string line, ExactMatches& exact_matches) {
     nlohmann::json jsonObj = nlohmann::json::parse(line);
 
     // Now you can access elements in the JSON object
-    std::string signature = jsonObj["signature"];
-    std::string signature_type = jsonObj["signature_type"];
-    std::vector<int> rules = jsonObj["rules"];
-    std::vector<std::vector<std::string>> exact_matches_str = jsonObj["exact_matches"];
-    std::vector<std::vector<std::string>> exact_matches_hex = jsonObj["exact_matches_hex"];
+    //std::string signature = jsonObj["signature"];
+    std::vector<std::string> exact_match_str = jsonObj["exact_match"];
+    std::vector<std::string> exact_match_hex = jsonObj["exact_match_hex"];
+    std::vector<int> non_unique_rules = jsonObj["rules"];
+    std::set<int> rules(non_unique_rules.begin(), non_unique_rules.end());
+    //for (const auto& rule : jsonObj["rules"]) {
+    //    rules.insert(static_cast<int>(rule));
+    //}
 
     std::string match = "0x";
 
-    int i = 0;
-    for (const auto& exact_match_hex : exact_matches_hex) {
-        // for every exact match string
-        int j = 0;
-        for (const auto& hex : exact_match_hex) {
-            std::string value_to_concat = "";
-            if ((hex.substr(0, 2) == "0x")) {
-                value_to_concat = hex.substr(2);
-            }
-            match = match + value_to_concat;
-            ++j;
+    int j = 0;
+    for (const auto& hex : exact_match_hex) {
+        std::string value_to_concat = "";
+        if ((hex.substr(0, 2) == "0x")) {
+            value_to_concat = hex.substr(2);
         }
-        //insert exact_match to ExactMatches.
-        exact_matches.insert(ExactMatch(rules, signature_type, match));
-        ++i;
-        match = "0x";
+        match = match + value_to_concat;
+        ++j;
     }
+    //insert exact_match to ExactMatches.
+    exact_matches.insert(ExactMatch(rules, match));
 }
 
  /**

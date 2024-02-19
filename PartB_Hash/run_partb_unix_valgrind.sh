@@ -52,4 +52,4 @@ cmake -DCMAKE_LIBRARY_PATH="../install" ..
 
 # Build and run the project, taking the path to the .json file as an argument:
 make all || exit 1
-src/cuckoohash "$WORK_DIR/$CPYJSONTO/$JSONNAME"
+valgrind src/cuckoohash "$WORK_DIR/$CPYJSONTO/$JSONNAME"
