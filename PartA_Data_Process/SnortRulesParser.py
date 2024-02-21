@@ -71,15 +71,6 @@ import ResultsAnalysis as ResultsAnalysis
 from datetime import datetime
 from config import config
 
-logging.basicConfig(level=logging.INFO)
-
-# Create a FileHandler to save log messages to a file
-log_file_handler = logging.FileHandler('SnortRuleParser.log')
-
-# Clear the log file from previous runs
-with open('SnortRuleParser.log', 'w') as file:
-    pass
-
 logger = logging.getLogger('SnortRulesParser')
 
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
@@ -198,21 +189,11 @@ def main():
     parser.add_argument('-d', '--debug', action='store_true', help='Prints debug information about the script\'s execution.')
     parser.add_argument('-j', '--json', action='store_true', help='Saves the exact matches as a .json file.')
     
-    args = parser.parse_args()
-
-    logger.info(f'Started parsing.')
-    start_time = time.time()                                       
+    args = parser.parse_args()    
 
     abs_save_path = os.path.abspath(args.path)
     logger.info(f'The path where the files will be saved is {abs_save_path}.')
 
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
-        # Create a formatter to specify the format of log messages
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        log_file_handler.setFormatter(formatter)
-        logger.addHandler(log_file_handler)
-        
     file_path = ""
     if args.file_name:
         file_path = 'snort3-community.rules'    
@@ -222,8 +203,25 @@ def main():
                 file_path = arg
                 break
     
+    logging.basicConfig(level=logging.INFO)
+    # Create a FileHandler to save log messages to a file
+    log_file_handler = logging.FileHandler(os.path.join(abs_save_path,'SnortRuleParser.log'))
+    # Clear the log file from previous runs
+    with open(os.path.join(abs_save_path,'SnortRuleParser.log'), 'w') as file:
+        pass
+    
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+        # Create a formatter to specify the format of log messages
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        log_file_handler.setFormatter(formatter)
+        logger.addHandler(log_file_handler)    
+    
     signatures_type = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
+    
+    logger.info(f'Started parsing.')
+    start_time = time.time()                                       
     
     data_by_signature, data_by_exactmatch = parse_file(file_path, signatures_type)
     ResultsAnalysis.unique_exactmatches = len(data_by_exactmatch)    
@@ -236,7 +234,6 @@ def main():
     logger.info(f'Finished parsing the file.\n')
     end_time = time.time()
     ResultsAnalysis.log_info(start_time, end_time, logger)
-
 
 if __name__ == "__main__":
     """

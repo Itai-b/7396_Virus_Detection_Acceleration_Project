@@ -42,7 +42,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     cumulative_counts = np.cumsum(length_counts)
     
     total_count = cumulative_counts[-1]
-    cumulative_percentages = (cumulative_counts / total_count) * 100
+    cumulative_percentages = (cumulative_counts / (total_rules - len(rules_with_no_signatures))) * 100
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
