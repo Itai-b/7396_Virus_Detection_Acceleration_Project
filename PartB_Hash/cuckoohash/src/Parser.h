@@ -3,6 +3,7 @@
 
 #include "ExactMatches.h"
 #include "Substring.h"
+#include "Statistics.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
@@ -19,18 +20,40 @@
 /// <typeparam name="T">Type of the unsigned int which will represent the substring {uint32_t, uint64_t, ...}</typeparam>
 /// <param name="exact_matches">Element of class ExactMatches, which is a vector of ExactMatch (rules,type,string) for each exact match extracted from the snort rules' signatures</param>
 /// <param name="substrings">The set of Substrings in which the results will be stored</param>
-template<typename T>
-std::size_t parseExactMatches(const ExactMatches& exact_matches, std::vector<Substring<T>>& substrings, std::size_t G = SUBSTRING_DEFAULT_GAP) {
+template<typename T, std::size_t G = SUBSTRING_DEFAULT_GAP>
+std::size_t parseExactMatches(const ExactMatches& exact_matches, std::vector<Substring<T>>& substrings, SubstringLogger& log) {
     std::set<int> total_unique_rules;
+    
+    // Extract substrings for each exact match string and store it into the substrings vector
     for (auto it = exact_matches.exact_matches->begin(); it != exact_matches.exact_matches->end(); ++it) {
         std::string hexString = (*it)->getExactMatch();
         std::set<int> rules = (*it)->getRulesNumbers();
         total_unique_rules.insert(rules.begin(), rules.end());
         Substring<T>::extractSubstrings(hexString, substrings, rules, G);
     }
+
+    // Parse the unique* substrings to log them into the substrings_log.json
+    // (*see extractSubstrings implementation)
+    for (Substring<T> substring : substrings) {
+        log.logSubstringData({
+            static_cast<std::size_t>(substring.getSubstring()),
+            substring.toStringHex(),
+            substring.str(),        // for full representation use: "substring.toStringFull()," instead
+            static_cast<std::size_t>(substring.getNumOfDups()),
+            std::set<int>(substring.rules->begin(), substring.rules->end())
+        });
+    }
     std::size_t num_of_unique_rules = total_unique_rules.size();
     return num_of_unique_rules;
+}
 
+template<typename T>
+std::size_t getTotalNumOfDups(const std::vector<Substring<T>>& substrings) {
+    std::size_t num_of_duplicates = 0;
+    for (Substring<T> substring : substrings) {
+        num_of_duplicates += static_cast<std::size_t>(substring.getNumOfDups());
+    }
+    return num_of_duplicates;
 }
 
 /**

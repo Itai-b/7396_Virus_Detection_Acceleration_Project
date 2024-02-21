@@ -34,6 +34,8 @@ public:
 
 	T getSubstring() { return this->substring; }
 	void setSubstring(T substring) { this->substring = substring; }
+	std::size_t getNumOfDups() { return this->num_of_dups; }
+	void logDuplicate() { this->num_of_dups++; }
 	
 	Substring<T>& operator=(const Substring<T>& other);
 	bool operator<(const Substring<T>& other) const;
@@ -43,12 +45,16 @@ public:
 	bool operator==(const Substring<T>& other) const;
 	bool operator!=(const Substring<T>& other) const;
 
+	std::string toStringHex();
+	std::string str();
+	std::string toStringFull();
 	template<class S> friend std::ostream& operator<<(std::ostream& os, const Substring<S>& substring);
 
 	static void extractSubstrings(const std::string& hexString, std::vector<Substring<T>>& substrings,
 		const std::set<int>& rules, std::size_t G = SUBSTRING_DEFAULT_GAP, std::size_t L = sizeof(T));
-
+	
 private:
+	std::size_t num_of_dups;
 	static uint8_t hexCharToInt(const char hexChar);
 };
 
@@ -68,7 +74,7 @@ private:
 /// <param name="hexString">A string of sizeof(T) or less bytes represented in hex (for example: "0x736E6F7274" for "snort").</param>
 /// <param name="rules">A set of integers representing the rule nubmers that match this substring.</param>
 template<typename T>
-Substring<T>::Substring(const std::string hexString, const std::set<int>& rules) {
+Substring<T>::Substring(const std::string hexString, const std::set<int>& rules) : num_of_dups(0) {
 	this->substring = 0;
 	std::size_t len = hexString.size();
 	for (std::size_t i = 0; i < len; i++) {
@@ -79,7 +85,7 @@ Substring<T>::Substring(const std::string hexString, const std::set<int>& rules)
 }
 
 template<typename T>
-Substring<T>::Substring(const T& substring, const std::set<int>& rules) : substring(substring) {
+Substring<T>::Substring(const T& substring, const std::set<int>& rules) : substring(substring), num_of_dups(0) {
 	this->rules = new std::set<int>(rules);
 }
 
@@ -90,15 +96,14 @@ Substring<T>::Substring(const T& substring, const std::set<int>& rules) : substr
 /// <typeparam name="T"></typeparam>
 /// <param name="other"></param>
 template<typename T>
-Substring<T>::Substring(const Substring<T>& other) {
-	this->substring = other.substring;
+Substring<T>::Substring(const Substring<T>& other) : substring(other.substring), num_of_dups(other.num_of_dups) {
 	this->rules = new std::set<int>(*other.rules);
 }
 
 
 // use for debug and testing, remove before release
 template<typename T>
-Substring<T>::Substring() : substring(0) {
+Substring<T>::Substring() : substring(0), num_of_dups(0) {
 	this->rules = new std::set<int>();
 }
 
@@ -112,6 +117,7 @@ template<typename T>
 Substring<T>& Substring<T>::operator=(const Substring<T>& other) {
 	if (this != &other) {
 		this->substring = other.substring;
+		this->num_of_dups = other.num_of_dups;
 		if (this->rules != nullptr) {
 			delete this->rules;
 		}
@@ -161,20 +167,53 @@ bool Substring<T>::operator!=(const Substring<T>& other) const {
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
+std::string Substring<T>::toStringHex() {
+	std::ostringstream oss;
+	std::size_t iterations = sizeof(T);
+	oss << "0x";
+	for (std::size_t i = iterations; i > 0; --i) {
+		uint8_t current_byte = (this->substring >> ((i - 1) * 8)) & 0xFF;
+		oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(current_byte);
+	}
+	return oss.str();
+}
+
+template<typename T>
+std::string Substring<T>::str() {
+	std::ostringstream oss;
 	std::size_t iterations = sizeof(T);
 	for (std::size_t i = iterations; i > 0; --i) {
-		uint8_t current_byte = (substring.substring >> ((i - 1) * 8)) & 0xFF;
-		os << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(current_byte) << " ('";
-		if (isprint(current_byte)) {
-			os << static_cast<char>(current_byte) << "') ";
+		uint8_t current_byte = (this->substring >> ((i - 1) * 8)) & 0xFF;
+		if (std::isprint(current_byte)) {
+			oss << static_cast<char>(current_byte);
 		}
 		else {
-			os << "NPSC" << "') "; // Non-Printable or Special Characters
+			oss << "?"; // Joker used to represent Non-Printable or Special Characters
 		}
 	}
-	// DEBUG
-	// os << std::hex << substring.substring << std::endl;
+	return oss.str();
+}
+
+template<typename T>
+std::string Substring<T>::toStringFull() {
+	std::ostringstream oss;
+	std::size_t iterations = sizeof(T);
+	for (std::size_t i = iterations; i > 0; --i) {
+		uint8_t current_byte = (this->substring >> ((i - 1) * 8)) & 0xFF;
+		oss << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(current_byte) << " ('";
+		if (std::isprint(current_byte)) {
+			oss << static_cast<char>(current_byte) << "') ";
+		}
+		else {
+			oss << "NPSC" << "') "; // Non-Printable or Special Characters
+		}
+	}
+	return oss.str();
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
+	os << substring.toStringFull();
 	return os;
 }
 
@@ -198,6 +237,7 @@ void Substring<T>::extractSubstrings(const std::string& hexString, std::vector<S
 	// Defaults for G and L are provided in function's declaration.
 	std::string hexOnlyStr = (hexString.substr(0, 2) == "0x") ? hexString.substr(2) : hexString;
 	std::size_t len = hexOnlyStr.size();
+	// Jumping by 2*L and 2*G because in hex representation each char = 2 hexDigits.
 	for (std::size_t i = 0; (i < len) && ((i + L * 2) <= len); i += G * 2) {
 		std::string hexSubstring = hexOnlyStr.substr(i, L * 2);
 		Substring<T> substring(hexSubstring, rules);
@@ -205,6 +245,7 @@ void Substring<T>::extractSubstrings(const std::string& hexString, std::vector<S
 		// check if an equivalent substring is already in the vector
 		if (it != substrings.end()) {	// substring found in vector - it will now represent the combined set of rules.
 			it->rules->insert(rules.begin(), rules.end());
+			it->logDuplicate();
 		}
 		else {							// substring is not in vector - add substring to vector
 			substrings.push_back(substring);
