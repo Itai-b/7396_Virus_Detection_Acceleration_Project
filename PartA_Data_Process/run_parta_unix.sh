@@ -12,7 +12,6 @@ WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 rules_fil="snort3-community.rules"
 save_path=$WORK_DIR
 
-
 # Check if Python is installed
 if ! command -v python3 &>/dev/null; then
     echo "python is not installed. Do you want to install it? (y/n)"
@@ -57,9 +56,9 @@ while getopts "r:p:" opt; do
 done
 
 # Set up the python script for running
-chmod +x SnortRulesParser.py
-dos2unix SnortRulesParser.py > /dev/null 2>&1
+chmod +x $WORK_DIR/SnortRulesParser.py
+dos2unix $WORK_DIR/SnortRulesParser.py > /dev/null 2>&1
 
 echo "Executing SnortRulesParser.py."
 # Run the python script
-python3 SnortRulesParser.py $rules_file -p $save_path -j -d
+python3 $WORK_DIR/SnortRulesParser.py $rules_file -p $save_path -j

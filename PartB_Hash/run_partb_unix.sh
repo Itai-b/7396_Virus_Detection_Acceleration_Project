@@ -39,7 +39,7 @@ fi
 
 # Copy the updated extracted exact_matches_hex.json from Part A, to the relevant Part B folder
 cd "$WORK_DIR"
-cp "$WORK_DIR/../Data/$JSONNAME" "$WORK_DIR/$CPYJSONTO/" || { echo "Error: Copying .json file failed."; exit 1; }
+cp "$WORK_DIR/../Data/PartA_Data/$JSONNAME" "$WORK_DIR/$CPYJSONTO/" || { echo "Error: Copying .json file failed."; exit 1; }
 
 # Prepare the build folder
 cd "$WORK_DIR/$SUBDIR"
