@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
-add_executable (cuckoohash "main.cpp" "CustomHash.h")
+add_executable (cuckoohash "main.cpp" "CustomHash.h" "Statistics.h" "Config.h")
 
 #find_package(libcuckoo REQUIRED)
 #find_package(nlohmann_json REQUIRED)
