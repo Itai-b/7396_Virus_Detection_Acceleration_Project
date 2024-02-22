@@ -30,6 +30,7 @@ else
 fi
 
 echo -e "Welcome and thank you for using our script!"
+echo -e "All the relevant data will be saved in the Data folder."
 
 # Prepare to run PartA - Data Process
 echo -e "${BLUE}Running PartA - Data Process...${NC}"
@@ -63,8 +64,16 @@ mkdir -p $WORK_DIR/Data/PartB_Data
 chmod +x $WORK_DIR/PartB_Hash/run_partb_unix.sh
 dos2unix $WORK_DIR/PartB_Hash/run_partb_unix.sh
 
+# Get the number of tests from the user
+echo -e "${BLUE}Enter the number of tests you want to run for each case:${NC}"
+read -p "Enter your choice (1-100): " num_of_tests
+if [ $num_of_tests -lt 1 ] || [ $num_of_tests -gt 100 ]; then
+	echo -e "${RED}Invalid input. Exiting the script...${NC}"
+	exit 1
+fi
+
 # Run PartB - Hash Insertion
-command $WORK_DIR/PartB_Hash/run_partb_unix.sh
+command $WORK_DIR/PartB_Hash/run_partb_unix.sh -n $num_of_tests
 # check if partB ran successfully
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartB - Hash Insertion ran successfully!${NC}"
@@ -72,3 +81,5 @@ else
 	echo -e "${RED}PartB - Hash Insertion was not complited.${NC}"
 	exit 1
 fi
+
+# Check if the user wants to run PartC - Aho-Corasick - TODO

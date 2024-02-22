@@ -1,5 +1,6 @@
 #include <libcuckoo/cuckoohash_map.hh>
 #include <nlohmann/json.hpp>
+#include <unistd.h>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -176,19 +177,32 @@ int main(int argc, char* argv[]) {
     std::string file_path = "parta_data_by_exactmatch.json";
     std::string dest_path = "";
     std::size_t num_of_tests = NUMBER_OF_TESTS;
-    if (argc >= 4) {                // running from console
-        file_path = argv[1];
-        dest_path = argv[2];
-        num_of_tests = static_cast<std::size_t>(std::stoi(std::string(argv[3])));
-    }
-    else if (argc >= 3) {           // backward compatability to older version of the running script
-        file_path = argv[1];
-        dest_path = argv[2];
-    }
-    else if (argc >= 2) {           // backward compatability to older version of the running script
-        file_path = argv[1];
+    
+    int opt;
+    bool is_file_path_set = false;
+    while ((opt = getopt(argc, argv, "f:d:n:")) != -1) {
+        switch (opt) {
+        case 'f':
+            file_path = optarg;
+            is_file_path_set = true;
+            break;
+        case 'd':
+            dest_path = optarg;
+            break;
+        case 'n':
+            num_of_tests = static_cast<std::size_t>(std::stoi(std::string(optarg)));
+            std::cout << "Number of tests: " << num_of_tests << std::endl;
+            break;
+        default:
+            std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 
+    if (!is_file_path_set) {
+        std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
+        exit(EXIT_FAILURE);
+    }
     ExactMatches exact_matches;
     parseFile(file_path, exact_matches); 
 

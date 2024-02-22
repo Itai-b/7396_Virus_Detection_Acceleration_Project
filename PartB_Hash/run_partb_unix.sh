@@ -6,24 +6,25 @@
 # Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SUBDIR=cuckoohash
-INSTALLDIR=install
+INSTALLDIR=$WORK_DIR/install
+DESTPATH=$WORK_DIR/../Data/PartB_Data
 JSONNAME=parta_data_by_exactmatch.json
-COPYJSONFROM=../Data
+COPYJSONFROM=$WORK_DIR/../Data
 CPYJSONTO=cuckoohash/src
 
 # Set up the installation scripts for running
-chmod +x install_libcuckoo_unix.sh
-dos2unix install_libcuckoo_unix.sh
-chmod +x install_nlohmann_json_unix.sh
-dos2unix install_nlohmann_json_unix.sh
+chmod +x $WORK_DIR/install_libcuckoo_unix.sh
+dos2unix $WORK_DIR/install_libcuckoo_unix.sh
+chmod +x $WORK_DIR/install_nlohmann_json_unix.sh
+dos2unix $WORK_DIR/install_nlohmann_json_unix.sh
 
 # Fix clock skews (WSL bug)
 sudo hwclock -s
 
 
 # Run the installation scripts:
-./install_libcuckoo_unix.sh
-./install_nlohmann_json_unix.sh
+$WORK_DIR/install_libcuckoo_unix.sh
+$WORK_DIR/install_nlohmann_json_unix.sh
 
 # Check for potential errors:
 if [ ! -d "$WORK_DIR/$SUBDIR" ]; then
@@ -47,9 +48,33 @@ cd "$WORK_DIR/$SUBDIR"
 mkdir -p build
 cd build
 
+# Recieve arguments from the user
+while getopts "n:" opt; do
+  case ${opt} in
+    n )
+      num_of_tests=$OPTARG
+      ;;
+    \? )
+      echo "Invalid option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+    : )
+      echo "Option -$OPTARG requires an argument" 1>&2
+      exit 1
+      ;;
+  esac
+done
+
+# Now you can use the variables $file_path, $dest_path, and $num_of_tests in your script
+
 # Configure cmake library path, which is shown on CMakePresets.json
 cmake -DCMAKE_LIBRARY_PATH="../install" ..
 
 # Build and run the project, taking the path to the .json file as an argument:
 make all || exit 1
-src/cuckoohash "$WORK_DIR/$CPYJSONTO/$JSONNAME"
+
+if [ "$num_of_tests" ]; then
+	src/cuckoohash -f "$WORK_DIR/$CPYJSONTO/$JSONNAME" -d $DESTPATH -n $num_of_tests || exit 1
+else
+	src/cuckoohash -f "$WORK_DIR/$CPYJSONTO/$JSONNAME" -d $DESTPATH || exit 1
+fi	
