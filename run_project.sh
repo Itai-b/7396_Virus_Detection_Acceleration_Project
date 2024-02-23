@@ -82,4 +82,4 @@ else
 	exit 1
 fi
 
-# Check if the user wants to run PartC - Aho-Corasick - TODO
+# TODO - add PartC - Aho-Corasick execution after implementation.

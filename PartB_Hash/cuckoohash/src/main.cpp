@@ -208,27 +208,39 @@ int main(int argc, char* argv[]) {
 
     Statistics stats_test1;
     SubstringLogger substrings_log1;
+    std::string l8g1_path = dest_path + "/Length8_Gap1";
+    std::string command = "mkdir -p " + l8g1_path;
+    system(command.c_str());
     runTests<uint64_t, uint64_t, CustomHash, 8, 1>(stats_test1, substrings_log1, exact_matches, num_of_tests);
-    stats_test1.writeToFile(dest_path, "L8_G1_increasing_table_size.json");
-    substrings_log1.writeToFile(dest_path, "L8_G1_substrings.json");
+    stats_test1.writeToFile(l8g1_path, "L8_G1_increasing_table_size.json");
+    substrings_log1.writeToFile(l8g1_path, "L8_G1_substrings.json");
 
     Statistics stats_test2;
     SubstringLogger substrings_log2;
+    std::string l8g2_path = dest_path + "/Length8_Gap2";
+    command = "mkdir -p " + l8g2_path;
+    system(command.c_str());
     runTests<uint64_t, uint64_t, CustomHash, 8, 2>(stats_test2, substrings_log2, exact_matches, num_of_tests);
-    stats_test2.writeToFile(dest_path, "L8_G2_increasing_table_size.json");
-    substrings_log2.writeToFile(dest_path, "L8_G2_substrings.json");
+    stats_test2.writeToFile(l8g2_path, "L8_G2_increasing_table_size.json");
+    substrings_log2.writeToFile(l8g2_path, "L8_G2_substrings.json");
 
     Statistics stats_test3;
     SubstringLogger substrings_log3;
+    std::string l4g1_path = dest_path + "/Length4_Gap1";
+    command = "mkdir -p " + l4g1_path;
+    system(command.c_str());
     runTests<uint32_t, uint32_t, CustomHash, 4, 1>(stats_test3, substrings_log3, exact_matches, num_of_tests);
-    stats_test3.writeToFile(dest_path, "L4_G1_increasing_table_size.json");
-    substrings_log3.writeToFile(dest_path, "L4_G1_substrings.json");
+    stats_test3.writeToFile(l4g1_path, "L4_G1_increasing_table_size.json");
+    substrings_log3.writeToFile(l4g1_path, "L4_G1_substrings.json");
 
     Statistics stats_test4;
     SubstringLogger substrings_log4;
+    std::string l4g2_path = dest_path + "/Length4_Gap2";
+    command = "mkdir -p " + l4g2_path;
+    system(command.c_str());
     runTests<uint32_t, uint32_t, CustomHash, 4, 2>(stats_test4, substrings_log4, exact_matches, num_of_tests);
-    stats_test4.writeToFile(dest_path, "L4_G2_increasing_table_size.json");
-    substrings_log4.writeToFile(dest_path, "L4_G2_substrings.json");
+    stats_test4.writeToFile(l4g2_path, "L4_G2_increasing_table_size.json");
+    substrings_log4.writeToFile(l4g2_path, "L4_G2_substrings.json");
 
     /*Statistics stats_test2;
     runTests<uint64_t, Empty, CustomHash, 8, 1>(stats_test2, exact_matches);
