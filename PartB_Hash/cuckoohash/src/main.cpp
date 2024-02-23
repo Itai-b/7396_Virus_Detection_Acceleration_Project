@@ -203,6 +203,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
         exit(EXIT_FAILURE);
     }
+    std::cout << "File path: " << file_path << std::endl;
     ExactMatches exact_matches;
     parseFile(file_path, exact_matches); 
 

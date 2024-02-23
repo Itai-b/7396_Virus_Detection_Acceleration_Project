@@ -13,6 +13,7 @@ from collections import Counter
 """___________________________________GLOBALS______________________________________"""
 
 global  total_rules, \
+        rules_sid, \
         total_pcre, \
         total_signatures, \
         total_content, \
@@ -20,6 +21,7 @@ global  total_rules, \
         unique_exactmatches
         
 total_rules = 0
+rules_sid = []
 total_pcre = 0
 total_content = 0
 total_exactmatches = 0
@@ -30,15 +32,17 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
         A function used to plot the cumulated lost rules by the exactmatch length.
     """
-    lost_rules_by_length = [0 for i in range(0, total_rules)]
+    lost_rules_by_length = {}
+    for rule in rules_sid:
+        lost_rules_by_length[rule] = 0
 
     for line in data_by_exactmatch:
         for rule in line["rules"]:
-            if lost_rules_by_length[rule - 1] <= len(line["exact_match"]):
-                lost_rules_by_length[rule - 1] = (len(line["exact_match"]) + 1)
-
-    length = [i for i in range(1, max(lost_rules_by_length) + 1)]
-    length_counts = [lost_rules_by_length.count(i) for i in range(1, max(lost_rules_by_length) + 1)]
+            if lost_rules_by_length[rule] <= len(line["exact_match"]):
+                lost_rules_by_length[rule] = (len(line["exact_match"]) + 1)
+    length = [i for i in range(1, max(lost_rules_by_length.values()) + 1)]
+    values_list = list(lost_rules_by_length.values())
+    length_counts = [values_list.count(i) for i in range(1, max(lost_rules_by_length.values()) + 1)]
     cumulative_counts = np.cumsum(length_counts)
     
     total_count = cumulative_counts[-1]
@@ -116,7 +120,7 @@ def check_rules_with_no_signitures(data_by_signature, logger):
         An auxiliary function used to check if there are any rules which do not contain a signature.
     """
     global rules_with_no_signatures
-    rules_with_no_signatures = list(range(1, total_rules + 1))
+    rules_with_no_signatures = rules_sid.copy()
     for line in data_by_signature:
         for rule in line["rules"]:
             if rule in rules_with_no_signatures:
@@ -132,7 +136,7 @@ def check_rules_lost_while_parsing(data_by_exactmatch, logger):
         An auxiliary function used to find which rules where lost during 
     """
     global rules_lost_while_parsing
-    rules_lost_while_parsing = list(range(1, total_rules + 1))
+    rules_lost_while_parsing = rules_sid.copy()
 
     for line in data_by_exactmatch:
         if (len(line["exact_match"]) == 0):

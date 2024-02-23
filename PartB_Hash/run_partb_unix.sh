@@ -7,10 +7,8 @@
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SUBDIR=cuckoohash
 INSTALLDIR=$WORK_DIR/install
+JSONPATH=$WORK_DIR/../Data/PartA_Data/parta_data_by_exactmatch.json
 DESTPATH=$WORK_DIR/../Data/PartB_Data
-JSONNAME=parta_data_by_exactmatch.json
-COPYJSONFROM=$WORK_DIR/../Data
-CPYJSONTO=cuckoohash/src
 
 # Set up the installation scripts for running
 chmod +x $WORK_DIR/install_libcuckoo_unix.sh
@@ -30,17 +28,10 @@ $WORK_DIR/install_nlohmann_json_unix.sh
 if [ ! -d "$WORK_DIR/$SUBDIR" ]; then
 	echo "$WORK_DIR/$SUBDIR not found."
 	exit 1
-elif [ ! -d "$WORK_DIR/$CPYJSONTO" ]; then
-	echo "Couldn't find $WORK_DIR/$CPYJSONTO to copy .json file to."
-	exit 1
-elif [ ! -d "$WORK_DIR/$CPYJSONFROM" ]; then
-	echo "Couldn't find $WORK_DIR/$CPYJSONFROM to copy .json file from."
-	exit 1
 fi
 
 # Copy the updated extracted exact_matches_hex.json from Part A, to the relevant Part B folder
 cd "$WORK_DIR"
-cp "$WORK_DIR/../Data/PartA_Data/$JSONNAME" "$WORK_DIR/$CPYJSONTO/" || { echo "Error: Copying .json file failed."; exit 1; }
 
 # Prepare the build folder
 cd "$WORK_DIR/$SUBDIR"
@@ -51,6 +42,12 @@ cd build
 # Recieve arguments from the user
 while getopts "n:" opt; do
   case ${opt} in
+    j )
+      file_path=$OPTARG
+      ;;
+    d )
+      dest_path=$OPTARG
+      ;;
     n )
       num_of_tests=$OPTARG
       ;;
@@ -74,7 +71,7 @@ cmake -DCMAKE_LIBRARY_PATH="../install" ..
 make all || exit 1
 
 if [ "$num_of_tests" ]; then
-	src/cuckoohash -f "$WORK_DIR/$CPYJSONTO/$JSONNAME" -d $DESTPATH -n $num_of_tests || exit 1
+	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests || exit 1
 else
-	src/cuckoohash -f "$WORK_DIR/$CPYJSONTO/$JSONNAME" -d $DESTPATH || exit 1
+	src/cuckoohash -f "$JSONPATH" -d $DESTPATH || exit 1
 fi	

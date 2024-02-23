@@ -8,7 +8,7 @@ NC='\033[0m' # No Color
 
 # Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
-SNORT_RULES_FILE=$WORK_DIR/auxillary/snort3-community.rules
+SNORT_RULES_FILE=$WORK_DIR/Auxillary/snort3-community.rules
 
 # Check if more than one argument is provided
 if [ $# -gt 1 ]; then

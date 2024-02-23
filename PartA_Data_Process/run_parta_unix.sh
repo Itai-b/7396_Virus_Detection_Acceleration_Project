@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # Initialize variables
-rules_fil="snort3-community.rules"
+rules_file="$WORK_DIR/../Auxillary/snort3-community.rules"
 save_path=$WORK_DIR
 
 # Check if Python is installed
@@ -61,4 +61,4 @@ dos2unix $WORK_DIR/SnortRulesParser.py > /dev/null 2>&1
 
 echo "Executing SnortRulesParser.py."
 # Run the python script
-python3 $WORK_DIR/SnortRulesParser.py $rules_file -p $save_path -j
+python3 $WORK_DIR/SnortRulesParser.py -r $rules_file -p $save_path -j
