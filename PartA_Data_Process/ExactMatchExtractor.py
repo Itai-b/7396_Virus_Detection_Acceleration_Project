@@ -1,35 +1,3 @@
-"""
-Exact Match Extractor
-
-This module provides functions for extracting exact match exactmatches from Perl Compatible Regular Expressions (pcre).
-
-Authors:
-    Idan Baruch (idan-b@campus.technion.ac.il)
-    Itai Benyamin (itai.b@campus.technion.ac.il)
-
-Functions:
-    - char_to_utf8(character):
-        Converts a character to its UTF-8 representation.
-    
-    - utf8_to_raw(input: str) -> str:
-        Converts a UTF-8 encoded string to its raw representation.
-    
-    - utf8_to_ascii(input: str) -> list:
-        Converts a UTF-8 encoded string to its ASCII values.
-    
-    - substitute_signature(match: re.Match):
-        Replaces a regex signature of type 'c{2}' with the exact match string (e.g., 'cc').
-    
-    - replace_special_metacharacters(regex_signature: str) -> str:
-        Replaces special meta-characters in a Perl Compatible Regular Expression (pcre) with their UTF-8 representation.
-    
-    - extract_exact_matches(regex_signature: str) -> list:
-        Returns a list of non-ambiguous exact match exact-matches within a given pcre signature.
-    
-    - run(pcre_string: str, flag='raw') -> list:
-        Runs the Exact Match Extractor functions on a pcre string and returns a list of extracted exact-matches.
-"""
-
 import re
 from config import config
 

@@ -1,81 +1,20 @@
-"""
-TODO: update documentation.
-
-Snort Rule Set Extractor
-
-This script extracts rules or sub-strings (for exact match) from Snort's rule set.
-Rules are taken from: https://www.snort.org/downloads/#rule-downloads (snort3-community.rules)
-There is an option to use any other rule set (which use the same format)
-
-Authors:
-    Idan Baruch (idan-b@campus.technion.ac.il)
-    Itai Benyamin (itai.b@campus.technion.ac.il)
-
-Usage:
-    Run the script from the terminal using the following command:
-    python SnortRulesParser.py snort3-community.rules
-    - if no file name is given, the script will use the default file name: snort3-community.rules
-    - if -json flag is given, the script will save the exact matches as a .json file under the path where the script is located.
-
-Description:
-    This script parses a given rule file for specified signatures and extracts matching data.
-    It supports extracting exact match rules and Perl compatible regular expression rules.
-    Extracted rules are saved as a JSON file or printed to the console.
-
-Modules:
-    - sys
-    - os
-    - argparse
-    - re (Regular Expressions)
-    - logging (For logging information about the script's execution)
-    - time
-    - datetime
-    - json
-    - ExactMatchExtractor (Custom module for exact match extraction)
-    - ContentProcessor (Custom module for content processing)
-    - config (Custom module for configurations and constants)
-
-Constants:
-    - EXACT_MATCH_SIGNATURE_signature: Regular expression signature for exact match rules.
-    - REGEX_SIGNATURE_signature: Regular expression signature for Perl compatible regular expression rules.
-
-Functions:
-    - parse_file(file_name: str, signatures: dict) -> list[tuple(int, str, str)]:
-        Parse a file for specified signatures and extract matching data.
-        
-    - save_rules_as_json(exact_matches: list[tuple(int, str, str)]):
-        An auxiliary function to save exact_matches to a JSON file.
-        
-    - print_rules(exact_matches: list[tuple(int, str, str)]):
-        An auxiliary function to print exact_matches, each in a new line.
-        
-    - log_info(start_time, end_time, length_histogram):
-        An auxiliary function to log information about the script's execution.
-
-    - main():
-        The main function that orchestrates the parsing and processing of rules.
-"""
-
-import sys
 import os
 import argparse
 import re
 import logging
 import time
-import csv
 import json
 
 import ExactMatchExtractor as ExactMatchExtractor
 import ContentProcessor as ContentProcessor
 import ResultsAnalysis as ResultsAnalysis
 from datetime import datetime
-from config import config
 
 logger = logging.getLogger('SnortRulesParser')
 
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
-RULE_NUMBER = r'(?:sid:)(\d+)'                      # rule number
+RULE_NUMBER = r'(?:sid:)(\d+)'                      # rule sid
 
 def add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule, data_by_signature):
     for line in data_by_signature:
