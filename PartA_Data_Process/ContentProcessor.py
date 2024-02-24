@@ -1,21 +1,3 @@
-"""
-Content Processor
-
-This module is responsible for processing content signatures of a snort rule.
-
-Authors:
-    Idan Baruch (idan-b@campus.technion.ac.il)
-    Itai Benyamin (itai.b@campus.technion.ac.il)
-
-Functions:
-    - substitute_pipe_patterns(match: re.match):
-        Given a regex pattern of type: |00 01 02 ...| where '00', '01', ... symbolize characters,
-        the function replaces it with the respective characters.
-    
-    - run(content_string: str) -> str:
-        Runs the Content Processor functions on a snort content signature.
-"""
-
 import re
 from config import config as config
 
