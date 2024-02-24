@@ -71,19 +71,11 @@ import ResultsAnalysis as ResultsAnalysis
 from datetime import datetime
 from config import config
 
-logging.basicConfig(level=logging.INFO)
-
-# Create a FileHandler to save log messages to a file
-log_file_handler = logging.FileHandler('SnortRuleParser.log')
-
-# Clear the log file from previous runs
-with open('SnortRuleParser.log', 'w') as file:
-    pass
-
 logger = logging.getLogger('SnortRulesParser')
 
 EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
 REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
+RULE_NUMBER = r'(?:sid:)(\d+)'                      # rule number
 
 def add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule, data_by_signature):
     for line in data_by_signature:
@@ -142,7 +134,7 @@ def save_data_as_json(data_by_signature, data_by_exactmatch, save_path):
              
     logger.info(f"Saved the partA data as .json file under the path {save_path}")
 
-def parse_file(file_name, signatures):
+def parse_file(file_name, signatures, rules_sid):
     
     with open(file_name, 'r') as file:
         rules = file.readlines()
@@ -152,7 +144,9 @@ def parse_file(file_name, signatures):
     
     ResultsAnalysis.total_rules = len(rules)
     
-    for rule_num, rule in enumerate(rules):
+    for rule in rules:
+        rule_sid = int(re.search(RULE_NUMBER, rule).group(1))
+        rules_sid.append(rule_sid)
         for signature_type, signature in signatures.items():
             matches = re.finditer(signature, rule)
             if matches:
@@ -167,8 +161,8 @@ def parse_file(file_name, signatures):
                     
                     exact_matches_hex = translate_exact_matches_to_hex(exact_matches)
                     #add_exact_matches_to_data(signature, exact_matches, exact_matches_hex, data_by_signature)
-                    add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule_num + 1, data_by_signature)
-                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_num + 1, signature_type, data_by_exactmatch)
+                    add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule_sid, data_by_signature)
+                    add_data_by_exactmatch(exact_matches, exact_matches_hex, rule_sid, signature_type, data_by_exactmatch)
                     ResultsAnalysis.total_exactmatches += len(exact_matches)
 
     return data_by_signature, data_by_exactmatch
@@ -193,39 +187,45 @@ def main():
         Usage (in Terminal): python SnortRuleParser.py snort3-community.rules
     """
     parser = argparse.ArgumentParser(description="Snort Rule Set Extractor")
-    parser.add_argument('file_name', metavar='file_name', type=str, nargs='?', default='snort3-community.rules')
+    parser.add_argument('-r', '--file_name', type=str, default='snort3-community.rules', help='The path for the snort.rules file to parse. Default is snort3-community')
     parser.add_argument('-p', '--path', type=str, default=os.getcwd(), help='The path where to save all the files')
     parser.add_argument('-d', '--debug', action='store_true', help='Prints debug information about the script\'s execution.')
     parser.add_argument('-j', '--json', action='store_true', help='Saves the exact matches as a .json file.')
     
-    args = parser.parse_args()
-
-    logger.info(f'Started parsing.')
-    start_time = time.time()                                       
+    args = parser.parse_args()    
 
     abs_save_path = os.path.abspath(args.path)
     logger.info(f'The path where the files will be saved is {abs_save_path}.')
 
+    file_path = ""
+    if args.file_name:
+        file_path = args.file_name    
+    else:
+        # If no file name is given, the script will expect that the file is in the same directory as the script.
+        file_path = 'snort3-community.rules' 
+    
+    logging.basicConfig(level=logging.INFO)
+    # Create a FileHandler to save log messages to a file
+    log_file_handler = logging.FileHandler(os.path.join(abs_save_path,'SnortRuleParser.log'))
+    # Clear the log file from previous runs
+    with open(os.path.join(abs_save_path,'SnortRuleParser.log'), 'w') as file:
+        pass
+    
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
         # Create a formatter to specify the format of log messages
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         log_file_handler.setFormatter(formatter)
-        logger.addHandler(log_file_handler)
-        
-    file_path = ""
-    if args.file_name:
-        file_path = 'snort3-community.rules'    
-    else:
-        for arg in sys.argv:
-            if arg.endswith('.rules'):
-                file_path = arg
-                break
+        logger.addHandler(log_file_handler)    
     
     signatures_type = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
     
-    data_by_signature, data_by_exactmatch = parse_file(file_path, signatures_type)
+    logger.info(f'Started parsing.')
+    start_time = time.time()                          
+
+    print(f'file path: {file_path}')
+    data_by_signature, data_by_exactmatch = parse_file(file_path, signatures_type, ResultsAnalysis.rules_sid)
     ResultsAnalysis.unique_exactmatches = len(data_by_exactmatch)    
 
     ResultsAnalysis.main(data_by_signature, data_by_exactmatch, abs_save_path, logger)
@@ -236,7 +236,6 @@ def main():
     logger.info(f'Finished parsing the file.\n')
     end_time = time.time()
     ResultsAnalysis.log_info(start_time, end_time, logger)
-
 
 if __name__ == "__main__":
     """
