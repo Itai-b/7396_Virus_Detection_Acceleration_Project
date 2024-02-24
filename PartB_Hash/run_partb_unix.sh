@@ -30,14 +30,9 @@ if [ ! -d "$WORK_DIR/$SUBDIR" ]; then
 	exit 1
 fi
 
-# Copy the updated extracted exact_matches_hex.json from Part A, to the relevant Part B folder
-cd "$WORK_DIR"
-
-# Prepare the build folder
-cd "$WORK_DIR/$SUBDIR"
 # rm -rf build
-mkdir -p build
-cd build
+mkdir -p $WORK_DIR/$SUBDIR/build
+cd $WORK_DIR/$SUBDIR/build
 
 # Recieve arguments from the user
 while getopts "n:" opt; do
@@ -74,4 +69,10 @@ if [ "$num_of_tests" ]; then
 	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests || exit 1
 else
 	src/cuckoohash -f "$JSONPATH" -d $DESTPATH || exit 1
-fi	
+fi
+
+# Run ResultsAnalysis.py
+cd $WORK_DIR
+chmod +x $WORK_DIR/ResultsAnalysis.py
+dos2unix $WORK_DIR/ResultsAnalysis.py
+python3 $WORK_DIR/ResultsAnalysis.py || exit 1

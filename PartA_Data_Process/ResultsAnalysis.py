@@ -6,11 +6,13 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import Counter
-import matplotlib.pyplot as plt
-import numpy as np
-from collections import Counter
+
+
 
 """___________________________________GLOBALS______________________________________"""
+
+plt.style.use('tableau-colorblind10')
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 global  total_rules, \
         rules_sid, \
@@ -47,27 +49,28 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     
     total_count = cumulative_counts[-1]
     cumulative_percentages = (cumulative_counts / (total_rules - len(rules_with_no_signatures))) * 100
+    
     fig, ax1 = plt.subplots()
-
-    color = 'tab:blue'
+    color = colors[0]
     ax1.set_xlabel('Length of ExactMatch')
     ax1.set_ylabel('Lost Rules', color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.plot(length, cumulative_counts, color=color)
 
     ax2 = ax1.twinx()
-    color = 'tab:red'
+    color = colors[1]
     ax2.set_ylabel('Percentage (%)', color=color)
     ax2.plot(length, cumulative_percentages, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
+
     for x_val in xticks:
         y_val = cumulative_percentages[x_val-1]
-        plt.plot(x_val, y_val, 'bo')
+        plt.plot(x_val, y_val, 'o', color=colors[3])
         if x_val == 1:
-            plt.text(x_val, y_val-3, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+            plt.text(x_val, y_val-3, f'({x_val}, {y_val:.2f}%)', fontsize=8, ha='left', va='bottom')
         else:
-            plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+            plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, ha='left', va='bottom')
 
     ax2.tick_params(axis='y', labelcolor=color)
     
@@ -91,22 +94,22 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
     cumulative_percentages = (cumulative_counts / total_count) * 100
 
     fig, ax1 = plt.subplots()
-
-    color = 'tab:blue'
+    color = colors[0]
     ax1.set_xlabel('Length of ExactMatch')
     ax1.set_ylabel('Count', color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.plot(length, cumulative_counts, color=color)
 
     ax2 = ax1.twinx()
-    color = 'tab:red'
+    color = colors[1]
     ax2.set_ylabel('Percentage (%)', color=color)
     ax2.plot(length, cumulative_percentages, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
+    
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
         y_val = cumulative_percentages[x_val-1]
-        plt.plot(x_val, y_val, 'bo')
+        plt.plot(x_val, y_val, 'o', color=colors[3])
         plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
     ax2.tick_params(axis='y', labelcolor=color)

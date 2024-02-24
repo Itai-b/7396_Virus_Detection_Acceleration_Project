@@ -67,6 +67,10 @@ dos2unix $WORK_DIR/PartB_Hash/run_partb_unix.sh
 # Get the number of tests from the user
 echo -e "${BLUE}Enter the number of tests you want to run for each case:${NC}"
 read -p "Enter your choice (1-100): " num_of_tests
+if ! [[ $num_of_tests =~ ^[0-9]+$ ]]; then
+	echo -e "${RED}Invalid input. Exiting the script...${NC}"
+	exit 1
+fi
 if [ $num_of_tests -lt 1 ] || [ $num_of_tests -gt 100 ]; then
 	echo -e "${RED}Invalid input. Exiting the script...${NC}"
 	exit 1
