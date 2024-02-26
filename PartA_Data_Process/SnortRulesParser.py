@@ -24,6 +24,7 @@ def add_data_by_signature(signature, signature_type, exact_matches, exact_matche
             if signature_type not in line["signature_type"]:
                 line["signature_type"].append(signature_type)
             return
+    # If the signature is not found in the data_by_signature list, add it.
     if signature_type == 'pcre':
         ResultsAnalysis.total_pcre += 1
     else:  # signature_type == 'content':
@@ -152,11 +153,12 @@ def main():
     
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-        # Create a formatter to specify the format of log messages
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        log_file_handler.setFormatter(formatter)
-        logger.addHandler(log_file_handler)    
     
+    # Create a formatter to specify the format of log messages
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_file_handler.setFormatter(formatter)
+    logger.addHandler(log_file_handler)    
+
     signatures_type = {'content': EXACT_MATCH_SIGNATURE,
                 'pcre': REGEX_SIGNATURE}
     
