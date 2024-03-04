@@ -36,8 +36,11 @@ os.makedirs(unzipped_dir, exist_ok=True)
 
 # Extract the folder from the zipped archive
 with tarfile.open(zipped_folder_path, 'r:gz') as tar:
-    tar.extractall(path=unzipped_dir, verbose=True)     # remove 'verbose=True' to avoid printing status of unzipping
-
+    #tar.extractall(path=unzipped_dir)     # use instead to avoid printing status of unzipping
+    for member in tar.getmembers():
+        print(f'Extracting: {member.name}')
+        tar.extract(member, path=unzipped_dir)
+    
 # Create or empty the all.rules file
 with open('all.rules', 'w'):
     pass
