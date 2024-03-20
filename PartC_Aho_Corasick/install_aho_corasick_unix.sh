@@ -4,11 +4,11 @@
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # Set the GitHub repository URL
-# REPO_URL=https://github.com/idanbaru/aho_corasick
-REPO_URL=https://github.com/cjgdev/aho_corasick
+REPO_URL=https://github.com/idanbaru/aho_corasick
+# REPO_URL=https://github.com/cjgdev/aho_corasick
 
 # Set the subdirectory name
-SUBDIR=aho_corasick
+SUBDIR=ahocorasickalg
 
 # Set the library and installation directories (in subdirectory)
 LIBDIR=aho_corasick
@@ -40,8 +40,8 @@ build_and_install(){
 	
 	cmake \
 		-B . -S "$WORK_DIR/$SUBDIR/$LIBDIR" \
-		-DCMAKE_INSTALL_PREFIX="$WORK_DIR/$SUBDIR/$INSTALLDIR" #\
-	#	-DBUILD_TESTS=OFF "$WORK_DIR/$SUBDIR/$LIBDIR"
+		-DCMAKE_INSTALL_PREFIX="$WORK_DIR/$SUBDIR/$INSTALLDIR" \
+		-DBUILD_TESTS=OFF "$WORK_DIR/$SUBDIR/$LIBDIR"
 		
 	make all
 	if [ $? -ne 0 ]; then

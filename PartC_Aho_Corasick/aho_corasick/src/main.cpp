@@ -1,7 +1,7 @@
 ﻿// aho_corasick.cpp : Defines the entry point for the application.
 //
 
-#include <aho_corasick/aho_corasick.hpp>
+#include "aho_corasick.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <string>
