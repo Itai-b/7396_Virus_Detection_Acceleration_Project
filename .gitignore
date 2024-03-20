@@ -45,6 +45,14 @@
 /PartB_Hash/cuckoohash/out/
 /PartB_Hash/cuckoohash/libcuckoo
 /PartB_Hash/cuckoohash/nlohmann_json
+
+/PartC_Aho_Corasick/aho_corasick/.vs
+/PartC_Aho_Corasick/aho_corasick/build
+/PartC_Aho_Corasick/aho_corasick/install
+/PartC_Aho_Corasick/aho_corasick/out/
+/PartC_Aho_Corasick/aho_corasick/aho_corasick
+/PartC_Aho_Corasick/aho_corasick/nlohmann_json
+
 /Data/
 /Old_Data/
 
