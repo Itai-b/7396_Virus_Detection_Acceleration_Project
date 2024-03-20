@@ -32,10 +32,21 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <mutex>
+#include <atomic>
+
 
 namespace aho_corasick {
 
-	// class interval
+// Default configurations for the behavior of the aho-corasick trie tree.
+// Change using trie.config...
+const bool DEFAULT_OVERLAPS = true;
+const bool DEFAULT_WHOLE_WORDS = false;
+const bool DEFAULT_INSENSITIVE = true;
+
+	/// <summary>
+	///		Class Interval represents an interval of [d_start, d_end].
+	/// </summary>
 	class interval {
 		size_t d_start;
 		size_t d_end;
@@ -70,7 +81,18 @@ namespace aho_corasick {
 		}
 	};
 
-	// class interval_tree
+
+	/// <summary>
+	/// 	The interval_tree class is a data structure used for storing and querying intervals.
+	///		It's implemented as a binary tree where each node represents a range of values and contains intervals that overlap with that range.
+	///		It includes:
+	///		    interval_collection: This is an alias for std::vector<T>, where T represents the type of intervals stored in the tree.
+	///			node class: A class representing a node in the binary tree. 
+	///				Each node contains a point (d_point) which represents the median value of the intervals it contains, 
+	///				left and right child nodes (d_left and d_right), and a collection of intervals (d_intervals). 
+	///			remove_overlaps method: This method removes overlapping intervals from the given collection of intervals.
+	///			find_overlaps method : This method finds intervals in the tree that overlap with a given interval i.
+	/// </summary>
 	template<typename T>
 	class interval_tree {
 	public:
@@ -230,7 +252,10 @@ namespace aho_corasick {
 		}
 	};
 
-	// class emit
+	/// <summary>
+	///		The emit class is a representation of an emitted token or substring found during text parsing.
+	///		The emitted substring will be registered by it's interval [start_idx, end_idx].
+	/// </summary>
 	template<typename CharType>
 	class emit: public interval {
 	public:
@@ -255,7 +280,9 @@ namespace aho_corasick {
 		bool is_empty() const { return (get_start() == -1 && get_end() == -1); }
 	};
 
-	// class token
+	/// <summary>
+	///		The token class represents a token generated during text parsing.
+	/// </summary>
 	template<typename CharType>
 	class token {
 	public:
@@ -289,7 +316,9 @@ namespace aho_corasick {
 		emit_type get_emit() const { return d_emit; }
 	};
 
-	// class state
+	/// <summary>
+	/// A class representing a State in the aho-corasick automaton (trie tree).
+	/// </summary>
 	template<typename CharType>
 	class state {
 	public:
@@ -384,18 +413,26 @@ namespace aho_corasick {
 		}
 	};
 
+
+	/// <summary>
+	///		A class that implements the Aho-Corasick automaton using a TRIE tree skeleton.
+	///		aho_corasick::trie is defined as basic_trie<char>.
+	///		Note: CharType has to be of types char: {char, wchar_t, char32_t, char64_t,...}.
+	/// </summary>
+	/// <typeparam name="CharType"></typeparam>
 	template<typename CharType>
 	class basic_trie {
 	public:
-		using string_type = std::basic_string < CharType > ;
+		using string_type = std::basic_string < CharType >;
 		using string_ref_type = std::basic_string<CharType>&;
 
 		typedef state<CharType>         state_type;
-		typedef state<CharType>*        state_ptr_type;
+		typedef state<CharType>* state_ptr_type;
 		typedef token<CharType>         token_type;
 		typedef emit<CharType>          emit_type;
 		typedef std::vector<token_type> token_collection;
 		typedef std::vector<emit_type>  emit_collection;
+		typedef basic_trie<CharType>	this_trie_type;
 
 		class config {
 			bool d_allow_overlaps;
@@ -404,9 +441,9 @@ namespace aho_corasick {
 
 		public:
 			config()
-				: d_allow_overlaps(true)
-				, d_only_whole_words(false)
-				, d_case_insensitive(false) {}
+				: d_allow_overlaps(DEFAULT_OVERLAPS)
+				, d_only_whole_words(DEFAULT_WHOLE_WORDS)
+				, d_case_insensitive(DEFAULT_INSENSITIVE) {}
 
 			bool is_allow_overlaps() const { return d_allow_overlaps; }
 			void set_allow_overlaps(bool val) { d_allow_overlaps = val; }
@@ -421,11 +458,12 @@ namespace aho_corasick {
 	private:
 		std::unique_ptr<state_type> d_root;
 		config                      d_config;
-		bool                        d_constructed_failure_states;
+		std::atomic_bool            d_constructed_failure_states;
 		unsigned                    d_num_keywords = 0;
+		mutable std::mutex			d_mutex;
 
 	public:
-		basic_trie(): basic_trie(config()) {}
+		basic_trie() : basic_trie(config()) {}
 
 		basic_trie(const config& c)
 			: d_root(new state_type())
@@ -455,12 +493,12 @@ namespace aho_corasick {
 				cur_state = cur_state->add_state(ch);
 			}
 			cur_state->add_emit(keyword, d_num_keywords++);
-			d_constructed_failure_states = false;
+			d_constructed_failure_states.store(false, std::memory_order_relaxed);
 		}
 
 		template<class InputIterator>
 		void insert(InputIterator first, InputIterator last) {
-			for (InputIterator it = first; first != last; ++it) {
+			for (InputIterator it = first; it != last; ++it) {
 				insert(*it);
 			}
 		}
@@ -482,12 +520,22 @@ namespace aho_corasick {
 			return token_collection(tokens);
 		}
 
-		emit_collection parse_text(string_type text) {
+		emit_collection parse_text(string_type text) const {
 			check_construct_failure_states();
 			size_t pos = 0;
 			state_ptr_type cur_state = d_root.get();
 			emit_collection collected_emits;
+			// TODO: here c stops when arriving to '\0' this has to be fixed
+			// DEBUG
+			std::cout << "text is: " << text << std::endl;
+			std::cout << "of len: " << text.length() << std::endl;
+			// DEBUG
+			//for (size_t i = 0; i < text.length(); ++i){
+				//auto c = text[i];
+				// DEBUG
 			for (auto c : text) {
+				std::cout << "\tchar is: " << c << std::endl;
+				// DEBUG
 				if (d_config.is_case_insensitive()) {
 					c = std::tolower(c);
 				}
@@ -504,6 +552,22 @@ namespace aho_corasick {
 				collected_emits.swap(tmp);
 			}
 			return emit_collection(collected_emits);
+		}
+
+		size_t getNumKeywords() const {
+			return this->d_num_keywords;
+		}
+
+		size_t getNumStates() const {
+			return 0; // TODO: implement
+		}
+
+		size_t getStateSize() const {
+			return sizeof(state<CharType>);
+		}
+
+		size_t size() const {
+			return 0; // TODO: implement
 		}
 
 	private:
@@ -550,9 +614,14 @@ namespace aho_corasick {
 			return result;
 		}
 
-		void check_construct_failure_states() {
-			if (!d_constructed_failure_states) {
-				construct_failure_states();
+		void check_construct_failure_states() const {
+			bool constructed = d_constructed_failure_states.load(std::memory_order_acquire);
+			if (!constructed) {
+				std::unique_lock<std::mutex> lock(d_mutex);
+				constructed = d_constructed_failure_states.load(std::memory_order_relaxed);
+				if(!constructed) {
+					const_cast<this_trie_type*>(this)->construct_failure_states();
+				}
 			}
 		}
 
@@ -562,7 +631,7 @@ namespace aho_corasick {
 				depth_one_state->set_failure(d_root.get());
 				q.push(depth_one_state);
 			}
-			d_constructed_failure_states = true;
+			//d_constructed_failure_states = true;
 
 			while (!q.empty()) {
 				auto cur_state = q.front();
@@ -580,6 +649,7 @@ namespace aho_corasick {
 				}
 				q.pop();
 			}
+			d_constructed_failure_states.store(true, std::memory_order_release);
 		}
 
 		void store_emits(size_t pos, state_ptr_type cur_state, emit_collection& collected_emits) const {
