@@ -83,7 +83,8 @@ def substitute_signature(match: re.match):
 def replace_special_metacharacters(regex_signature: str) -> str:
     """
     Given a Perl Compatible Regular Expression (pcre), this function will replace all special meta-characters with
-    their UTF-8 representation.
+    their UTF-8 representation. Example: '\?' will be replaced by utf8('?') not to be confused with the regex '?'.
+    Issue: '\\' is searching '\\\\' => '\\'
     
     :param regex_signature: A Perl Compatible Regular Expression (pcre) raw string in the form of r''.
     
@@ -114,9 +115,10 @@ def extract_exact_matches(regex_signature: str) -> list:
     
     # Replaces all "canceled" ('\'+) special meta-characters with their UTF-8 representation.
     regex_signature = replace_special_metacharacters(regex_signature)
-    
+
     # Replaces the unique *exact match* signature (\w){(\d+)} for example: 'o{2}' in the actual string, for example: 'oo'
-    regex_signature = re.sub(r'(\w){(\d+)}', substitute_signature, regex_signature)
+    for bracket_pattern in config.bracket_patterns:
+        regex_signature = re.sub(bracket_pattern, substitute_signature, regex_signature)
 
     # Replaces any non-exact match (ambiguous) signatures with an empty space ' '.
     for unwanted_signature in config.unwanted_pattens:

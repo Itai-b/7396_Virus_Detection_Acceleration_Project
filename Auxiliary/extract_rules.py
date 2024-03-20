@@ -5,14 +5,14 @@ import tarfile
 import re
 
 # Define regex patten of a wanted rule line
-pattern = re.compile(r'sid:\d+')
+pattern = re.compile(r'sid:\d+;')
 bad_pattern = re.compile(r'alert \( gid:\d+')
 
 
 # Function to check if dropped lines contain wanted signatures (content / pcre)
 def contains_keywords(dropped_line):
-    content_pattern = re.compile(r'content:".*?"')
-    pcre_pattern = re.compile(r'pcre:".*?"')
+    content_pattern = re.compile(r'content:".*?"[;,]')
+    pcre_pattern = re.compile(r'pcre:".*?";')
     return content_pattern.search(dropped_line) or pcre_pattern.search(dropped_line)
 
 
@@ -28,7 +28,8 @@ if not zipped_folder_path.endswith('.tar.gz'):
 
 # Extract 'path/to/zipped_file' without .tar.gz ending
 rules_dir = os.path.dirname(zipped_folder_path)
-unzipped_file_name = os.path.splitext(os.path.basename(zipped_folder_path))[0]      # extract basename without .endings
+# Extract basename without any extensions
+unzipped_file_name = os.path.splitext(os.path.splitext(os.path.basename(zipped_folder_path))[0])[0]
 unzipped_dir = os.path.join(rules_dir, unzipped_file_name)
 
 # Create a new directory (if not exist) in 'path/to/zipped_file' to extract the zipped files to there
@@ -42,7 +43,7 @@ with tarfile.open(zipped_folder_path, 'r:gz') as tar:
         tar.extract(member, path=unzipped_dir)
     
 # Create or empty the all.rules file
-with open('all.rules', 'w'):
+with open(unzipped_file_name + '.rules', 'w'):
     pass
 
 rules_count = 0
@@ -50,7 +51,7 @@ content_count = 0
 pcre_count = 0
 dropped_rules_count = 0
 # Insert (to 'all.rules' file) rules that match the defined regex Pattern from all files ending with '.rules'
-with open('all.rules', 'a') as all_rules:
+with open(unzipped_file_name + '.rules', 'a') as all_rules:
     for root, dirs, files in os.walk(unzipped_dir):
         for file in files:
             if file.endswith('.rules'):
@@ -68,7 +69,7 @@ with open('all.rules', 'a') as all_rules:
                             print(f'Dropped line without Snort ID: {line.strip()}')
                             dropped_rules_count += 1
 
-print(f'Finished appending all rules from: {unzipped_file_name} to: \'all.rules\'')
+print(f'Finished appending all rules from: {unzipped_file_name} to: \'{unzipped_file_name}.rules\'')
 print(f'There were: {rules_count} rules')
 print(f'            {content_count} rules with content signature(s)')
 print(f'            {pcre_count} rules with pcre signature(s)')

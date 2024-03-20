@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # Initialize variables
-rules_file="$WORK_DIR/../Auxillary/snort3-community.rules"
+rules_file="$WORK_DIR/../Auxiliary/snort3-community.rules"
 save_path=$WORK_DIR
 
 # Check if Python is installed

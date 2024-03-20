@@ -13,7 +13,7 @@ from collections import Counter
 
 plt.style.use('tableau-colorblind10')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 8))
 
 global  total_rules, \
         rules_sid, \

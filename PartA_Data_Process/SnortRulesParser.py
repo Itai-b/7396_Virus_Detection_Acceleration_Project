@@ -12,9 +12,9 @@ from datetime import datetime
 
 logger = logging.getLogger('SnortRulesParser')
 
-EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
-REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
-RULE_NUMBER = r'(?:sid:)(\d+)'                      # rule sid
+CONTENT_SIGNATURE = r'(?:content:")(.*?)(?:"[,;])'  # exact match rules
+PCRE_SIGNATURE = r'(?:pcre:")(.*?)(?:";)'           # perl compatible regular expression rules
+RULE_NUMBER = r'(?:sid:)(\d+)(?:;)'                 # rule sid
 
 def add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule, data_by_signature):
     for line in data_by_signature:
@@ -159,8 +159,8 @@ def main():
     log_file_handler.setFormatter(formatter)
     logger.addHandler(log_file_handler)    
 
-    signatures_type = {'content': EXACT_MATCH_SIGNATURE,
-                'pcre': REGEX_SIGNATURE}
+    signatures_type = {'content': CONTENT_SIGNATURE,
+                'pcre': PCRE_SIGNATURE}
     
     logger.info(f'Started parsing.')
     start_time = time.time()                          
