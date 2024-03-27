@@ -334,9 +334,14 @@ const bool DEFAULT_INSENSITIVE = true;
 	private:
 		size_t                         d_depth;
 		ptr                            d_root;
-		std::map<CharType, unique_ptr> d_success;
+		std::map<CharType, unique_ptr> d_success;		// Effective list of transitions and chars
+														// For every state in the automaton:
+														//		map: {char_of_next_state(s) : ptr_to_follow_up_state}
+														//		Bla => ['B', ptr_B] -> ['l', ptr_l] -> ['a', ptr_a]
+														//		map_item.first = the char of the state
+														//		map_item.second = the ptr to the state
 		ptr                            d_failure;
-		string_collection              d_emits;
+		string_collection              d_emits;			// Emits, list of full keywords stored in terminal nodes
 
 	public:
 		state(): state(0) {}
@@ -347,6 +352,29 @@ const bool DEFAULT_INSENSITIVE = true;
 			, d_success()
 			, d_failure(nullptr)
 			, d_emits() {}
+
+		size_t get_size(bool include_emits = false, bool include_peripherals = false) const {
+			size_t calculated_size = 0;
+			
+			size_t map_element = sizeof(CharType) + sizeof(unique_ptr);
+			size_t num_of_map_elements = d_success.size();
+
+			calculated_size += map_element * num_of_map_elements;
+			
+			if (include_peripherals) {
+				calculated_size += sizeof(d_depth) + sizeof(d_root) + sizeof(d_failure);
+			}
+
+			if (include_emits) {
+				for (auto e : d_emits) {
+					calculated_size += sizeof(e.second);
+					for (CharType c : e.first) {
+						calculated_size += sizeof(CharType);
+					}
+				}
+			}
+			return calculated_size;
+		}
 
 		ptr next_state(CharType character) const {
 			return next_state(character, false);
@@ -427,7 +455,7 @@ const bool DEFAULT_INSENSITIVE = true;
 		using string_ref_type = std::basic_string<CharType>&;
 
 		typedef state<CharType>         state_type;
-		typedef state<CharType>* state_ptr_type;
+		typedef state<CharType>*		state_ptr_type;
 		typedef token<CharType>         token_type;
 		typedef emit<CharType>          emit_type;
 		typedef std::vector<token_type> token_collection;
@@ -525,17 +553,7 @@ const bool DEFAULT_INSENSITIVE = true;
 			size_t pos = 0;
 			state_ptr_type cur_state = d_root.get();
 			emit_collection collected_emits;
-			// TODO: here c stops when arriving to '\0' this has to be fixed
-			// DEBUG
-			std::cout << "text is: " << text << std::endl;
-			std::cout << "of len: " << text.length() << std::endl;
-			// DEBUG
-			//for (size_t i = 0; i < text.length(); ++i){
-				//auto c = text[i];
-				// DEBUG
 			for (auto c : text) {
-				std::cout << "\tchar is: " << c << std::endl;
-				// DEBUG
 				if (d_config.is_case_insensitive()) {
 					c = std::tolower(c);
 				}
@@ -554,20 +572,14 @@ const bool DEFAULT_INSENSITIVE = true;
 			return emit_collection(collected_emits);
 		}
 
+		size_t traverse_tree(bool include_emits = false, bool include_peripherals = false) const {
+			size_t size = 0;
+			this->traverse_tree_aux(d_root.get(), &size, include_emits, include_peripherals);
+			return size;
+		}
+
 		size_t getNumKeywords() const {
 			return this->d_num_keywords;
-		}
-
-		size_t getNumStates() const {
-			return 0; // TODO: implement
-		}
-
-		size_t getStateSize() const {
-			return sizeof(state<CharType>);
-		}
-
-		size_t size() const {
-			return 0; // TODO: implement
 		}
 
 	private:
@@ -659,6 +671,28 @@ const bool DEFAULT_INSENSITIVE = true;
 					auto emit_str = typename emit_type::string_type(str.first);
 					collected_emits.push_back(emit_type(pos - emit_str.size() + 1, pos, emit_str, str.second));
 				}
+			}
+		}
+
+		void traverse_tree_aux(const typename basic_trie<CharType>::state_ptr_type& node, size_t* size_ptr,
+			bool include_emits = false, bool include_peripherals = false) const {
+			if (!node) return;
+
+			// Print the current state or node details
+			*size_ptr += node->get_size(include_emits, include_peripherals);
+			/*
+			std::cout << "Emits: ";
+			for (const auto& emit : node->get_emits()) {
+				std::cout << emit.first << " ";
+			}
+			std::cout << std::endl;
+			*/
+
+			// Recursively traverse child states
+			for (const auto& transition : node->get_transitions()) {
+				auto child_state = node->next_state(transition);
+				std::cout << transition << ",  ";
+				this->traverse_tree_aux(child_state, size_ptr, include_emits, include_peripherals);
 			}
 		}
 	};

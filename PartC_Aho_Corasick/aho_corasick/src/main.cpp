@@ -2,21 +2,30 @@
 //
 
 #include "aho_corasick.hpp"
+#include "Parser.h"
+#include "ExactMatches.h"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <chrono>
 
+void find(aho_corasick::trie& trie, std::basic_string<char>& text) {
+	auto res = trie.parse_text(text);
+	
+	// DEBUG
+	size_t trie_size = trie.traverse_tree();
+	std::cout << "TRIE size FINAL: " << trie_size << std::endl;
+	// DEBUG
 
-using namespace std;
+	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
+	for (auto match : res) { // res is of class emit
+		std::cout << '\t' << match.get_keyword() << std::endl;
+	}
 
-
-// TODO: implement function to actually return approx. size of the trie tree.
-void print_tree_size(const aho_corasick::trie& trie) {
-	std::size_t tree_size = sizeof(trie);
-	std::cout << "Tree Size: " << tree_size << std::endl;
+	std::cout << std::endl;
 }
+
 
 int main()
 {
@@ -29,8 +38,13 @@ int main()
 
 	// TOOD: Check with the double insertion ("hers" x2 -> double space?) because it does give double hits(!)
 	aho_corasick::trie trie;
-	print_tree_size(trie);
-	basic_string<char> arr[] = {
+	std::cout << "Starting TRIE size: " << trie.traverse_tree() << std::endl;
+	std::cout << "Size w/ peripherals: " << trie.traverse_tree(true, true) << std::endl;
+	std::basic_string<char> arr[] = {
+		{'h', 'e', 'r', 's'},
+		{'h', 'e', 'r', 's'},
+		{'h', 'e', 'r', 's'},
+		{'h', 'e', 'r', 's'},
 		{'h', 'e', 'r', 's'},
 		{'h', 'e', 'r', 's'},
 		{'h', 'i', 's'},
@@ -41,29 +55,14 @@ int main()
 	};
 	for (auto s : arr) {
 		trie.insert(s);
-		print_tree_size(trie);
+		std::cout << "TRIE size: " << trie.traverse_tree() << ", Size w/ peripherals: " << trie.traverse_tree(true, true) << std::endl;
 		std::cout << '\t' << "Number of Keywords: " << trie.getNumKeywords()	<< std::endl;
-		std::cout << '\t' << "Number of States: "	<< trie.getNumStates()		<< std::endl;
-		std::cout << '\t' << "Size of a State: "	<< trie.getStateSize()		<< std::endl;
-		std::cout << '\t' << "Size of TRIE: "		<< trie.size()				<< std::endl;
 	}
 
-	string toParse_str = "u\0\0\0sHErs\0\0";
-	std::cout << "str len is: " << toParse_str.length() << std::endl;
-
-	basic_string<char> toParse_spc = { 'u', '\0', '\0', '\0', 's', 'H', 'E', 'r', 's', '\0', '\0' };
-	std::cout << "spc len is: " << toParse_spc.length() << std::endl;
-
-	auto res = trie.parse_text(toParse_spc);
-	print_tree_size(trie);
-
-	// TODO: fix bug where text is being parsed until the first '\0'.
-	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
-	for (auto match : res) { // res if of class emit
-		std::cout << '\t' << match.get_keyword() << std::endl;
-	}
-
-
+	
+	// Example:
+			std::basic_string<char> toParse_spc = { 'u', '\0', '\0', '\0', 's', 'H', 'E', 'r', 's', '\0', '\0' };
+			find(trie, toParse_spc);
 	// TODO: run valgrind on this sh(!)t, i dont see who deletes after the 'new' allocates by state::add_state().
 	return 0;
 }
