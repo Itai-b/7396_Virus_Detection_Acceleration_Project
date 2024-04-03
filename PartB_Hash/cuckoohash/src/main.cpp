@@ -38,11 +38,6 @@ void runTests(Statistics& stats, SubstringLogger& log, const ExactMatches& exact
     std::cout << "Starting Test: L = " << L << " , G = " << G << ", " << "increasing table size "       \
         << "[" << std::dec << substrings.size() << " Substring(s), " << num_of_substrings_duplicates   \
         << " Duplicates]" << std::endl << std::endl;
-    /* if (max_hash_powers == nullptr)
-        std::cout << "increasing table size." << std::endl;
-    else {
-        std::cout << "changing max hash power." << std::endl;
-    }*/
     
     // Useful when trying to quickly produce the substrings logs
     if (num_of_tests <= 0) {

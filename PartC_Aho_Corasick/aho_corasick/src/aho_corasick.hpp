@@ -20,6 +20,8 @@
 * SOFTWARE.
 */
 
+// Revised by Idan Baruch & Itai Benyamin. Up to date: 03/04/24.
+
 #ifndef AHO_CORASICK_HPP
 #define AHO_CORASICK_HPP
 
@@ -255,6 +257,12 @@ const bool DEFAULT_INSENSITIVE = true;
 	/// <summary>
 	///		The emit class is a representation of an emitted token or substring found during text parsing.
 	///		The emitted substring will be registered by it's interval [start_idx, end_idx].
+	///		The emit list (d_emits) is stored at the end of string (terminal nodes).
+	///		Note:
+	///			For multiple insertion of the *same* string, the TRIE doesn't change, but the emit list *does*.
+	///			This means that if the TRIE had the string: d -> o -> g -> $ [d_emits: ['dog']]
+	///			After second insertion of the string 'dog': d -> o -> g -> $ [d_emits: ['dog', 'dog']]
+	///			THIS INFORMATION AFFECTS THE TRIE SIZE AND IS CALCULATED AS PERIPHERAL.
 	/// </summary>
 	template<typename CharType>
 	class emit: public interval {
@@ -353,6 +361,16 @@ const bool DEFAULT_INSENSITIVE = true;
 			, d_failure(nullptr)
 			, d_emits() {}
 
+		/// <summary>
+		/// Returns the size of a node in Bytes.
+		///	Usage:
+		///		.get_size() - returns node size without emits list or peripherals
+		///		.get_size(true) - returns node size with emits list but without peripherals
+		///		.get_size(true, true) - returns full node size with emits list and peripherals
+		/// </summary>
+		/// <param name="include_emits">A Boolean to determine whether or not to calculate a node's emit list in the total size.</param>
+		/// <param name="include_peripherals">A Boolean to determine whether or not to calculate a node's peripherals in the total size.</param>
+		/// <returns></returns>
 		size_t get_size(bool include_emits = false, bool include_peripherals = false) const {
 			size_t calculated_size = 0;
 			
@@ -446,6 +464,7 @@ const bool DEFAULT_INSENSITIVE = true;
 	///		A class that implements the Aho-Corasick automaton using a TRIE tree skeleton.
 	///		aho_corasick::trie is defined as basic_trie<char>.
 	///		Note: CharType has to be of types char: {char, wchar_t, char32_t, char64_t,...}.
+	///			  Use std::basic_string to deal with strings that has NPSCs (Non Printable and Special Characters).
 	/// </summary>
 	/// <typeparam name="CharType"></typeparam>
 	template<typename CharType>
@@ -547,7 +566,12 @@ const bool DEFAULT_INSENSITIVE = true;
 			}
 			return token_collection(tokens);
 		}
-
+		
+		/// <summary>
+		/// Scans the aho_corasick TRIE for a text and returns the list of emits (strings) that were found
+		/// </summary>
+		/// <param name="text">A text to find exact matches on using the aho_corasick automaton</param>
+		/// <returns>An std::vector of the emits (strings with relevant intervals) found</returns>
 		emit_collection parse_text(string_type text) const {
 			check_construct_failure_states();
 			size_t pos = 0;
@@ -572,9 +596,16 @@ const bool DEFAULT_INSENSITIVE = true;
 			return emit_collection(collected_emits);
 		}
 
-		size_t traverse_tree(bool include_emits = false, bool include_peripherals = false) const {
+		/// <summary>
+		/// Traverse the Aho Corasick TRIE tree to 
+		/// </summary>
+		/// <param name="include_emits">A Boolean to determine whether or not to calculate a node's emit list in the total size.</param>
+		/// <param name="include_peripherals">A Boolean to determine whether or not to calculate a node's peripherals in the total size.</param>
+		/// <param name="print">A Boolean to determine whether or not to print the emits when traversing the tree</param>
+		/// <returns></returns>
+		size_t traverse_tree(bool include_emits = false, bool include_peripherals = false, bool print = false) const {
 			size_t size = 0;
-			this->traverse_tree_aux(d_root.get(), &size, include_emits, include_peripherals);
+			this->traverse_tree_aux(d_root.get(), &size, include_emits, include_peripherals, print);
 			return size;
 		}
 
@@ -674,25 +705,41 @@ const bool DEFAULT_INSENSITIVE = true;
 			}
 		}
 
-		void traverse_tree_aux(const typename basic_trie<CharType>::state_ptr_type& node, size_t* size_ptr,
-			bool include_emits = false, bool include_peripherals = false) const {
-			if (!node) return;
 
-			// Print the current state or node details
-			*size_ptr += node->get_size(include_emits, include_peripherals);
-			/*
-			std::cout << "Emits: ";
-			for (const auto& emit : node->get_emits()) {
-				std::cout << emit.first << " ";
+		/// <summary>
+		/// An Auxiliary function that recursively traverse the TRIE tree in pre-orderly manner.
+		/// </summary>
+		/// <param name="node">Node to inspect</param>
+		/// <param name="size_ptr">A pointer to a paramter that holds the sum value of the tree size in Bytes</param>
+		/// <param name="include_emits">A Boolean to determine whether or not to calculate a node's emit list in the total size.</param>
+		/// <param name="include_peripherals">A Boolean to determine whether or not to calculate a node's peripherals in the total size.</param>
+		/// <param name="print">A Boolean to determine whether or not to print the emits when traversing the tree</param>
+		void traverse_tree_aux(const typename basic_trie<CharType>::state_ptr_type& node, size_t* size_ptr,
+			bool include_emits = false, bool include_peripherals = false, bool print = false) const {
+			
+			// Stop condition: NULLPTR (no further sons / transitions to node)
+			if (!node) {
+				return;
 			}
-			std::cout << std::endl;
-			*/
+			
+			// Pre-Order traversal (NLR): First apply function (sum) on Node, then call children Left to Right.
+			*size_ptr += node->get_size(include_emits, include_peripherals);
+			
+			// Print the current state's or node's details (emits list <=> terminal node)
+			if (print) {
+				std::cout << "Emits: ";
+				for (const auto& emit : node->get_emits()) {
+					std::cout << emit.first << " ";
+				}
+				std::cout << std::endl;
+			}
 
 			// Recursively traverse child states
 			for (const auto& transition : node->get_transitions()) {
-				// DEBUG
-				//std::cout << transition << ",  ";
-				// DEBUG
+				// Print transitions (chars of next states in TRIE)
+				if (print) {
+					std::cout << transition << ",  ";
+				}
 				auto child_state = node->next_state(transition);
 				this->traverse_tree_aux(child_state, size_ptr, include_emits, include_peripherals);
 			}

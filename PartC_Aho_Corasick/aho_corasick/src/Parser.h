@@ -14,7 +14,7 @@
 
 typedef std::basic_string<char> bstring;
 
-void hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstrings) {
+std::size_t hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstrings) {
     // Remove the "0x" prefix if present
     std::string cleanedHexString = hexString.substr(0, 2) == "0x" ? hexString.substr(2) : hexString;
 
@@ -34,6 +34,7 @@ void hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstr
         result.push_back(static_cast<char>(byteValue));
     }
     bstrings.push_back(result);
+    return result.length();
 }
 
 /// <summary>
@@ -41,14 +42,19 @@ void hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstr
 /// </summary>
 /// <param name="exact_matches">Element of class ExactMatches, which is a vector of ExactMatch (rules,type,string) for each exact match extracted from the snort rules' signatures</param>
 /// <param name="keywords">An empty vector in which the basic_strings will be stored</param>
-void convertExactMatches(const ExactMatches& exact_matches, std::vector<bstring>& bstrings) {
+std::size_t convertExactMatches(const ExactMatches& exact_matches, std::vector<bstring>& bstrings) {
+    std::size_t max_length = 0;
     for (auto it = exact_matches.exact_matches->begin(); it != exact_matches.exact_matches->end(); ++it) {
         std::string hexString = (*it)->getExactMatch();
         //std::set<int> rules = (*it)->getRulesNumbers();
         //total_unique_rules.insert(rules.begin(), rules.end());
         //bstrings.push_back(hexStringToBstring(hexString));
-        hexStringToBstring(hexString, bstrings);
+        std::size_t length = hexStringToBstring(hexString, bstrings);
+        if (length > max_length) {
+            max_length = length;
+        }
     }
+    return max_length;
 }
 
 /**

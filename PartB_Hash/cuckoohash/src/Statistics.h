@@ -31,7 +31,7 @@ public:
 
     /// <summary>
     /// Usage: 
-    ///     stats.addData({hash_table_size, double load_factor, avg_number_of_rules_inserted, percentage_of_rules_inserted,            
+    ///     stats.addData({hash_table_size, load_factor, avg_number_of_rules_inserted, percentage_of_rules_inserted,            
     ///         avg_number_of_substrings_inserted, percentage_of_all_substrings_inserted, hash_power, average_run_time});
     /// </summary>
     /// <param name="testStatistics">A struct to contain the logged test statistics.</param>
