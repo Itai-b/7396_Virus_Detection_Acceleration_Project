@@ -690,8 +690,10 @@ const bool DEFAULT_INSENSITIVE = true;
 
 			// Recursively traverse child states
 			for (const auto& transition : node->get_transitions()) {
+				// DEBUG
+				//std::cout << transition << ",  ";
+				// DEBUG
 				auto child_state = node->next_state(transition);
-				std::cout << transition << ",  ";
 				this->traverse_tree_aux(child_state, size_ptr, include_emits, include_peripherals);
 			}
 		}

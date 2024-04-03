@@ -117,7 +117,11 @@ def translate_exact_matches_to_hex(exact_matches):
         hex_list = []
         for i, char_list in enumerate(exact_match):
             for char in char_list:
-                hex_list.append(hex(ord(char)))
+                hex_value = (hex(ord(char)))
+                if len(hex_value) < 4:
+                    hex_list.append('0x' + '0' + hex_value[-1])
+                else:
+                    hex_list.append(hex_value)
         exact_matches_hex.append(hex_list)
     return exact_matches_hex            
 

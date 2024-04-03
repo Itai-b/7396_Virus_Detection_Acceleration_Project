@@ -14,26 +14,26 @@
 
 typedef std::basic_string<char> bstring;
 
-bstring hexStringToBstring(const std::string& hexString) {
+void hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstrings) {
     // Remove the "0x" prefix if present
     std::string cleanedHexString = hexString.substr(0, 2) == "0x" ? hexString.substr(2) : hexString;
 
     size_t len = cleanedHexString.size();
     // Ensure the input string has an even number of characters
     if (len % 2 != 0) {
+        std::cout << "koko" << std::endl;
         throw std::invalid_argument("Hex string length must be even!");
     }
 
     // Convert each pair of hexadecimal characters to a byte
-   bstring result;
+    bstring result;
     for (size_t i = 0; i < len; i += 2) {
         std::istringstream iss(cleanedHexString.substr(i, 2));
         int byteValue;
         iss >> std::hex >> byteValue;
         result.push_back(static_cast<char>(byteValue));
     }
-
-    return result;
+    bstrings.push_back(result);
 }
 
 /// <summary>
@@ -46,7 +46,8 @@ void convertExactMatches(const ExactMatches& exact_matches, std::vector<bstring>
         std::string hexString = (*it)->getExactMatch();
         //std::set<int> rules = (*it)->getRulesNumbers();
         //total_unique_rules.insert(rules.begin(), rules.end());
-        bstrings.push_back(hexStringToBstring(hexString));
+        //bstrings.push_back(hexStringToBstring(hexString));
+        hexStringToBstring(hexString, bstrings);
     }
 }
 
