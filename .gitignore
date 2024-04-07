@@ -45,12 +45,26 @@
 /PartB_Hash/cuckoohash/out/
 /PartB_Hash/cuckoohash/libcuckoo
 /PartB_Hash/cuckoohash/nlohmann_json
+
+/PartC_Aho_Corasick/aho_corasick/.vs
+/PartC_Aho_Corasick/aho_corasick/build
+/PartC_Aho_Corasick/aho_corasick/install
+/PartC_Aho_Corasick/aho_corasick/out/
+/PartC_Aho_Corasick/aho_corasick/aho_corasick
+/PartC_Aho_Corasick/aho_corasick/nlohmann_json
+
+/PartC_Aho_Corasick/ahocorasickalg
+
+/PartC_AC
+
 /Data/
+/Old_Data/
 
 /PartC_Aho_Corasick/aho_corasick/build/
 /PartC_Aho_Corasick/aho_corasick/install/
 /PartC_Aho_Corasick/aho_corasick/out/
 
+/Auxiliary/problematic.rules
 /auxiliary/rules/*
 !auxiliary/rules/snort3-community-rules.tar.gz
 !auxiliary/rules/snortrules-snapshot-3190.tar.gz

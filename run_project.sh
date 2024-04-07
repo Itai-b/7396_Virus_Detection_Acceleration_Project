@@ -8,7 +8,7 @@ NC='\033[0m' # No Color
 
 # Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
-SNORT_RULES_FILE=$WORK_DIR/Auxillary/snort3-community.rules
+SNORT_RULES_FILE=$WORK_DIR/Auxiliary/snort3-community.rules
 
 # Check if more than one argument is provided
 if [ $# -gt 1 ]; then
@@ -18,7 +18,7 @@ fi
 
 # Check if the first argument is provided and it ends with .rules
 if [[ $1 ]]; then
-	if [[$1 == *.rules]]; then
+	if [[ $1 == *.rules ]]; then
 		echo "Processing $1..."
 		SNORT_RULES_FILE=$(realpath $1)
 	else

@@ -12,9 +12,9 @@ from datetime import datetime
 
 logger = logging.getLogger('SnortRulesParser')
 
-EXACT_MATCH_SIGNATURE = r'(?:content:")(.*?)(?:")'  # exact match rules
-REGEX_SIGNATURE = r'(?:pcre:")(.*?)(?:")'           # perl compatible regular expression rules
-RULE_NUMBER = r'(?:sid:)(\d+)'                      # rule sid
+CONTENT_SIGNATURE = r'(?:content:")(.*?)(?:"[,;])'  # exact match rules
+PCRE_SIGNATURE = r'(?:pcre:")(.*?)(?:";)'           # perl compatible regular expression rules
+RULE_NUMBER = r'(?:sid:)(\d+)(?:;)'                 # rule sid
 
 def add_data_by_signature(signature, signature_type, exact_matches, exact_matches_hex, rule, data_by_signature):
     for line in data_by_signature:
@@ -117,7 +117,11 @@ def translate_exact_matches_to_hex(exact_matches):
         hex_list = []
         for i, char_list in enumerate(exact_match):
             for char in char_list:
-                hex_list.append(hex(ord(char)))
+                hex_value = (hex(ord(char)))
+                if len(hex_value) < 4:
+                    hex_list.append('0x' + '0' + hex_value[-1])
+                else:
+                    hex_list.append(hex_value)
         exact_matches_hex.append(hex_list)
     return exact_matches_hex            
 
@@ -159,8 +163,8 @@ def main():
     log_file_handler.setFormatter(formatter)
     logger.addHandler(log_file_handler)    
 
-    signatures_type = {'content': EXACT_MATCH_SIGNATURE,
-                'pcre': REGEX_SIGNATURE}
+    signatures_type = {'content': CONTENT_SIGNATURE,
+                'pcre': PCRE_SIGNATURE}
     
     logger.info(f'Started parsing.')
     start_time = time.time()                          

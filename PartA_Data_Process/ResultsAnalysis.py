@@ -13,7 +13,7 @@ from collections import Counter
 
 plt.style.use('tableau-colorblind10')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 8))
 
 global  total_rules, \
         rules_sid, \
@@ -35,6 +35,7 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
     """
         A function used to plot the cumulated lost rules by the exactmatch length.
     """
+    rules_with_signatures = (total_rules - len(rules_with_no_signatures))
     lost_rules_by_length = {}
     for rule in rules_sid:
         lost_rules_by_length[rule] = 0
@@ -43,22 +44,37 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
         for rule in line["rules"]:
             if lost_rules_by_length[rule] <= len(line["exact_match"]):
                 lost_rules_by_length[rule] = (len(line["exact_match"]) + 1)
+
     length = [i for i in range(1, max(lost_rules_by_length.values()) + 1)]
     values_list = list(lost_rules_by_length.values())
     length_counts = [values_list.count(i) for i in range(1, max(lost_rules_by_length.values()) + 1)]
-    cumulative_counts = np.cumsum(length_counts)
+    lost_cumulative_counts = np.cumsum(length_counts)
     
-    total_count = cumulative_counts[-1]
-    cumulative_percentages = (cumulative_counts / (total_rules - len(rules_with_no_signatures))) * 100
-    
+    lost_cumulative_percentages = (lost_cumulative_counts / (total_rules - len(rules_with_no_signatures))) * 100
+
+    cumulative_counts = [(rules_with_signatures - lost_count) for lost_count in lost_cumulative_counts]
+    cumulative_percentages = [(100 - lost_percentage) for lost_percentage in lost_cumulative_percentages]
+
     fig, ax1 = plt.subplots()
+    ax2 = ax1.twinx()
+    
+    # Switch the visible axes.
+    ax1.spines['right'].set_position(('outward', 0))
+    ax1.spines['right'].set_visible(True)
+    ax1.yaxis.set_label_position('right')
+    ax1.yaxis.set_ticks_position('right')
+
+    ax2.spines['left'].set_position(('outward', 0))
+    ax2.spines['left'].set_visible(True)
+    ax2.yaxis.set_label_position('left')
+    ax2.yaxis.set_ticks_position('left')
+
     color = 'black'
     ax1.set_xlabel('Length of ExactMatch')
-    ax1.set_ylabel('Lost Rules', color=color)
+    ax1.set_ylabel('Number of Rules', color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.plot(length, cumulative_counts, color=color)
 
-    ax2 = ax1.twinx()
     ax2.set_ylabel('Percentage (%)', color='black')
     ax2.plot(length, cumulative_percentages, color=colors[1])
     ax2.tick_params(axis='y', labelcolor='black')
@@ -66,16 +82,17 @@ def plot_lost_rules_by_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     for x_val in xticks:
         y_val = cumulative_percentages[x_val-1]
-        plt.plot(x_val, y_val, 'o', color=colors[0], markersize=5)
-        if x_val == 1:
-            plt.text(x_val, y_val-3, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+        ax2.plot(x_val, y_val, 'o', color=colors[0], markersize=5)
+        if (x_val == 2) or (x_val == 4):
+            ax2.text(x_val, y_val-3, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
         else:
-            plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+            ax2.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
     ax2.tick_params(axis='y', labelcolor=color)
     
-    plt.title('Lost Rules by ExactMatch length threshold (only rules with signatures)', fontweight='bold', fontsize=10)
-    plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_lost_rules.png'), dpi=300)
+    plt.suptitle('Rules that remained after ExactMatch length threshold', fontweight='bold', fontsize=10)
+    plt.title('(out of all rules with signatures)', fontweight='bold', fontsize=8)
+    plt.savefig(os.path.join(abs_save_path, 'rules_remained_after_threshold.png'), dpi=300)
     plt.close()  
 
 def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
@@ -95,12 +112,23 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
 
     fig, ax1 = plt.subplots()
     color = 'black'
+    ax2 = ax1.twinx()
+    
+    # Switch the visible axes.
+    ax1.spines['right'].set_position(('outward', 0))
+    ax1.spines['right'].set_visible(True)
+    ax1.yaxis.set_label_position('right')
+    ax1.yaxis.set_ticks_position('right')
+    ax2.spines['left'].set_position(('outward', 0))
+    ax2.spines['left'].set_visible(True)
+    ax2.yaxis.set_label_position('left')
+    ax2.yaxis.set_ticks_position('left')
+
     ax1.set_xlabel('Length of ExactMatch')
     ax1.set_ylabel('Count', color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.plot(length, cumulative_counts, color=color)
 
-    ax2 = ax1.twinx()
     color = 'black'
     ax2.set_ylabel('Percentage (%)', color=color)
     ax2.plot(length, cumulative_percentages, color=colors[1])
@@ -109,13 +137,13 @@ def plot_cummulative_exactmatch_length(data_by_exactmatch, abs_save_path):
     xticks = [2**i for i in range(int(np.log2(max(length))) + 1)]
     for x_val in xticks:
         y_val = cumulative_percentages[x_val-1]
-        plt.plot(x_val, y_val, 'o', color=colors[0], markersize=5)
-        plt.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
+        ax2.plot(x_val, y_val, 'o', color=colors[0], markersize=5)
+        ax2.text(x_val, y_val, f'({x_val}, {y_val:.2f}%)', fontsize=8, fontweight='bold', ha='left', va='bottom')
 
     ax2.tick_params(axis='y', labelcolor=color)
     
     plt.title('Cumulated ExactMatches by length', fontweight='bold')
-    plt.savefig(os.path.join(abs_save_path, 'cumulative_plot_exactmatches.png'), dpi=300)
+    plt.savefig(os.path.join(abs_save_path, 'cumulated_exactmatches_by_length.png'), dpi=300)
     plt.close()  
     
 def check_rules_with_no_signitures(data_by_signature, logger):
