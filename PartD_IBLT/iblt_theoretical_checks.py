@@ -1,7 +1,12 @@
 from iblt import IBLT
+from matplotlib import pyplot as plt
 import os
 import argparse
 import json
+
+plt.style.use('tableau-colorblind10')
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+plt.figure(figsize=(10, 6))
 
 class Data:
     def __init__(self, m, rules):
@@ -39,6 +44,14 @@ def check_json_file_type(file_path):
         else:
             return 'Invalid JSON'
 
+def genGeneralPlots(rules_set):
+    #TODO: finish implementation
+    global SAVE_PATH, NAME
+    print(f"Number of Rules sets: {len(rules_set)}")
+    print(f'The max length of the rules set is: {max([len(rules) for rules in rules_set])}')
+    print(f'The mean length of the rules set is: {(sum([len(rules) for rules in rules_set])/len(rules_set)):.2f}')
+    
+
 def parse_json(json_path):
     # Read the .json file and parse it to a list of rules
     # Check if .json file is an array of objects or a series of objects
@@ -59,11 +72,14 @@ def parse_json(json_path):
                 rules.append(obj['rules'])
     return rules
 
+NAME = ""
+SAVE_PATH = os.path.join('..', 'Data', 'PartD_Data')
 VALUESIZE = 10
 KEYSIZE = 10
 K = 6
 M = [2, 4, 8, 16, 32, 64, 128, 256, 512]
 def main():
+    global NAME, SAVE_PATH
     # get from args the path to .json file
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--path", help="Path to .json file", required=True)
@@ -82,9 +98,12 @@ def main():
         print("Error: Please provide a valid file name to save the results.")
         return 1
 
+    NAME = args.name
+
     results = []
     # Create an instance of IBLT
     rules = parse_json(json_path)
+    genGeneralPlots(rules)
     for m in M:
         data = Data(m, rules)
         data.calculate_sucess_rate()
@@ -93,7 +112,8 @@ def main():
         results.append({'m': m, 'sucess_rate': data.sucess_rate})
 
     # Save the results to a .json file
-    with open(f'../Data/PartD_Data/iblt_theoretical_checks_{args.name}.json', 'w') as file:
+    file_path = os.path.join(SAVE_PATH, f'iblt_theoretical_checks_{NAME}.json')
+    with open(file_path, 'w') as file:
         for result in results:
             file.write(json.dumps(result) + '\n')
 

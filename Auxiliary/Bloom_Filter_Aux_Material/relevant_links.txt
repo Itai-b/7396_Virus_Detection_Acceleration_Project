@@ -6,7 +6,7 @@ https://www.i-programmer.info/programming/72-theory/4641-the-invertible-bloom-fi
 
 Invertable Bloom Filter Tables Articles
 https://medium.com/codechain/invertible-bloom-lookup-table-37600927cfbe
-https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6120248
+https://www.researchgate.net/publication/261170589_Invertible_Bloom_Lookup_Tables
 https://www.sciencedirect.com/science/article/pii/S0020019013002950
 https://www.researchgate.net/publication/366656760_Invertible_Bloom_Lookup_Tables_with_Listing_Guarantees - Technion's article
 https://ics.uci.edu/~eppstein/pubs/EppGooUye-SIGCOMM-11.pdf
