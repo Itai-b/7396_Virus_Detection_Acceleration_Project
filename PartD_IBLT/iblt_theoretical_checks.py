@@ -4,18 +4,14 @@ import os
 import argparse
 import json
 
-plt.style.use('tableau-colorblind10')
-colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-plt.figure(figsize=(10, 6))
-
 class Data:
     def __init__(self, m, rules):
         self.m = m
         self.rules_set = rules
-        self.sucess_rate = 0
+        self.success_rate = 0
 
-    def calculate_sucess_rate(self):
-        total_sucess_rate = 0
+    def calculate_success_rate(self):
+        total_success_rate = 0
         for rules in self.rules_set:
             iblt = IBLT(self.m, K, KEYSIZE, VALUESIZE)
             for rule in rules:
@@ -24,10 +20,10 @@ class Data:
             if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
                 entries_size = len(entries[1])
                 success_rate = (entries_size/len(rules))
-                total_sucess_rate += success_rate
+                total_success_rate += success_rate
             else:
-                total_sucess_rate += 1
-        self.sucess_rate = total_sucess_rate/len(self.rules_set)
+                total_success_rate += 1
+        self.success_rate = total_success_rate/len(self.rules_set)
 
 def check_json_file_type(file_path):
     with open(file_path, 'r') as file:
@@ -43,14 +39,6 @@ def check_json_file_type(file_path):
             return 'Series of objects'
         else:
             return 'Invalid JSON'
-
-def genGeneralPlots(rules_set):
-    #TODO: finish implementation
-    global SAVE_PATH, NAME
-    print(f"Number of Rules sets: {len(rules_set)}")
-    print(f'The max length of the rules set is: {max([len(rules) for rules in rules_set])}')
-    print(f'The mean length of the rules set is: {(sum([len(rules) for rules in rules_set])/len(rules_set)):.2f}')
-    
 
 def parse_json(json_path):
     # Read the .json file and parse it to a list of rules
@@ -73,7 +61,7 @@ def parse_json(json_path):
     return rules
 
 NAME = ""
-SAVE_PATH = os.path.join('..', 'Data', 'PartD_Data')
+SAVE_PATH = os.path.join('..', 'Data', 'PartD_Data', 'IBLT_JSONs')
 VALUESIZE = 10
 KEYSIZE = 10
 K = 6
@@ -103,15 +91,18 @@ def main():
     results = []
     # Create an instance of IBLT
     rules = parse_json(json_path)
-    genGeneralPlots(rules)
     for m in M:
         data = Data(m, rules)
-        data.calculate_sucess_rate()
+        data.calculate_success_rate()
         print('M: ', m)
-        print('Sucess rate: ', data.sucess_rate)
-        results.append({'m': m, 'sucess_rate': data.sucess_rate})
+        print('success rate: ', data.success_rate)
+        results.append({'m': m, 'success_rate': data.success_rate})
 
     # Save the results to a .json file
+    # Create the directory if it doesn't exist using mkdir -p
+    if not os.path.exists(SAVE_PATH):
+        os.makedirs(SAVE_PATH)
+        
     file_path = os.path.join(SAVE_PATH, f'iblt_theoretical_checks_{NAME}.json')
     with open(file_path, 'w') as file:
         for result in results:
