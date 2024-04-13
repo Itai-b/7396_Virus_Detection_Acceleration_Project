@@ -1,0 +1,15 @@
+link to Data Structures lecture about Bloom Filter
+https://panoptotech.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=caab23c7-003c-4219-9485-ae2800d5883c
+
+Bloom Filter -
+https://www.i-programmer.info/programming/72-theory/4641-the-invertible-bloom-filter.html
+
+Invertable Bloom Filter Tables Articles
+https://medium.com/codechain/invertible-bloom-lookup-table-37600927cfbe
+https://www.researchgate.net/publication/261170589_Invertible_Bloom_Lookup_Tables
+https://www.sciencedirect.com/science/article/pii/S0020019013002950
+https://www.researchgate.net/publication/366656760_Invertible_Bloom_Lookup_Tables_with_Listing_Guarantees - Technion's article
+https://ics.uci.edu/~eppstein/pubs/EppGooUye-SIGCOMM-11.pdf
+
+Python Implementation for IBLT
+https://github.com/jesperborgstrup/Py-IBLT
