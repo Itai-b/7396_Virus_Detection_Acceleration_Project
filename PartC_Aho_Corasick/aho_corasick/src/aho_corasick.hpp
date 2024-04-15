@@ -36,6 +36,7 @@
 #include <vector>
 #include <mutex>
 #include <atomic>
+#include <iostream>  // Use for the 'print' option in tree traversal
 
 
 namespace aho_corasick {
@@ -387,7 +388,7 @@ const bool DEFAULT_INSENSITIVE = true;
 				for (auto e : d_emits) {
 					calculated_size += sizeof(e.second);
 					for (CharType c : e.first) {
-						calculated_size += sizeof(CharType);
+						calculated_size += sizeof(c);
 					}
 				}
 			}

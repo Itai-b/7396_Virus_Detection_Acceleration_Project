@@ -66,9 +66,9 @@ cmake -DCMAKE_LIBRARY_PATH="../install" ..
 make all || exit 1
 
 if [ "$num_of_tests" ]; then
-	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests || exit 1
+	valgrind src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests || exit 1
 else
-	src/cuckoohash -f "$JSONPATH" -d $DESTPATH || exit 1
+	valgring src/cuckoohash -f "$JSONPATH" -d $DESTPATH || exit 1
 fi
 
 # Run ResultsAnalysis.py
