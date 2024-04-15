@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
-// #include <unistd.h> // when running from WSL
+#include <unistd.h>		// comment when running from Visual Studio
 #include <chrono>
 
 /// <summary>
@@ -121,7 +121,8 @@ int main(int argc, char* argv[]) {
 	std::string file_path = "parta_data_by_exactmatch.json";
 	std::string dest_path = "";
 	
-	/* USE IN WSL WITH THE UNIX STANDARD LIBRARY <UNISTD.H>
+	// Comment this when running in Visual Studio (as well as #include <unistd.h>
+	// USE IN WSL WITH THE UNIX STANDARD LIBRARY <UNISTD.H>
 	int opt;
 	bool is_file_path_set = false;
 	while ((opt = getopt(argc, argv, "f:d:")) != -1) {
@@ -140,11 +141,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!is_file_path_set) {
-		std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path]" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "File path: " << file_path << std::endl;
-	*/
 
 	ExactMatches exact_matches;
 	parseFile(file_path, exact_matches);
@@ -160,8 +160,8 @@ int main(int argc, char* argv[]) {
 	stats.writeToFile(dest_path, "partc_results.json");
 
 	auto end_time = std::chrono::high_resolution_clock::now();
-	auto total_runtime = std::chrono::duration_cast<std::chrono::milliseconds>(start_time - end_time).count();
+	auto total_runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 	std::cout << "Finished running Aho Corasick Tests in " << static_cast<double>(total_runtime) << "[ms]." << std::endl;
-	// TODO: run valgrind on this sh(!)t, i dont see who deletes after the 'new' allocates by state::add_state().
+	// TODO: run valgrind on this, i dont see who deletes after the 'new' allocates by state::add_state().
 	return 0;
 }
