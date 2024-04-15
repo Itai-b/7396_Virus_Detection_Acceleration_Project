@@ -86,4 +86,53 @@ else
 	exit 1
 fi
 
-# TODO - add PartC - Aho-Corasick execution after implementation.
+# Check if the user wants to run PartC
+echo -e "${BLUE}Do you want to run PartC - Aho-Corasick Insertion? enter (${GREEN}y${BLUE}/${RED}n${BLUE})${NC}"
+read -p "Enter your choice: " answer
+if [ $answer = "${answer#[Yy]}" ]; then
+	echo -e "${RED}Exiting the script...${NC}"
+	exit 0
+fi
+
+# Prepare to run PartC - Aho-Corasick Insertion
+echo -e "${BLUE}Running PartC - Aho-Corasick Insertion...${NC}"
+
+mkdir -p $WORK_DIR/Data/PartC_Data
+chmod +x $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
+dos2unix $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
+
+command $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
+# check if PartC ran successfully
+if [ $? -eq 0 ]; then
+	echo -e "${GREEN}PartC - Aho-Corasick Insertion ran successfully!${NC}"
+else
+	echo -e "${RED}PartC - Aho-Corasick Insertion was not complited.${NC}"
+	exit 1
+fi
+
+# Check if the user wants to run PartD
+echo -e "${BLUE}Do you want to run PartD - IBLT? enter (${GREEN}y${BLUE}/${RED}n${BLUE})${NC}"
+echo -e "${BLUE}It is expected to finish in ~15 min${NC}"
+read -p "Enter your choice: " answer
+if [ $answer = "${answer#[Yy]}" ]; then
+	echo -e "${RED}Exiting the script...${NC}"
+	exit 0
+fi
+
+# Prepare to run PartD - IBLT
+echo -e "${BLUE}Running PartD - IBLT...${NC}"
+
+mkdir -p $WORK_DIR/Data/PartD_Data
+chmod +x $WORK_DIR/PartD_IBLT/run_partd_unix.sh
+dos2unix $WORK_DIR/PartB_Hash/run_partd_unix.sh
+
+command $WORK_DIR/PartD_IBLT/run_partd_unix.sh
+# check if PartD ran successfully
+if [ $? -eq 0 ]; then
+	echo -e "${GREEN}PartD - IBLT ran successfully!${NC}"
+else
+	echo -e "${RED}PartB - IBLT was not complited.${NC}"
+	exit 1
+fi
+
+echo -e "${BLUE}Finish the execution, exiting...${NC}"

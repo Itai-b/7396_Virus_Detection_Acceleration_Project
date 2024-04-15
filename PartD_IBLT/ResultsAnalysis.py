@@ -84,11 +84,11 @@ def genIBLTPlot(iblt_paths):
     plt.ylabel('Success Rate')
     # change the y-axis to percentage
     plt.axhline(y=1, color='r', linestyle='--', alpha=0.5, linewidth=0.5)
-    plt.ylim(0.5, 1.05)
+    plt.ylim(0.5, 1.001)
     ax = plt.gca()
     ticks = ax.get_yticks()
     ax.set_yticks(ticks)
-    ax.set_yticklabels(['{:.0f}%'.format(x*100) for x in ticks])
+    ax.set_yticklabels(['{:.0f}%'.format(x*100) for x in ticks[:-1]] + [''])
     # draw a horizontal red line at y=100%
     plt.title('IBLT ListEntries Mean Success Rate by Number of Bits in IBLT (m)')
     plt.xticks([r + barwidth * 2 for r in range(len(plot_data['aho_corasick']))], [x[0] for x in plot_data['aho_corasick']])
@@ -99,7 +99,7 @@ def genIBLTPlot(iblt_paths):
     plt.close()
 
 def genHeatmap():
-    fig = plt.figure(figsize=figsize, dpi=dpi)
+    fig = plt.figure(figsize=(10,6))
     # Get the file path
     paths = []
     exactmatch_path = os.path.join(DATA_PATH, 'PartA_Data', 'parta_data_by_exactmatch.json')
@@ -162,7 +162,6 @@ def genHeatmap():
     
 DATA_PATH = os.path.join('..', 'Data')
 SAVE_PATH = os.path.join(DATA_PATH, 'PartD_Data')
-THRESHOLD = 8
 def main():
     if not os.path.exists(DATA_PATH):
         print(f"Data path not found: {DATA_PATH}")
