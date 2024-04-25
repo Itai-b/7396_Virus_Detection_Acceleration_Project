@@ -32,9 +32,9 @@ public:
 	Substring();
 	~Substring();
 
-	T getSubstring() { return this->substring; }
+	T getSubstring() const { return this->substring; }
 	void setSubstring(T substring) { this->substring = substring; }
-	std::size_t getNumOfDups() { return this->num_of_dups; }
+	std::size_t getNumOfDups() const { return this->num_of_dups; }
 	void logDuplicate() { this->num_of_dups++; }
 	
 	Substring<T>& operator=(const Substring<T>& other);
@@ -45,9 +45,9 @@ public:
 	bool operator==(const Substring<T>& other) const;
 	bool operator!=(const Substring<T>& other) const;
 
-	std::string toStringHex();
-	std::string str();
-	std::string toStringFull();
+	std::string toStringHex() const;
+	std::string str() const;
+	std::string toStringFull() const;
 	template<class S> friend std::ostream& operator<<(std::ostream& os, const Substring<S>& substring);
 
 	static void extractSubstrings(const std::string& hexString, std::vector<Substring<T>>& substrings,
@@ -167,7 +167,7 @@ bool Substring<T>::operator!=(const Substring<T>& other) const {
 }
 
 template<typename T>
-std::string Substring<T>::toStringHex() {
+std::string Substring<T>::toStringHex() const {
 	std::ostringstream oss;
 	std::size_t iterations = sizeof(T);
 	oss << "0x";
@@ -179,7 +179,7 @@ std::string Substring<T>::toStringHex() {
 }
 
 template<typename T>
-std::string Substring<T>::str() {
+std::string Substring<T>::str() const {
 	std::ostringstream oss;
 	std::size_t iterations = sizeof(T);
 	for (std::size_t i = iterations; i > 0; --i) {
@@ -195,7 +195,7 @@ std::string Substring<T>::str() {
 }
 
 template<typename T>
-std::string Substring<T>::toStringFull() {
+std::string Substring<T>::toStringFull() const {
 	std::ostringstream oss;
 	std::size_t iterations = sizeof(T);
 	for (std::size_t i = iterations; i > 0; --i) {
@@ -244,7 +244,9 @@ void Substring<T>::extractSubstrings(const std::string& hexString, std::vector<S
 		auto it = std::find(substrings.begin(), substrings.end(), substring);
 		// check if an equivalent substring is already in the vector
 		if (it != substrings.end()) {	// substring found in vector - it will now represent the combined set of rules.
-			it->rules->insert(rules.begin(), rules.end());
+			if (rules.size() != 0) {		// used when extracting substrings from a test string (to search in the hash table and not insert)
+				it->rules->insert(rules.begin(), rules.end());
+			}
 			it->logDuplicate();
 		}
 		else {							// substring is not in vector - add substring to vector
