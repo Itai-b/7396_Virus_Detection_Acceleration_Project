@@ -371,7 +371,7 @@ const bool DEFAULT_INSENSITIVE = true;
 		/// </summary>
 		/// <param name="include_emits">A Boolean to determine whether or not to calculate a node's emit list in the total size.</param>
 		/// <param name="include_peripherals">A Boolean to determine whether or not to calculate a node's peripherals in the total size.</param>
-		/// <returns></returns>
+		/// <returns>The size of the node w/ or w/o emits and peripherals</returns>
 		size_t get_size(bool include_emits = false, bool include_peripherals = false) const {
 			size_t calculated_size = 0;
 			
@@ -393,6 +393,23 @@ const bool DEFAULT_INSENSITIVE = true;
 				}
 			}
 			return calculated_size;
+		}
+
+		/// <summary>
+		/// Returns the number of edges coming out of the node (directed outside: for node 'u' we count every edge 'e' such that 'e' = 'u'->?).
+		/// </summary>
+		/// <returns>The number of edges coming out of the node</returns>
+		size_t count_edges() const {	 
+			size_t edge_count = this->d_success.size(); // leading to a suffix or a successor transition
+			// IDENTICAL: size_t edge_count = this->get_transitions().size();
+			
+
+			// Add one for the failure link (leading to a transition in-case of a failed match) if it's not nullptr
+			if (this->d_failure != nullptr) {
+				edge_count++;
+			}
+
+			return edge_count;	
 		}
 
 		ptr next_state(CharType character) const {
@@ -610,6 +627,16 @@ const bool DEFAULT_INSENSITIVE = true;
 			return size;
 		}
 
+		/// <summary>
+		/// Returns the total number of edges in the Aho Corasick automaton.
+		/// </summary>
+		/// <returns>The total number of edges in the Aho Corasick automaton</returns>
+		size_t count_edges() {
+			size_t total_edges = 0;
+			this->traverse_tree_aux(d_root.get(), &total_edges, false, false, false, true);
+			return total_edges;
+		}
+
 		size_t getNumKeywords() const {
 			return this->d_num_keywords;
 		}
@@ -715,8 +742,9 @@ const bool DEFAULT_INSENSITIVE = true;
 		/// <param name="include_emits">A Boolean to determine whether or not to calculate a node's emit list in the total size.</param>
 		/// <param name="include_peripherals">A Boolean to determine whether or not to calculate a node's peripherals in the total size.</param>
 		/// <param name="print">A Boolean to determine whether or not to print the emits when traversing the tree</param>
+		/// <param name="count_edges">A Boolean to determine whether or not to count ONLY the edges of the automaton</param>
 		void traverse_tree_aux(const typename basic_trie<CharType>::state_ptr_type& node, size_t* size_ptr,
-			bool include_emits = false, bool include_peripherals = false, bool print = false) const {
+			bool include_emits = false, bool include_peripherals = false, bool print = false, bool count_edges = false) const {
 			
 			// Stop condition: NULLPTR (no further sons / transitions to node)
 			if (!node) {
@@ -724,7 +752,12 @@ const bool DEFAULT_INSENSITIVE = true;
 			}
 			
 			// Pre-Order traversal (NLR): First apply function (sum) on Node, then call children Left to Right.
-			*size_ptr += node->get_size(include_emits, include_peripherals);
+			if (count_edges) {
+				*size_ptr += node->count_edges();
+			}
+			else {
+				*size_ptr += node->get_size(include_emits, include_peripherals);
+			}
 			
 			// Print the current state's or node's details (emits list <=> terminal node)
 			if (print) {
@@ -742,7 +775,7 @@ const bool DEFAULT_INSENSITIVE = true;
 					std::cout << transition << ",  ";
 				}
 				auto child_state = node->next_state(transition);
-				this->traverse_tree_aux(child_state, size_ptr, include_emits, include_peripherals);
+				this->traverse_tree_aux(child_state, size_ptr, include_emits, include_peripherals, print, count_edges);
 			}
 		}
 	};
