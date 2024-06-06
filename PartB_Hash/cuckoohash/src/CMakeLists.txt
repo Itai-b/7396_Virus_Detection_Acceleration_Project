@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
-add_executable (cuckoohash "main.cpp" "CustomHash.h" "Statistics.h" "Config.h")
+add_executable (cuckoohash "main.cpp" "CustomHash.h" "Statistics.h" "Config.h" "Auxiliary.h")
 
 #find_package(libcuckoo REQUIRED)
 #find_package(nlohmann_json REQUIRED)
@@ -12,7 +12,7 @@ target_link_libraries(cuckoohash PRIVATE libcuckoo -lpthread)
 target_link_libraries(cuckoohash PRIVATE nlohmann_json::nlohmann_json)
 
 if(CMAKE_CXX_COMPILE_ID MATCHES "MSVC")
-	target_compile_options(cuckoohash PRIVATE /W4 /permissive- /std:c++latest)
+	target_compile_options(cuckoohash PRIVATE /W4 /permissive- /std:c++17)
 else()
 	target_compile_options(cuckoohash PRIVATE -Wall -pedantic -std=c++17)
 endif()

@@ -1,23 +1,4 @@
-#include <libcuckoo/cuckoohash_map.hh>
-#include <nlohmann/json.hpp>
-#include <unistd.h>
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <string>
-#include <set>
-#include <algorithm>
-#include <random>
-#include <chrono>
-#include <typeinfo>
-#include "ExactMatches.h"
-#include "Substring.h"
-#include "CustomHash.h"
-#include "Parser.h"
-#include "Statistics.h"
-#include "Config.h"
+#include "Auxiliary.h"
 
 #define SIMULATION_POINTER_VALUE 0  // use for simulation (see comment on architecture differences)
 
@@ -253,7 +234,7 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
     // It is assumed for now that the testString is in the form of "0xFFFFFFFF..."
     std::vector<Substring<K>> testSubstrings;
     std::set<int> empty_ruleset;  // used since the testSubstrings has *NO* rules related to it (unlike the substring entries in the hash table).
-    Substring<K>::extractSubstrings(testString, testSubstrings, empty_ruleset, G);
+    Substring<K>::extractSubstrings(testString, testSubstrings, empty_ruleset, G, L, true);
     for (Substring<K> testSubstring : testSubstrings) {
         bool found = false;
         K key_to_search = testSubstring.substring;
@@ -261,7 +242,14 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
         if (isSimulation) {
             found = hashTable->contains(key_to_search);
             // debug
-            if (found) { std::cout << "koko"; }
+            if (found) { std::cout << "found" << std::endl; }
+            else {
+                for (Substring<K> substr : substrings_in_table) {
+                    if (substr == testSubstring) {
+                        std::cout << "found in vector :X" << std::endl;
+                    }
+                }
+            }
             // debug
         }
         else {
@@ -279,17 +267,25 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
         
         if (found) {
             std::cout << "Found substring: " << testSubstring << std::endl;
-            for (auto substring : substrings) {
+            for (auto& substring : substrings) {
                 if (substring == testSubstring) {
                     rules_ptr = substring.rules;
+                    if (rules_ptr != nullptr) {
+                        std::cout << "With rules: ";
+                        bool first = true;
+                        for (auto rule : *rules_ptr) {
+                            if (!first) {
+                                std::cout << ", ";
+                            }
+                            std::cout << rule;
+                            first = false;
+                        }
+                        std::cout << std::endl;
+                    }
+                    else {
+                        std::cout << "No rules found." << std::endl;
+                    }
                 }
-            }
-            if (rules_ptr != nullptr) {
-                std::cout << "With rules: ";
-                for (auto rule : *rules_ptr) {
-                    std::cout << rule << ", ";
-                }
-                std::cout << std::endl;
             }
         }
         
@@ -348,45 +344,26 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
 /// <param name="argv">Run with path to exact_matches_hex.json from terminal/script.</param>
 /// <returns></returns>
 int main(int argc, char* argv[]) {
+    // Define start time and path to: json file with all the rules, destination path to save the results, number of tests
     auto start_time = std::chrono::high_resolution_clock::now();
     std::string file_path = "parta_data_by_exactmatch.json";
     std::string dest_path = "";
     std::size_t num_of_tests = NUMBER_OF_TESTS;
     
-    int opt;
-    bool is_file_path_set = false;
-    while ((opt = getopt(argc, argv, "f:d:n:")) != -1) {
-        switch (opt) {
-        case 'f':
-            file_path = optarg;
-            is_file_path_set = true;
-            break;
-        case 'd':
-            dest_path = optarg;
-            break;
-        case 'n':
-            num_of_tests = static_cast<std::size_t>(std::stoi(std::string(optarg)));
-            std::cout << "Number of tests: " << num_of_tests << std::endl;
-            break;
-        default:
-            std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (!is_file_path_set) {
-        std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-n num_of_tests]" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    std::cout << "File path: " << file_path << std::endl;
+    // Get arguments from VS/WSL
+    getOpts(argc, argv, file_path, dest_path, &num_of_tests);
+    
+    // Parse PartA.json file to fill the ExactMatches vector with the extracted data from the .rules file
     ExactMatches exact_matches;
     parseFile(file_path, exact_matches); 
 
+    // START TESTS:
     // Statistics stats_test1;
     SubstringLogger substrings_log0;
-    std::string search_test_path = dest_path + "/SearchTMP_Length8_Gap1";
-    std::string command = "mkdir -p " + search_test_path;
-    system(command.c_str());
+    std::string search_test_path = dest_path + "\\SearchTMP_Length8_Gap1";
+    //std::string command = "mkdir -p " + search_test_path;
+    std::string command = "mkdir " + search_test_path;
+    createDir(search_test_path);
     std::string testStr4 = "0x75736572"; // "user"
     std::string testStr8 = "0x75536552694E466F"; // "uSeRiNFo"
     std::string testStr8_2 = "0x674174454372615348455220762E312E322E33"; // "gAtECraSHER v1.2.3"
@@ -398,6 +375,7 @@ int main(int argc, char* argv[]) {
     return 0;
     // DEBUG
 
+    // Test 1: L = 8, G = 1
     Statistics stats_test1;
     SubstringLogger substrings_log1;
     std::string l8g1_path = dest_path + "/Length8_Gap1";
@@ -407,6 +385,7 @@ int main(int argc, char* argv[]) {
     stats_test1.writeToFile(l8g1_path, "L8_G1_increasing_table_size.json");
     substrings_log1.writeToFile(l8g1_path, "L8_G1_substrings.json");
 
+    // Test 2: L = 8, G = 2
     Statistics stats_test2;
     SubstringLogger substrings_log2;
     std::string l8g2_path = dest_path + "/Length8_Gap2";
@@ -416,6 +395,7 @@ int main(int argc, char* argv[]) {
     stats_test2.writeToFile(l8g2_path, "L8_G2_increasing_table_size.json");
     substrings_log2.writeToFile(l8g2_path, "L8_G2_substrings.json");
 
+    // Test 3: L = 4, G = 1
     Statistics stats_test3;
     SubstringLogger substrings_log3;
     std::string l4g1_path = dest_path + "/Length4_Gap1";
@@ -425,6 +405,7 @@ int main(int argc, char* argv[]) {
     stats_test3.writeToFile(l4g1_path, "L4_G1_increasing_table_size.json");
     substrings_log3.writeToFile(l4g1_path, "L4_G1_substrings.json");
 
+    // Test 4: L = 4, G = 2
     Statistics stats_test4;
     SubstringLogger substrings_log4;
     std::string l4g2_path = dest_path + "/Length4_Gap2";
@@ -434,36 +415,7 @@ int main(int argc, char* argv[]) {
     stats_test4.writeToFile(l4g2_path, "L4_G2_increasing_table_size.json");
     substrings_log4.writeToFile(l4g2_path, "L4_G2_substrings.json");
 
-    /*Statistics stats_test2;
-    runTests<uint64_t, Empty, CustomHash, 8, 1>(stats_test2, exact_matches);
-    stats_test2.writeToFile("L8_G1_EmptyClass_increasing_table_size.json");
-
-    Statistics stats_test3;
-    runTests<uint64_t, uint64_t, CustomHash, 8, 2>(stats_test3, exact_matches);
-    stats_test3.writeToFile("L8_G2_increasing_table_size.json");
-
-    Statistics stats_test4;
-    runTests<uint64_t, Empty, CustomHash, 8, 2>(stats_test4, exact_matches);
-    stats_test4.writeToFile("L8_G2_EmptyClass_increasing_table_size.json");
-    
-    Statistics stats_test5;
-    runTests<uint32_t, uint32_t, CustomHash, 4, 1>(stats_test5, exact_matches);
-    stats_test5.writeToFile("L4_G1_increasing_table_size.json");
-
-    Statistics stats_test6;
-    runTests<uint32_t, Empty, CustomHash, 4, 1>(stats_test6, exact_matches);
-    stats_test6.writeToFile("L4_G1_EmptyClass_increasing_table_size.json");
-
-    Statistics stats_test7;
-    runTests<uint32_t, uint32_t, CustomHash, 4, 2>(stats_test7, exact_matches);
-    stats_test7.writeToFile("L4_G2_increasing_table_size.json");
-
-    Statistics stats_test8;
-    runTests<uint32_t, Empty, CustomHash, 4, 2>(stats_test8, exact_matches);
-    stats_test8.writeToFile("L4_G1_EmptyClass_increasing_table_size.json");*/
-
-    // TODO: Add HashPower test
-
+    // Register finish time and calculate total execution time
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     std::cout << "Total execution time: " << duration.count() << " [ms]." << std::endl;

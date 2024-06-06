@@ -51,7 +51,7 @@ public:
 	template<class S> friend std::ostream& operator<<(std::ostream& os, const Substring<S>& substring);
 
 	static void extractSubstrings(const std::string& hexString, std::vector<Substring<T>>& substrings,
-		const std::set<int>& rules, std::size_t G = SUBSTRING_DEFAULT_GAP, std::size_t L = sizeof(T));
+		const std::set<int>& rules, std::size_t G = SUBSTRING_DEFAULT_GAP, std::size_t L = sizeof(T), bool tolower = false);
 	
 private:
 	std::size_t num_of_dups;
@@ -233,13 +233,34 @@ std::ostream& operator<<(std::ostream& os, const Substring<T>& substring) {
 /// <param name="L">The length of each splitted substring (default: L = sizeof(T))</param>
 template <typename T>
 void Substring<T>::extractSubstrings(const std::string& hexString, std::vector<Substring<T>>& substrings, 
-									 const std::set<int>& rules, std::size_t G, std::size_t L) {
+									 const std::set<int>& rules, std::size_t G, std::size_t L, bool tolower) {
 	// Defaults for G and L are provided in function's declaration.
 	std::string hexOnlyStr = (hexString.substr(0, 2) == "0x") ? hexString.substr(2) : hexString;
 	std::size_t len = hexOnlyStr.size();
+
+	// Create a new string to hold the lowercase hex representation
+	std::string lowerHexStr;
+	if (tolower) {
+		lowerHexStr.reserve(len); // Reserve space to avoid multiple allocations
+		for (std::size_t i = 0; i < len; i += 2) {
+			std::string byteStr = hexOnlyStr.substr(i, 2);
+			int byteValue = std::stoi(byteStr, nullptr, 16);
+
+			// Check if the byte represents an uppercase letter (A=0x41 to Z=0x5A)
+			if (byteValue >= 'A' && byteValue <= 'Z') {
+				byteValue += 'a' - 'A'; // Convert to lowercase (a=0x61 to z=0x7A)
+			}
+
+			// Convert the byte back to a hex string and append to result
+			std::stringstream ss;
+			ss << std::hex << std::setfill('0') << std::setw(2) << byteValue;
+			lowerHexStr.append(ss.str());
+		}
+	}
+
 	// Jumping by 2*L and 2*G because in hex representation each char = 2 hexDigits.
 	for (std::size_t i = 0; (i < len) && ((i + L * 2) <= len); i += G * 2) {
-		std::string hexSubstring = hexOnlyStr.substr(i, L * 2);
+		std::string hexSubstring = (tolower) ? lowerHexStr.substr(i, L * 2) : hexOnlyStr.substr(i, L * 2);
 		Substring<T> substring(hexSubstring, rules);
 		auto it = std::find(substrings.begin(), substrings.end(), substring);
 		// check if an equivalent substring is already in the vector
