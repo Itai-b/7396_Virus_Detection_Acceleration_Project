@@ -360,9 +360,9 @@ int main(int argc, char* argv[]) {
     // START TESTS:
     // Statistics stats_test1;
     SubstringLogger substrings_log0;
-    std::string search_test_path = dest_path + "\\SearchTMP_Length8_Gap1";
-    //std::string command = "mkdir -p " + search_test_path;
-    std::string command = "mkdir " + search_test_path;
+    std::string search_test_path = dest_path + "/SearchTMP_Length8_Gap1";
+    std::string command = "mkdir -p " + search_test_path;
+    //std::string command = "mkdir " + search_test_path;
     createDir(search_test_path);
     std::string testStr4 = "0x75736572"; // "user"
     std::string testStr8 = "0x75536552694E466F"; // "uSeRiNFo"

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 plt.style.use('tableau-colorblind10')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-def plot_statistics(abs_test_path, table_data, substring_data):
+def plot_statistics(abs_test_path, table_data):
 
     dir_name = os.path.basename(abs_test_path)
     substring_length = dir_name.split('_')[0][-1]
@@ -84,23 +84,19 @@ def main():
     for test_dir in tests_dir:
         abs_test_path = os.path.join(data_dir, test_dir)
         hash_table_json_file = next((os.path.join(root, file) for root, dirs, files in os.walk(abs_test_path) for file in files if file.endswith("table_size.json")), None)
-        substring_json_file = next((os.path.join(root, file) for root, dirs, files in os.walk(abs_test_path) for file in files if file.endswith("substrings.json")), None)
     
-        if (hash_table_json_file == None or substring_json_file == None):
-            print("Error: Missing JSON files in directory: " + abs_test_path)
-            return
+        if (hash_table_json_file == None):
+            print("Missing hash_table JSON files in directory: " + abs_test_path)
+            continue
         
         table_data = {}
-        substring_data = {}
 
         # Load the JSON files
         with open(hash_table_json_file, "r") as f:
             table_data = json.load(f)
 
-        with open(substring_json_file, "r") as f:
-            substring_data = json.load(f)
 
-        plot_statistics(abs_test_path, table_data, substring_data)
+        plot_statistics(abs_test_path, table_data)
 
 if __name__ == "__main__":
     """
