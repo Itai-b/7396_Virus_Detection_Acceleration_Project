@@ -12,6 +12,8 @@
 struct TestStatistics {
 public:
     std::size_t nodes_size;                         // an std::size_t representing the size (in [KB]) allocated to the aho corasick *NODES*
+    std::size_t total_edges;                        // an std::size_t representing the total number of edges in the aho corasick TRIE
+    std::size_t size_in_theory;                     // an std::size_t representing the theoretical size of the aho corasick TRIE in a minimalistic implementation
     std::size_t aho_corasick_size;                  // an std::size_t representing the size (in [KB]) allocated to the aho corasick TRIE (FULL)
     std::size_t aho_corasick_no_emits_size;         // an std::size_t representing the size (in [KB]) allocated to the aho corasick TRIE (Without Emits List)
     std::size_t exact_matches_inserted;             // an std::size_t representing the number of exact matches that were inserted to the aho corasick TRIE
@@ -42,6 +44,8 @@ public:
         for (const auto& test : allTestsData) {
             nlohmann::json dataItem;
             dataItem["nodes_size"] = test.nodes_size;
+            dataItem["total_edges"] = test.total_edges;
+            dataItem["size_in_theory"] = test.size_in_theory;
             dataItem["aho_corasick_size"] = test.aho_corasick_size;
             dataItem["aho_corasick_no_emits_size"] = test.aho_corasick_no_emits_size;
             dataItem["exact_matches_inserted"] = test.exact_matches_inserted;

@@ -15,14 +15,21 @@
 #include <unistd.h>		// comment when running from Visual Studio
 #include <chrono>
 
+
+// Theoretically we count implement the AC automaton using a transition table and a go-to table for each state.
+// In this minimalistic implementation, the total size would be the number of edges times 11, since:
+// for each edge, we would keep the following information: { Curr_State [3Bytes], Curr_Char [1Byte], Next_State [3Bytes], IBLT_PTR [4Bytes] }.
+// (This is assuming a x32-bits hardware).
+#define SIZE_OF_GO_TO_TABLE_ENTRY 11	// Bytes
+
 /// <summary>
 /// Parse text to find exact matches in the Aho Corasick TRIE.
 /// Prints any exact matches found.
 /// </summary>
 /// <param name="trie">The Aho Corasick State Machine (TRIE tree)</param>
 /// <param name="text">The input text to parse</param>
-void find(aho_corasick::trie& trie, std::basic_string<char>& text) {
-	auto res = trie.parse_text(text);
+void find(aho_corasick::trie* trie, bstring& text) {
+	auto res = trie->parse_text(text);
 	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
 	for (auto match : res) { // res is of class emit
 		std::cout << '\t' << match.get_keyword() << std::endl;
@@ -49,6 +56,8 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 
 	aho_corasick::trie* aho_corasick_trie;
 	std::size_t nodes_size = 0;
+	std::size_t total_edges = 0;
+	std::size_t size_in_theory = 0;
 	std::size_t aho_corasick_size = 0;
 	std::size_t aho_corasick_no_emits_size = 0;
 	std::size_t exact_matches_inserted = 0;
@@ -68,12 +77,14 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 	}
 
 	nodes_size = aho_corasick_trie->traverse_tree();
+	total_edges = aho_corasick_trie->count_edges();
+	size_in_theory = total_edges * SIZE_OF_GO_TO_TABLE_ENTRY;
 	aho_corasick_size = aho_corasick_trie->traverse_tree(true, true);
 	aho_corasick_no_emits_size = aho_corasick_trie->traverse_tree(true, false);
 
 	// Find example:
-	// std::basic_string<char> toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
-	// find(trie, toParse_spc);
+	bstring toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
+	find(aho_corasick_trie, toParse_spc);
 
 	delete aho_corasick_trie;
 
@@ -84,6 +95,8 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 	// Collect and Print Statistics:
 	TestStatistics test_data = {
 		nodes_size,
+		total_edges,
+		size_in_theory,
 		aho_corasick_size,
 		aho_corasick_no_emits_size,
 		exact_matches_inserted,
@@ -96,6 +109,8 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 		<< "Aho Corasick TRIE full size: " << aho_corasick_size << std::endl											\
 		<< "Aho Corasick TRIE no emits size: " << aho_corasick_no_emits_size << std::endl								\
 		<< "Aho Corasick TRIE only nodes size: " << nodes_size << std::endl												\
+		<< "Aho Corasick TRIE number of edges: " << total_edges << std::endl											\
+		<< "Aho Corasick size in theory: " << size_in_theory << std::endl												\
 		<< "Insertion time: " << static_cast<double>(test_runtime) << "[ms]." << std::endl								\
 		<< std::endl;
 }

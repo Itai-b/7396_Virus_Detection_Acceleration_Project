@@ -12,6 +12,7 @@
 struct TestStatistics {
 public:
     std::size_t hash_table_size;                    // an std::size_t represents the size (in [KB]) allocated to the hash table tested
+    std::size_t additional_size;                    // an std::size_t represents the additional size (in [KB]) allocated for the lists of SID for each entry of the hash table.
     double load_factor;                             // a double represents the load factor of the hash table in the end of the test
     double avg_number_of_rules_inserted;            // a double represents the average number of rules inserted to the hash table
     double percentage_of_rules_inserted;            // a double represents the percentage of rules inserted to the hash table
@@ -45,6 +46,7 @@ public:
         for (const auto& test : allTestsData) {
             nlohmann::json dataItem;
             dataItem["hash_table_size"] = test.hash_table_size;
+            dataItem["additional_size"] = test.additional_size;
             dataItem["load_factor"] = test.load_factor;
             dataItem["number_of_rules_inserted"] = test.avg_number_of_rules_inserted;
             dataItem["percentage_of_rules_inserted"] = test.percentage_of_rules_inserted;

@@ -50,7 +50,6 @@ while getopts "j:d:" opt; do
   esac
 done
 
-
 # Configure cmake library path, which is shown on CMakePresets.json
 cmake -DCMAKE_LIBRARY_PATH="../install" ..
 
@@ -63,4 +62,7 @@ src/aho_corasick -f "$JSONPATH" -d "$DESTPATH" || exit 1
 
 
 # Run ResultsAnalysis.py
-# TODO: Add python final script
+echo -e "${BLUE}Running ResultsAnalysis.py${NC}"
+chmod +x $WORK_DIR/ResultsAnalysis.py
+dos2unix $WORK_DIR/ResultsAnalysis.py > /dev/null 2>&1
+python3 $WORK_DIR/ResultsAnalysis.py
