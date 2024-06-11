@@ -14,11 +14,6 @@ figsize = [i/dpi for i in desired_size]
 
 fig = plt.figure(figsize=figsize, dpi=dpi)
 
-
-
-# DONE: generate a bar chart for iblt listEntries success rate
-# TODO: generate a heatmap for rules number in each exactmatch/substring
-
 def check_json_file_type(file_path):
     with open(file_path, 'r') as file:
         # Skip leading whitespace
@@ -63,7 +58,7 @@ def genIBLTPlot(iblt_paths):
             filename = iblt_path.split('\\')[-1]
             modified_filename = '_'.join(filename.split('_')[3:]).split('.')[0]
             modified_filename = modified_filename.lower()
-            if modified_filename == 'exactmatches':
+            if modified_filename.endswith('exactmatches'):
                 modified_filename = 'aho_corasick'
             elif modified_filename.endswith('substrings'):
                 # swap the word 'substrings' with 'Bloom Filter'
