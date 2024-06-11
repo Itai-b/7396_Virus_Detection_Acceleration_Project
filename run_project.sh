@@ -124,7 +124,7 @@ echo -e "${BLUE}Running PartD - IBLT...${NC}"
 
 mkdir -p $WORK_DIR/Data/PartD_Data
 chmod +x $WORK_DIR/PartD_IBLT/run_partd_unix.sh
-dos2unix $WORK_DIR/PartB_Hash/run_partd_unix.sh
+dos2unix $WORK_DIR/PartD_IBLT/run_partd_unix.sh
 
 command $WORK_DIR/PartD_IBLT/run_partd_unix.sh
 # check if PartD ran successfully
