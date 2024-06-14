@@ -8,7 +8,7 @@
     {
         "sid": 57465,
         "signature": "/(^|&)(server)?id=/im",
-        "hex_string_example": "26 73 65 72 76 65 72 69 64 3d",
+        "hex_string_example": "26 73 65 72 76 65 72 69 64 3D",
         "length": 10
     },
     {

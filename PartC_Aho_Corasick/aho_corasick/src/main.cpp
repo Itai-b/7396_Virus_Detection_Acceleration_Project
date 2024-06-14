@@ -83,6 +83,7 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 	aho_corasick_no_emits_size = aho_corasick_trie->traverse_tree(true, false);
 
 	// Find example:
+	// TODO: change this to a read from snort_string_check.json file.
 	bstring toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
 	find(aho_corasick_trie, toParse_spc);
 
@@ -134,13 +135,15 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 int main(int argc, char* argv[]) {
 	auto start_time = std::chrono::high_resolution_clock::now();
 	std::string file_path = "parta_data_by_exactmatch.json";
+	std::string test_file_path = "snort_string_check.json";
 	std::string dest_path = "";
 	
 	// Comment this when running in Visual Studio (as well as #include <unistd.h>
 	// USE IN WSL WITH THE UNIX STANDARD LIBRARY <UNISTD.H>
 	int opt;
 	bool is_file_path_set = false;
-	while ((opt = getopt(argc, argv, "f:d:")) != -1) {
+	bool is_test_file_path_set = false;
+	while ((opt = getopt(argc, argv, "f:d:t:")) != -1) {
 		switch (opt) {
 		case 'f':
 			file_path = optarg;
@@ -149,14 +152,18 @@ int main(int argc, char* argv[]) {
 		case 'd':
 			dest_path = optarg;
 			break;
+		case 't':
+			test_file_path = optarg;
+			is_test_file_path_set = true;
+			break;	
 		default:
-			std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path]" << std::endl;
+			std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-t test_file_path]" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	if (!is_file_path_set) {
-		std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path]" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-t test_file_path]" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	std::cout << "File path: " << file_path << std::endl;

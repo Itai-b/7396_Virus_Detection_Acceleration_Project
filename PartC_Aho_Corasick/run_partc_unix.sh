@@ -9,6 +9,7 @@ SUBDIR=aho_corasick
 INSTALLDIR=$WORK_DIR/install
 JSONPATH=$WORK_DIR/../Data/PartA_Data/parta_data_by_exactmatch.json
 DESTPATH=$WORK_DIR/../Data/PartC_Data
+TESTPATH=$WORK_DIR/../Auxiliary/snort_string_to_check.json
 
 # Set up the installation scripts for running
 chmod +x $WORK_DIR/install_nlohmann_json_unix.sh
@@ -31,13 +32,16 @@ mkdir -p $WORK_DIR/$SUBDIR/build
 cd $WORK_DIR/$SUBDIR/build
 
 # Recieve arguments from the user
-while getopts "j:d:" opt; do
+while getopts "j:d:t:" opt; do
   case ${opt} in
     j )
       JSONPATH=$OPTARG
       ;;
     d )
       DESTPATH=$OPTARG
+      ;;
+    t )
+      TESTPATH=$OPTARG
       ;;
     \? )
       echo "Invalid option: -$OPTARG" 1>&2
@@ -58,7 +62,7 @@ make all || exit 1
 
 # Prepare Input Data and Output Directory
 mkdir -p "$DESTPATH"
-src/aho_corasick -f "$JSONPATH" -d "$DESTPATH" || exit 1
+src/aho_corasick -f "$JSONPATH" -d "$DESTPATH"  -t "$TESTPATH" || exit 1
 
 
 # Run ResultsAnalysis.py
