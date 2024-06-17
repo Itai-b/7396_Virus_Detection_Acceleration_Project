@@ -75,6 +75,61 @@ private:
 };
 
 
+/// Search Key, Original Rule, Rules Hits (#SIDs), # Hits on Original Rule, # Hits on Other Rules
+struct SearchResults {
+public:
+    std::string search_key;                         // an std::string represents a search pattern that could be assosiated with a specific SID
+    int original_sid;                               // an integer represents the Snort ID of the wanted rule to search
+    std::vector<std::pair<int,int>> sids_hit;       // a histogram of pairs (sid, number of hits)
+};
+
+/// <summary>
+/// Class dedicated to store results from the search test in the cuckoo hash map.
+/// Stores the data from each test to a json file.
+/// </summary>
+class Results {
+public:
+    Results() {}
+
+    /// <summary>
+    /// Usage: 
+    ///     stats.addData({std::string search_key, int original_sid, std::vector<std::pair<int, int>> sids_hit})
+    /// </summary>
+    /// <param name="searchResults">A struct to contain the logged test results.</param>
+    void addData(const SearchResults& searchResults) {
+        results.push_back(searchResults);
+    }
+
+    void writeToFile(const std::string& path, const std::string& filename) {
+        // Store the data from the vector to a JSON object
+        nlohmann::json jsonData;
+        for (const auto& data : results) {
+            nlohmann::json dataItem;
+            dataItem["search_key"] = data.search_key;
+            dataItem["original_sid"] = data.original_sid;
+            dataItem["sids_hit"] = data.sids_hit;
+            jsonData.push_back(dataItem);
+        }
+
+        // Print the JSON object to a file
+        std::string file_path = path + "/" + filename;
+        std::ofstream outputFile(file_path);
+        if (outputFile.is_open()) {
+            outputFile << std::setw(4) << jsonData; // Print with indentation of 4 spaces (= 1 tab)
+            outputFile.close();
+            std::cout << "Data has been written to " << filename << " successfully." << std::endl;
+        }
+        else {
+            std::cerr << "Unable to open file " << file_path << "." << std::endl;
+        }
+    }
+
+private:
+    std::vector<SearchResults> results;
+};
+
+
+
 struct SubstringData {
 public:
     std::size_t uint_representation;        // an std::size_t of the substring unsigned int value

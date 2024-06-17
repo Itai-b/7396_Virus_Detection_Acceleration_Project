@@ -167,7 +167,7 @@ void runTests(Statistics& stats, SubstringLogger& log, const ExactMatches& exact
 /// <typeparam name="G">Gap between 2 substrings when parsing an exact match for substrings</typeparam>
 template<typename K, typename V, typename H = CustomHash, std::size_t L = sizeof(K), std::size_t G = SUBSTRING_DEFAULT_GAP>
 void searchTest(std::string testString, SubstringLogger& log, const ExactMatches& exact_matches, bool isSimulation = true) {
-
+    // TODO: sub testString with path to JSON testfile (to read many test strings for)
     std::vector<Substring<K>> substrings;
     // std::size_t num_of_unique_rules =
     parseExactMatches<K, G>(exact_matches, substrings, log);
@@ -230,6 +230,10 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
     substrings_inserted = substrings_in_table.size();
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
+
+    std::map<>;
+    // TODO: start a for loop for each test search
+    
     // Parse testString to extract substrings with relevant Lengths and Gaps respectively to the hash table:
     // It is assumed for now that the testString is in the form of "0xFFFFFFFF..."
     std::vector<Substring<K>> testSubstrings;
@@ -241,16 +245,6 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
         sid_list_ptr_type_ rules_ptr = nullptr;
         if (isSimulation) {
             found = hashTable->contains(key_to_search);
-            // debug
-            if (found) { std::cout << "found" << std::endl; }
-            else {
-                for (Substring<K> substr : substrings_in_table) {
-                    if (substr == testSubstring) {
-                        std::cout << "found in vector :X" << std::endl;
-                    }
-                }
-            }
-            // debug
         }
         else {
             // now the value_found is the ptr for the list of rules
@@ -261,12 +255,15 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
             catch (std::out_of_range) {
                 found = false;
             }
-
             //found = (rules_ptr != nullptr);
         }
         
+        // Deals with any hits to the given search pattern
+        // Since we only simulated the rules Bloom Filter in Part D,
+        //      we dont have in the real hash table the sid assosiated with every cuckoo hash table entry.
+        // That means we have to iterate over the orignial substrings vector to get this information for further analysis.
         if (found) {
-            std::cout << "Found substring: " << testSubstring << std::endl;
+            // std::cout << "Found substring: " << testSubstring << std::endl;
             for (auto& substring : substrings) {
                 if (substring == testSubstring) {
                     rules_ptr = substring.rules;
