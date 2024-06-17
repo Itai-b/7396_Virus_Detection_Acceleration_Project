@@ -168,6 +168,7 @@ void runTests(Statistics& stats, SubstringLogger& log, const ExactMatches& exact
 template<typename K, typename V, typename H = CustomHash, std::size_t L = sizeof(K), std::size_t G = SUBSTRING_DEFAULT_GAP>
 void searchTest(std::string testString, SubstringLogger& log, const ExactMatches& exact_matches, bool isSimulation = true) {
     // TODO: sub testString with path to JSON testfile (to read many test strings for)
+    Results results;
     std::vector<Substring<K>> substrings;
     // std::size_t num_of_unique_rules =
     parseExactMatches<K, G>(exact_matches, substrings, log);
@@ -231,8 +232,8 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
 
-    std::map<>;
-    // TODO: start a for loop for each test search
+    // TODO: start a for loop for each test search        
+    std::map<int, int> sid_hits_histogram;
     
     // Parse testString to extract substrings with relevant Lengths and Gaps respectively to the hash table:
     // It is assumed for now that the testString is in the form of "0xFFFFFFFF..."
@@ -261,56 +262,54 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
         // Deals with any hits to the given search pattern
         // Since we only simulated the rules Bloom Filter in Part D,
         //      we dont have in the real hash table the sid assosiated with every cuckoo hash table entry.
-        // That means we have to iterate over the orignial substrings vector to get this information for further analysis.
+        // Iterates over the orignial substrings vector to get this information for further analysis.
         if (found) {
             // std::cout << "Found substring: " << testSubstring << std::endl;
             for (auto& substring : substrings) {
                 if (substring == testSubstring) {
                     rules_ptr = substring.rules;
                     if (rules_ptr != nullptr) {
-                        std::cout << "With rules: ";
+                        // std::cout << "With rules: ";
                         bool first = true;
                         for (auto rule : *rules_ptr) {
-                            if (!first) {
-                                std::cout << ", ";
+                            // Document the sid hit in the historgram
+                            if (sid_hits_histogram.find(rule) == sid_hits_histogram.end()) {
+                                sid_hits_histogram[rule] = 0;
                             }
-                            std::cout << rule;
-                            first = false;
+                            sid_hits_histogram[rule]++;
+                            // if (!first) {
+                                // std::cout << ", ";
+                            // }
+                            // std::cout << rule;
+                            //first = false;
                         }
-                        std::cout << std::endl;
+                        // std::cout << std::endl;
                     }
                     else {
+                        // we shouldn't get here
                         std::cout << "No rules found." << std::endl;
                     }
                 }
             }
         }
-        
-        /*// debug
-        else {
-            for (auto substring : substrings) {
-                if (substring == testSubstring) {
-                    rules_ptr = substring.rules;
-                }
-            }
-        }
-        // debug */
-        
     }
+    // Document Test Search Results
+    int i = 0; // the loop iteration (implement)
+    std::cout << "Search Test Results: " << std::endl;
+    std::cout << "Test String #" << i << " : " << sid_hits_histogram[original_sid] << " wanted hit(s)." << std::endl;
+
+    SearchResults search_results = {
+            search_key,
+            original_sid,
+            sid_hits_histogram
+    };
+    results.addData(search_results);
+    // TODO: Close test loop
 
     // TIME STAMP END: delete hash table
     auto timestamp_b = std::chrono::high_resolution_clock::now();
     auto test_runtime = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp_b - timestamp_a).count();
 
-   
-    /*
-    sum_load_factors += max_lf;     // TODO: check if to add occupancy or final load factor instead of max
-    //sum_occupancy += num_of_elements_inserted / num_of_table_slots;
-    sum_substrings_inserted += substrings_inserted;
-    sum_unique_rules_covered += unique_rules_inserted.size();
-    sum_runtime += test_runtime;
-    
-    */
 
     // calculate additional size of the data structure
     std::size_t additional_size_bytes = 0;
@@ -323,6 +322,8 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
     std::cout << "Finished search test. Time elapsed: " << test_runtime << "[ms]." << std::endl     \
         << "Table size: " << int(hashTable->capacity() * sizeof(std::pair<K, V>) / 1024) << "[KB]. "     \
         << "Additional size: " << int(additional_size_bytes / 1024) << "[KB]." << std::endl << std::endl;
+    
+    results.writeToFile("search_results.json"); // TODO: check file path
 }
 
 /// <summary>
@@ -345,10 +346,11 @@ int main(int argc, char* argv[]) {
     auto start_time = std::chrono::high_resolution_clock::now();
     std::string file_path = "parta_data_by_exactmatch.json";
     std::string dest_path = "";
+    std::string test_path = "";
     std::size_t num_of_tests = NUMBER_OF_TESTS;
     
     // Get arguments from VS/WSL
-    getOpts(argc, argv, file_path, dest_path, &num_of_tests);
+    getOpts(argc, argv, file_path, dest_path, &num_of_tests, test_path);
     
     // Parse PartA.json file to fill the ExactMatches vector with the extracted data from the .rules file
     ExactMatches exact_matches;

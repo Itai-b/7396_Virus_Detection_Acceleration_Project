@@ -9,6 +9,7 @@ SUBDIR=cuckoohash
 INSTALLDIR=$WORK_DIR/install
 JSONPATH=$WORK_DIR/../Data/PartA_Data/parta_data_by_exactmatch.json
 DESTPATH=$WORK_DIR/../Data/PartB_Data
+TESTPATH=$WORK_DIR/../Auxiliary/snort_string_to_check.json
 
 # Set up the installation scripts for running
 chmod +x $WORK_DIR/install_libcuckoo_unix.sh
@@ -45,6 +46,9 @@ while getopts "n:" opt; do
       ;;
     n )
       num_of_tests=$OPTARG
+      ;;
+    t )
+      test_path=$OPTARG
       ;;
     \? )
       echo "Invalid option: -$OPTARG" 1>&2
