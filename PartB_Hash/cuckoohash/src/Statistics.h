@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <map>
 #include <set>
 #include <cstdio>
 #include <nlohmann/json.hpp>
@@ -80,7 +81,7 @@ struct SearchResults {
 public:
     std::string search_key;                         // an std::string represents a search pattern that could be assosiated with a specific SID
     int original_sid;                               // an integer represents the Snort ID of the wanted rule to search
-    std::vector<std::pair<int,int>> sids_hit;       // a histogram of pairs (sid, number of hits)
+    std::map<int,int> sids_hit;       // a histogram of pairs (sid, number of hits)
 };
 
 /// <summary>

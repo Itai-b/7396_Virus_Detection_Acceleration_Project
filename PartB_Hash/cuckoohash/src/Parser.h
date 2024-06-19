@@ -66,15 +66,11 @@ std::size_t getTotalNumOfDups(const std::vector<Substring<T>>& substrings) {
 void parseLine(std::string line, ExactMatches& exact_matches) {
     nlohmann::json jsonObj = nlohmann::json::parse(line);
 
-    // Now you can access elements in the JSON object
-    //std::string signature = jsonObj["signature"];
+    
     std::vector<std::string> exact_match_str = jsonObj["exact_match"];
     std::vector<std::string> exact_match_hex = jsonObj["exact_match_hex"];
     std::vector<int> non_unique_rules = jsonObj["rules"];
     std::set<int> rules(non_unique_rules.begin(), non_unique_rules.end());
-    //for (const auto& rule : jsonObj["rules"]) {
-    //    rules.insert(static_cast<int>(rule));
-    //}
 
     std::string match = "0x";
 
@@ -87,14 +83,13 @@ void parseLine(std::string line, ExactMatches& exact_matches) {
         match = match + value_to_concat;
         ++j;
     }
-    //insert exact_match to ExactMatches.
     exact_matches.insert(ExactMatch(rules, match));
 }
 
  /**
-  * Parse a line in 'parta_data.json' to extract items of class ExactMatch.
+  * Parse 'parta_data.json' to extract items of class ExactMatch.
   *
-  * @param line string representing a line in the parsed .json file
+  * @param file_path string representing a .json file to be parsed
   * @param exact_matches reference to a member of class ExactMaches,
   * that the results of the parsing will be inserted to
   */
@@ -115,6 +110,43 @@ void parseFile(std::string file_path, ExactMatches& exact_matches) {
     }
     catch (const std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
+    }
+}
+
+
+/// <summary>
+/// Parse a JSON test file containing hexStrings of signatures patterns to search.
+/// </summary>
+/// <param name="file_path">Path to JSON file containing the search hexStrings</param>
+/// <param name="res">A vector containing SearchResults element for each search pattern</param>
+void parseFile(std::string file_path, std::vector<SearchResults>& res) {
+    std::ifstream inputFile(file_path);
+    if (!inputFile.is_open()) {
+        std::cerr << "Unable to open .json file" << std::endl;
+        exit(1);
+    }
+
+    nlohmann::json jsonObj;
+    inputFile >> jsonObj;
+
+    inputFile.close();
+
+    for (const auto& item : jsonObj) {
+        SearchResults search_item;
+        search_item.original_sid = item["sid"];
+        std::string tmp_string = item["hex_string_example"];
+        
+        // Process the string from a form of {FF FF FF FF ...} -> {0xFFFFFFFF...}
+        std::ostringstream oss;
+        oss << "0x";
+        for (std::size_t i = 0; i < tmp_string.size(); ++i) {
+            if (tmp_string[i] != ' ') {
+                oss << tmp_string[i]; 
+            }
+        }
+        
+        search_item.search_key = oss.str();
+        res.push_back(search_item);
     }
 }
 

@@ -166,11 +166,9 @@ void runTests(Statistics& stats, SubstringLogger& log, const ExactMatches& exact
 /// <typeparam name="L">Length of substring (L = sizeof(K))</typeparam>
 /// <typeparam name="G">Gap between 2 substrings when parsing an exact match for substrings</typeparam>
 template<typename K, typename V, typename H = CustomHash, std::size_t L = sizeof(K), std::size_t G = SUBSTRING_DEFAULT_GAP>
-void searchTest(std::string testString, SubstringLogger& log, const ExactMatches& exact_matches, bool isSimulation = true) {
-    // TODO: sub testString with path to JSON testfile (to read many test strings for)
-    Results results;
+void searchTest(std::string test_path, Results& results, SubstringLogger& log, const ExactMatches& exact_matches, bool isSimulation = true) {
+    std::vector<SearchResults> search_results;
     std::vector<Substring<K>> substrings;
-    // std::size_t num_of_unique_rules =
     parseExactMatches<K, G>(exact_matches, substrings, log);
 
     std::cout << "Starting Search Test: L = " << L << " , G = " << G << ", " << "[" << std::dec << substrings.size()    \
@@ -178,11 +176,8 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
 
     libcuckoo::cuckoohash_map<K, V, H>* hashTable;
     std::size_t num_of_slots = substrings.size() * sizeof(std::pair<K, V>);
-    //std::size_t sum_additional_size_bytes = 0;
-    //double load_factor = 0;
-    //double unique_rules_covered = 0;
-    //double runtime = 0;
-    
+
+    // Shuffle substrings for random insertion
     std::shuffle(substrings.begin(), substrings.end(), std::default_random_engine(std::random_device()()));
 
     // TIME STAMP BEGIN: initiate hash table
@@ -194,7 +189,6 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
    
     // Inserting the substrings from the substrings vector to the hash table
     int substrings_inserted = 0;
-    //double max_lf = 0.0;
     std::set<int> unique_rules_inserted;
     std::vector<Substring<K>> substrings_in_table;
 
@@ -210,101 +204,84 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
             value = SIMULATION_POINTER_VALUE;
         }
         // UNCOMMENT IF USING x32-bits hardware(!)
-        // else  {
-        //    value = iter.rules;
-        // }
+            // else  {
+            //    value = iter.rules;
+            // }
 
         // NO NEED WHEN INSERTING ALL SUBSTRINGS (!) (Check if hash capacity reached test threshold for hash table size)
-        //if (hashTable->capacity() * sizeof(std::pair<K, V>) >= table_size && hashTable->load_factor() >= MAX_LOAD_FACTOR) {
-        //    break;
-        //}
+            //if (hashTable->capacity() * sizeof(std::pair<K, V>) >= table_size && hashTable->load_factor() >= MAX_LOAD_FACTOR) {
+            //    break;
+            //}
 
-        // Insert entry(key,value) to hash table
         hashTable->insert(key, value);
         substrings_in_table.push_back(iter);
-
         unique_rules_inserted.insert(iter.rules->begin(), iter.rules->end());
-        //if (hashTable->load_factor() > max_lf) {
-        //    max_lf = hashTable->load_factor();
-        //}
     }
+
     substrings_inserted = substrings_in_table.size();
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
+    // Parse the test JSON file to get a vector of {search_key, original_sid, **EMPTY** sid_hits_historam map}
+    parseFile(test_path, search_results);
 
-    // TODO: start a for loop for each test search        
-    std::map<int, int> sid_hits_histogram;
-    
-    // Parse testString to extract substrings with relevant Lengths and Gaps respectively to the hash table:
-    // It is assumed for now that the testString is in the form of "0xFFFFFFFF..."
-    std::vector<Substring<K>> testSubstrings;
-    std::set<int> empty_ruleset;  // used since the testSubstrings has *NO* rules related to it (unlike the substring entries in the hash table).
-    Substring<K>::extractSubstrings(testString, testSubstrings, empty_ruleset, G, L, true);
-    for (Substring<K> testSubstring : testSubstrings) {
-        bool found = false;
-        K key_to_search = testSubstring.substring;
-        sid_list_ptr_type_ rules_ptr = nullptr;
-        if (isSimulation) {
-            found = hashTable->contains(key_to_search);
-        }
-        else {
-            // now the value_found is the ptr for the list of rules
-            found = true;
-            try {
-                hashTable->find(key_to_search);
+    // For each item in the above vector, extract the relevant size Substrings from the search_item.search_key
+    //  then, seach in the hashtable each one of the substrings created from the search key and document findings in the histogram map.
+    int search_test_number = 0;
+    for (SearchResults search_item : search_results) {    
+        // Parse testString to extract substrings with relevant Lengths and Gaps respectively to the hash table:
+        // It is assumed for now that the testString is in the form of "0xFFFFFFFF..."
+        std::vector<Substring<K>> testSubstrings;
+        std::set<int> empty_ruleset;  // used since the testSubstrings has *NO* rules related to it (unlike the substring entries in the hash table).
+        Substring<K>::extractSubstrings(search_item.search_key, testSubstrings, empty_ruleset, G, L, true); // true - force lowercase on search key
+        for (Substring<K> testSubstring : testSubstrings) {
+            bool found = false;
+            K key_to_search = testSubstring.substring;
+            sid_list_ptr_type_ rules_ptr = nullptr;
+            if (isSimulation) {
+                found = hashTable->contains(key_to_search);
             }
-            catch (std::out_of_range) {
-                found = false;
+            else {
+                // now the value_found is the ptr for the list of rules
+                found = true;
+                try {
+                    hashTable->find(key_to_search);
+                }
+                catch (std::out_of_range) {
+                    found = false;
+                }
+                //found = (rules_ptr != nullptr);
             }
-            //found = (rules_ptr != nullptr);
-        }
         
-        // Deals with any hits to the given search pattern
-        // Since we only simulated the rules Bloom Filter in Part D,
-        //      we dont have in the real hash table the sid assosiated with every cuckoo hash table entry.
-        // Iterates over the orignial substrings vector to get this information for further analysis.
-        if (found) {
-            // std::cout << "Found substring: " << testSubstring << std::endl;
-            for (auto& substring : substrings) {
-                if (substring == testSubstring) {
-                    rules_ptr = substring.rules;
-                    if (rules_ptr != nullptr) {
-                        // std::cout << "With rules: ";
-                        bool first = true;
-                        for (auto rule : *rules_ptr) {
-                            // Document the sid hit in the historgram
-                            if (sid_hits_histogram.find(rule) == sid_hits_histogram.end()) {
-                                sid_hits_histogram[rule] = 0;
+            // Deals with any hits to the given search pattern
+            // Since we only simulated the rules Bloom Filter in Part D,
+            //      we dont have in the real hash table the sid assosiated with every cuckoo hash table entry.
+            // Iterates over the orignial substrings vector to get this information for further analysis.
+            if (found) {
+                // std::cout << "Found substring: " << testSubstring << std::endl;
+                for (auto& substring : substrings) {
+                    if (substring == testSubstring) {
+                        rules_ptr = substring.rules;
+                        if (rules_ptr != nullptr) {
+                            bool first = true;
+                            for (auto rule : *rules_ptr) {
+                                // Document the sid hit in the historgram
+                                if (search_item.sids_hit.find(rule) == search_item.sids_hit.end()) {
+                                    search_item.sids_hit[rule] = 0;
+                                }
+                                search_item.sids_hit[rule]++;
                             }
-                            sid_hits_histogram[rule]++;
-                            // if (!first) {
-                                // std::cout << ", ";
-                            // }
-                            // std::cout << rule;
-                            //first = false;
                         }
-                        // std::cout << std::endl;
-                    }
-                    else {
-                        // we shouldn't get here
-                        std::cout << "No rules found." << std::endl;
+                        else {
+                            std::cout << "No rules found." << std::endl;
+                        }
                     }
                 }
             }
-        }
-    }
-    // Document Test Search Results
-    int i = 0; // the loop iteration (implement)
-    std::cout << "Search Test Results: " << std::endl;
-    std::cout << "Test String #" << i << " : " << sid_hits_histogram[original_sid] << " wanted hit(s)." << std::endl;
-
-    SearchResults search_results = {
-            search_key,
-            original_sid,
-            sid_hits_histogram
-    };
-    results.addData(search_results);
-    // TODO: Close test loop
+        }   // FOR LOOP: SUBSTRINGS
+        std::cout << "Search Test Results: " << std::endl;
+        std::cout << "Test String #" << (++search_test_number) << " : " << search_item.sids_hit[search_item.original_sid] << " wanted hit(s)." << std::endl;
+        results.addData(search_item);
+    }   // FOR LOOP: SEARCH ITEM
 
     // TIME STAMP END: delete hash table
     auto timestamp_b = std::chrono::high_resolution_clock::now();
@@ -322,8 +299,6 @@ void searchTest(std::string testString, SubstringLogger& log, const ExactMatches
     std::cout << "Finished search test. Time elapsed: " << test_runtime << "[ms]." << std::endl     \
         << "Table size: " << int(hashTable->capacity() * sizeof(std::pair<K, V>) / 1024) << "[KB]. "     \
         << "Additional size: " << int(additional_size_bytes / 1024) << "[KB]." << std::endl << std::endl;
-    
-    results.writeToFile("search_results.json"); // TODO: check file path
 }
 
 /// <summary>
@@ -357,18 +332,49 @@ int main(int argc, char* argv[]) {
     parseFile(file_path, exact_matches); 
 
     // START TESTS:
-    // Statistics stats_test1;
-    SubstringLogger substrings_log0;
-    std::string search_test_path = dest_path + "/SearchTMP_Length8_Gap1";
+    // Search test - L8 G1
+    std::cout << "Search Test L8 G1" << std::endl;
+    std::string search_test_path = dest_path + "/SearchTest_Length8_Gap1";
     std::string command = "mkdir -p " + search_test_path;
-    //std::string command = "mkdir " + search_test_path;
     createDir(search_test_path);
-    std::string testStr4 = "0x75736572"; // "user"
-    std::string testStr8 = "0x75536552694E466F"; // "uSeRiNFo"
-    std::string testStr8_2 = "0x674174454372615348455220762E312E322E33"; // "gAtECraSHER v1.2.3"
-    searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 4, 1>(testStr8_2, substrings_log0, exact_matches);
-    //stats_test1.writeToFile(l8g1_path, "L8_G1_increasing_table_size.json");
-    substrings_log0.writeToFile(search_test_path, "tmp.json");
+    Results results_log_L8_G1;
+    SubstringLogger substrings_log_L8_G1;
+    searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 8, 1>(test_path, results_log_L8_G1, substrings_log_L8_G1, exact_matches);
+    results_log_L8_G1.writeToFile(search_test_path, "search_results.json");
+    substrings_log_L8_G1.writeToFile(search_test_path, "inserted_substrings.json");
+
+    // Search test - L8 G2
+    std::cout << "Search Test L8 G2" << std::endl;
+    search_test_path = dest_path + "/SearchTest_Length8_Gap2";
+    command = "mkdir -p " + search_test_path;
+    createDir(search_test_path);
+    Results results_log_L8_G2;
+    SubstringLogger substrings_log_L8_G2;
+    searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 8, 2>(test_path, results_log_L8_G2, substrings_log_L8_G2, exact_matches);
+    results_log_L8_G2.writeToFile(search_test_path, "search_results.json");
+    substrings_log_L8_G2.writeToFile(search_test_path, "inserted_substrings.json");
+
+    // Search test - L4 G1
+    std::cout << "Search Test L4 G1" << std::endl;
+    search_test_path = dest_path + "/SearchTest_Length4_Gap1";
+    command = "mkdir -p " + search_test_path;
+    createDir(search_test_path);
+    Results results_log_L4_G1;
+    SubstringLogger substrings_log_L4_G1;
+    searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 4, 1>(test_path, results_log_L4_G1, substrings_log_L4_G1, exact_matches);
+    results_log_L4_G1.writeToFile(search_test_path, "search_results.json");
+    substrings_log_L4_G1.writeToFile(search_test_path, "inserted_substrings.json");
+
+    // Search test - L4 G2
+    std::cout << "Search Test L4 G2" << std::endl;
+    search_test_path = dest_path + "/SearchTest_Length4_Gap2";
+    command = "mkdir -p " + search_test_path;
+    createDir(search_test_path);
+    Results results_log_L4_G2;
+    SubstringLogger substrings_log_L4_G2;
+    searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 4, 2>(test_path, results_log_L4_G2, substrings_log_L4_G2, exact_matches);
+    results_log_L4_G2.writeToFile(search_test_path, "search_results.json");
+    substrings_log_L4_G2.writeToFile(search_test_path, "inserted_substrings.json");
 
     // DEBUG
     return 0;
