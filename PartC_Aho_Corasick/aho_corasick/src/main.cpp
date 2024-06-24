@@ -1,20 +1,4 @@
-﻿// aho_corasick.cpp : Defines the entry point for the application.
-//
-
-#include "aho_corasick.hpp"
-#include "Parser.h"
-#include "Statistics.h"
-#include "ExactMatches.h"
-#include <nlohmann/json.hpp>
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <unistd.h>		// comment when running from Visual Studio
-#include <chrono>
-
+﻿#include "Auxiliary.h"
 
 // Theoretically we count implement the AC automaton using a transition table and a go-to table for each state.
 // In this minimalistic implementation, the total size would be the number of edges times 11, since:
@@ -37,6 +21,25 @@ void find(aho_corasick::trie* trie, bstring& text) {
 	std::cout << std::endl;
 }
 
+/// <summary>
+/// Parse text to find exact matches in the Aho Corasick TRIE.
+/// Prints any exact matches found.
+/// </summary>
+/// <param name="trie">The Aho Corasick State Machine (TRIE tree)</param>
+/// <param name="text">The input text to parse</param>
+/// <param name="log">The respective SearchResults item where the hits would be registered</param>
+void find(aho_corasick::trie* trie, bstring& text, SearchResults& log) {
+	auto res = trie->parse_text(text);
+	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
+	for (auto match : res) { // res is of class emit
+		std::cout << '\t' << match.get_keyword() << std::endl;
+		// TODO: did we implement the pointer at the relevant rules in the end of every Aho Corasick entry?
+		//		 IF YES: parse the rules pointer and document in the histogram
+		//		 IF NOT: store keywords, check partial match to the entry bstrings and extract relevant rules (option A might be faster thou)
+	}
+	std::cout << std::endl;
+}
+
 
 /// <summary>
 /// Run a single test of insertion to the Aho Corasick TRIE tree for a given min threshold on the exact matches.
@@ -45,7 +48,7 @@ void find(aho_corasick::trie* trie, bstring& text) {
 /// <param name="stats">A class member of Statistics</param>
 /// <param name="threshold">Minimum length threshold for the exact matches (take only exact matches with length >= threshold)</param>
 /// <param name="bstrings">An std::vector of the basic_string<char> represeting the exact matches to insert</param>
-void runTest(Statistics& stats, const size_t threshold, const std::vector<bstring>& bstrings) {
+void runTest(Statistics& stats, Results& results, const size_t threshold, const std::vector<bstring>& bstrings, std::vector<SearchResults>* search_results = nullptr) {
 	// Pre test: setting a vector of the min thresholded basic_strings:
 	std::vector<bstring> thresholded_bstrings;
 	for (auto s : bstrings) {
@@ -53,6 +56,9 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 			thresholded_bstrings.push_back(s);
 		}
 	}
+	
+	std::vector<bstring> search_strings;
+	toBstring(search_results, search_strings);
 
 	aho_corasick::trie* aho_corasick_trie;
 	std::size_t nodes_size = 0;
@@ -84,8 +90,16 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 
 	// Find example:
 	// TODO: change this to a read from snort_string_check.json file.
-	bstring toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
-	find(aho_corasick_trie, toParse_spc);
+	// bstring toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
+	// find(aho_corasick_trie, toParse_spc);
+
+	if (threshold >= 1 && threshold <= 8){ // Relevant range for searching the tree
+		int i = 0;
+		for (bstring search_string : search_strings) {
+			find(aho_corasick_trie, search_string, search_results[i]);
+			++i;
+		}
+	}
 
 	delete aho_corasick_trie;
 
@@ -135,49 +149,31 @@ void runTest(Statistics& stats, const size_t threshold, const std::vector<bstrin
 int main(int argc, char* argv[]) {
 	auto start_time = std::chrono::high_resolution_clock::now();
 	std::string file_path = "parta_data_by_exactmatch.json";
-	std::string test_file_path = "snort_string_check.json";
 	std::string dest_path = "";
+	std::string test_path = "snort_string_check.json";
 	
-	// Comment this when running in Visual Studio (as well as #include <unistd.h>
-	// USE IN WSL WITH THE UNIX STANDARD LIBRARY <UNISTD.H>
-	int opt;
-	bool is_file_path_set = false;
-	bool is_test_file_path_set = false;
-	while ((opt = getopt(argc, argv, "f:d:t:")) != -1) {
-		switch (opt) {
-		case 'f':
-			file_path = optarg;
-			is_file_path_set = true;
-			break;
-		case 'd':
-			dest_path = optarg;
-			break;
-		case 't':
-			test_file_path = optarg;
-			is_test_file_path_set = true;
-			break;	
-		default:
-			std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-t test_file_path]" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	if (!is_file_path_set) {
-		std::cerr << "Usage: " << argv[0] << " [-f file_path] [-d dest_path] [-t test_file_path]" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	std::cout << "File path: " << file_path << std::endl;
+	getOpts(argc, argv, file_path, dest_path, test_path);
 
 	ExactMatches exact_matches;
 	parseFile(file_path, exact_matches);
 
+	std::vector<SearchResults> search_results;
+	parseFile(test_path, search_results);
+
 	std::vector<bstring> bstrings;
-	std::size_t max_length = convertExactMatches(exact_matches, bstrings);
+	std::size_t max_length = toBstring(exact_matches, bstrings);
 	std::size_t max_threshold = max_length + 1;
 
 	Statistics stats;
 	for (std::size_t threshold = 1; threshold <= max_threshold; ++threshold) {
-		runTest(stats, threshold, bstrings);
+		Results results;
+		runTest(stats, results, threshold, bstrings, &search_results);
+		std::string res_file_name = "search_results_t_" + std::to_string(threshold) + ".json";
+
+		// In order to have comparison ground with the Hash Table, we will also check the search results (hits/misses) using threshold
+		if (threshold >= 1 && threshold <= 8) {
+			results.writeToFile(dest_path, res_file_name);
+		}
 	}
 	stats.writeToFile(dest_path, "partc_results.json");
 

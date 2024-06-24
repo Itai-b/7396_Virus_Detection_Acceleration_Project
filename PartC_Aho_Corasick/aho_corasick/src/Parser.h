@@ -41,8 +41,8 @@ std::size_t hexStringToBstring(const std::string& hexString, std::vector<bstring
 /// Convert the ExactMatches to std::basic_string<char>.
 /// </summary>
 /// <param name="exact_matches">Element of class ExactMatches, which is a vector of ExactMatch (rules,type,string) for each exact match extracted from the snort rules' signatures</param>
-/// <param name="keywords">An empty vector in which the basic_strings will be stored</param>
-std::size_t convertExactMatches(const ExactMatches& exact_matches, std::vector<bstring>& bstrings) {
+/// <param name="bstrings">An empty vector in which the basic_strings will be stored</param>
+std::size_t toBstring(const ExactMatches& exact_matches, std::vector<bstring>& bstrings) {
     std::size_t max_length = 0;
     for (auto it = exact_matches.exact_matches->begin(); it != exact_matches.exact_matches->end(); ++it) {
         std::string hexString = (*it)->getExactMatch();
@@ -55,6 +55,22 @@ std::size_t convertExactMatches(const ExactMatches& exact_matches, std::vector<b
         }
     }
     return max_length;
+}
+
+
+/// <summary>
+/// Convert a SearchResults to std::basic_string<char>.
+/// </summary>
+/// <param name="search_results">A vector of SearchResults (search_key,original_sid,sids_hit) for each pattern to search in the built aho corasick TRIE</param>
+/// <param name="search_strings">An empty vector in which the basic_strings will be stored</param>
+void toBstring(const std::vector<SearchResults>* search_results, std::vector<bstring>& bstrings) {
+    if (search_results == nullptr) {
+        return;
+    }
+    for (SearchResults search_item : *search_results) {
+        std::string hexString = search_item.search_key;
+        hexStringToBstring(hexString, bstrings);
+    }
 }
 
 /**
@@ -118,5 +134,43 @@ void parseFile(std::string file_path, ExactMatches& exact_matches) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 }
+
+
+/// <summary>
+/// Parse a JSON test file containing hexStrings of signatures patterns to search.
+/// </summary>
+/// <param name="file_path">Path to JSON file containing the search hexStrings</param>
+/// <param name="res">A vector containing SearchResults element for each search pattern</param>
+void parseFile(std::string file_path, std::vector<SearchResults>& res) {
+    std::ifstream inputFile(file_path);
+    if (!inputFile.is_open()) {
+        std::cerr << "Unable to open .json file" << std::endl;
+        exit(1);
+    }
+
+    nlohmann::json jsonObj;
+    inputFile >> jsonObj;
+
+    inputFile.close();
+
+    for (const auto& item : jsonObj) {
+        SearchResults search_item;
+        search_item.original_sid = item["sid"];
+        std::string tmp_string = item["hex_string_example"];
+
+        // Process the string from a form of {FF FF FF FF ...} -> {0xFFFFFFFF...}
+        std::ostringstream oss;
+        oss << "0x";
+        for (std::size_t i = 0; i < tmp_string.size(); ++i) {
+            if (tmp_string[i] != ' ') {
+                oss << tmp_string[i];
+            }
+        }
+
+        search_item.search_key = oss.str();
+        res.push_back(search_item);
+    }
+}
+
 
 #endif // !_PARSER_H
