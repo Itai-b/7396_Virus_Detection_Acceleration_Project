@@ -58,6 +58,9 @@ void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std
 /// <param name="bstrings">An std::vector of the basic_string<char> represeting the exact matches to insert</param>
 void runTest(Statistics& stats, Results& results, const size_t threshold, const std::vector<bstring>& bstrings, 
 	std::vector<SearchResults>* search_results, std::map<bstring, std::set<int>>& sids_map) {
+	for (auto it = (*search_results).begin(); it != (*search_results).end(); it++) {
+		it->sids_hit.clear();
+	}
 	// Pre test: setting a vector of the min thresholded basic_strings:
 	std::vector<bstring> thresholded_bstrings;
 	for (auto s : bstrings) {
