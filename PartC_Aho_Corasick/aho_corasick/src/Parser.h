@@ -2,6 +2,8 @@
 #define _PARSER_H
 
 #include "ExactMatches.h"
+#include "Statistics.h"
+#include "bstring.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
@@ -12,29 +14,11 @@
 #include <fstream>
 #include <iomanip>
 
-typedef std::basic_string<char> bstring;
-
-std::size_t hexStringToBstring(const std::string& hexString, std::vector<bstring>& bstrings) {
-    // Remove the "0x" prefix if present
-    std::string cleanedHexString = hexString.substr(0, 2) == "0x" ? hexString.substr(2) : hexString;
-
-    size_t len = cleanedHexString.size();
-    // Ensure the input string has an even number of characters
-    if (len % 2 != 0) {
-        std::cout << "koko" << std::endl;
-        throw std::invalid_argument("Hex string length must be even!");
-    }
-
-    // Convert each pair of hexadecimal characters to a byte
-    bstring result;
-    for (size_t i = 0; i < len; i += 2) {
-        std::istringstream iss(cleanedHexString.substr(i, 2));
-        int byteValue;
-        iss >> std::hex >> byteValue;
-        result.push_back(static_cast<char>(byteValue));
-    }
-    bstrings.push_back(result);
-    return result.length();
+std::size_t addBstring(const std::string& hexString, std::vector<bstring>& bstrings) {
+    bstring bstring;
+    hexToBstring(hexString, bstring);
+    bstrings.push_back(bstring);
+    return bstring.length();
 }
 
 /// <summary>
@@ -48,8 +32,8 @@ std::size_t toBstring(const ExactMatches& exact_matches, std::vector<bstring>& b
         std::string hexString = (*it)->getExactMatch();
         //std::set<int> rules = (*it)->getRulesNumbers();
         //total_unique_rules.insert(rules.begin(), rules.end());
-        //bstrings.push_back(hexStringToBstring(hexString));
-        std::size_t length = hexStringToBstring(hexString, bstrings);
+        //bstrings.push_back(addBstring(hexString));
+        std::size_t length = addBstring(hexString, bstrings);
         if (length > max_length) {
             max_length = length;
         }
@@ -69,7 +53,7 @@ void toBstring(const std::vector<SearchResults>* search_results, std::vector<bst
     }
     for (SearchResults search_item : *search_results) {
         std::string hexString = search_item.search_key;
-        hexStringToBstring(hexString, bstrings);
+        addBstring(hexString, bstrings);
     }
 }
 
@@ -83,15 +67,10 @@ void toBstring(const std::vector<SearchResults>* search_results, std::vector<bst
 void parseLine(std::string line, ExactMatches& exact_matches) {
     nlohmann::json jsonObj = nlohmann::json::parse(line);
 
-    // Now you can access elements in the JSON object
-    //std::string signature = jsonObj["signature"];
-    //std::vector<std::string> exact_match_str = jsonObj["exact_match"];
+    // Accessing elements in the JSON object
     std::vector<std::string> exact_match_hex = jsonObj["exact_match_hex"];
     std::vector<int> non_unique_rules = jsonObj["rules"];
     std::set<int> rules(non_unique_rules.begin(), non_unique_rules.end());
-    //for (const auto& rule : jsonObj["rules"]) {
-    //    rules.insert(static_cast<int>(rule));
-    //}
 
     std::string match = "0x";
 

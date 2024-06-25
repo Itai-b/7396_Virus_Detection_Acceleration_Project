@@ -28,14 +28,22 @@ void find(aho_corasick::trie* trie, bstring& text) {
 /// <param name="trie">The Aho Corasick State Machine (TRIE tree)</param>
 /// <param name="text">The input text to parse</param>
 /// <param name="log">The respective SearchResults item where the hits would be registered</param>
-void find(aho_corasick::trie* trie, bstring& text, SearchResults& log) {
+void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std::map<bstring, std::set<int>>& map) {
 	auto res = trie->parse_text(text);
 	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
 	for (auto match : res) { // res is of class emit
 		std::cout << '\t' << match.get_keyword() << std::endl;
-		// TODO: did we implement the pointer at the relevant rules in the end of every Aho Corasick entry?
-		//		 IF YES: parse the rules pointer and document in the histogram
-		//		 IF NOT: store keywords, check partial match to the entry bstrings and extract relevant rules (option A might be faster thou)
+		bstring match_bstring = match.get_keyword();
+		try {
+			const std::set<int>& rules = map.at(match_bstring);
+			for (int rule : rules) {
+				log.sids_hit[rule]++;
+			}
+		}
+		catch (const std::out_of_range& e) {
+			// Handle case where key is not found
+			std::cout << "\tNo rules found for this match." << std::endl;
+		}
 	}
 	std::cout << std::endl;
 }
@@ -48,12 +56,23 @@ void find(aho_corasick::trie* trie, bstring& text, SearchResults& log) {
 /// <param name="stats">A class member of Statistics</param>
 /// <param name="threshold">Minimum length threshold for the exact matches (take only exact matches with length >= threshold)</param>
 /// <param name="bstrings">An std::vector of the basic_string<char> represeting the exact matches to insert</param>
-void runTest(Statistics& stats, Results& results, const size_t threshold, const std::vector<bstring>& bstrings, std::vector<SearchResults>* search_results = nullptr) {
+void runTest(Statistics& stats, Results& results, const size_t threshold, const std::vector<bstring>& bstrings, 
+	std::vector<SearchResults>* search_results, std::map<bstring, std::set<int>>& sids_map) {
 	// Pre test: setting a vector of the min thresholded basic_strings:
 	std::vector<bstring> thresholded_bstrings;
 	for (auto s : bstrings) {
 		if (s.length() >= threshold) {
 			thresholded_bstrings.push_back(s);
+		}
+	}
+
+	// Remove all entries of the (pattern, sids) map, that have patterns of length below threshold
+	for (auto it = sids_map.begin(); it != sids_map.end(); ) {
+		if (it->first.length() < threshold) {
+			it = sids_map.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 	
@@ -68,7 +87,6 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	std::size_t aho_corasick_no_emits_size = 0;
 	std::size_t exact_matches_inserted = 0;
 
-	std::cout << "========================================== Min Threshold <= " << threshold << " Bytes ==========================================" << std::endl;
 
 	// TIME STAMP BEGIN: initiate Aho Corasick state machine
 	auto timestamp_a = std::chrono::high_resolution_clock::now();
@@ -95,8 +113,9 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 
 	if (threshold >= 1 && threshold <= 8){ // Relevant range for searching the tree
 		int i = 0;
-		for (bstring search_string : search_strings) {
-			find(aho_corasick_trie, search_string, search_results[i]);
+		for (bstring& search_string : search_strings) {
+			find(aho_corasick_trie, search_string, (*search_results)[i], sids_map);
+			results.addData((*search_results)[i]);
 			++i;
 		}
 	}
@@ -120,14 +139,17 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	};
 	stats.addData(test_data);
 
-	std::cout << std::endl << std::dec << exact_matches_inserted << " Exact Match(es) were inserted." << std::endl		\
-		<< "Aho Corasick TRIE full size: " << aho_corasick_size << std::endl											\
-		<< "Aho Corasick TRIE no emits size: " << aho_corasick_no_emits_size << std::endl								\
-		<< "Aho Corasick TRIE only nodes size: " << nodes_size << std::endl												\
-		<< "Aho Corasick TRIE number of edges: " << total_edges << std::endl											\
-		<< "Aho Corasick size in theory: " << size_in_theory << std::endl												\
-		<< "Insertion time: " << static_cast<double>(test_runtime) << "[ms]." << std::endl								\
-		<< std::endl;
+	if (threshold >= 1 && threshold <= 8) {
+		std::cout << "========================================== Min Threshold <= " << threshold << " Bytes ==========================================" << std::endl;
+		std::cout << std::endl << std::dec << exact_matches_inserted << " Exact Match(es) were inserted." << std::endl		\
+			<< "Aho Corasick TRIE full size: " << aho_corasick_size << std::endl											\
+			<< "Aho Corasick TRIE no emits size: " << aho_corasick_no_emits_size << std::endl								\
+			<< "Aho Corasick TRIE only nodes size: " << nodes_size << std::endl												\
+			<< "Aho Corasick TRIE number of edges: " << total_edges << std::endl											\
+			<< "Aho Corasick size in theory: " << size_in_theory << std::endl												\
+			<< "Insertion time: " << static_cast<double>(test_runtime) << "[ms]." << std::endl								\
+			<< std::endl;
+	}
 }
 	
 
@@ -152,28 +174,42 @@ int main(int argc, char* argv[]) {
 	std::string dest_path = "";
 	std::string test_path = "snort_string_check.json";
 	
+	// Retrieving arguments from WSL / Visual Studio
 	getOpts(argc, argv, file_path, dest_path, test_path);
 
+	// Parsing input file of patterns to add to the Aho Corasick TRIE
 	ExactMatches exact_matches;
 	parseFile(file_path, exact_matches);
 
+	// Creating a map for each input exact match with its respective rule
+	std::map<bstring, std::set<int>> sids_map;
+	exact_matches.createMap(sids_map);
+
+	// Parsing test file of patterns to search the Aho Corasick TRIE
 	std::vector<SearchResults> search_results;
 	parseFile(test_path, search_results);
 
+	// Setting max threshold as the longest bstring length + 1
 	std::vector<bstring> bstrings;
 	std::size_t max_length = toBstring(exact_matches, bstrings);
 	std::size_t max_threshold = max_length + 1;
 
+	// Running tests: Aho Corasick TRIE creation, insertion and search
 	Statistics stats;
 	for (std::size_t threshold = 1; threshold <= max_threshold; ++threshold) {
 		Results results;
-		runTest(stats, results, threshold, bstrings, &search_results);
+		runTest(stats, results, threshold, bstrings, &search_results, sids_map);
 		std::string res_file_name = "search_results_t_" + std::to_string(threshold) + ".json";
 
 		// In order to have comparison ground with the Hash Table, we will also check the search results (hits/misses) using threshold
 		if (threshold >= 1 && threshold <= 8) {
 			results.writeToFile(dest_path, res_file_name);
+			// Clear sids_hit histogram for next threshold search
+			for (SearchResults search_item : search_results) {
+				search_item.sids_hit.clear();
+			}
 		}
+
 	}
 	stats.writeToFile(dest_path, "partc_results.json");
 

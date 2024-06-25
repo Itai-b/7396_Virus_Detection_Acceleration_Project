@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
-add_executable (aho_corasick "main.cpp" "aho_corasick.hpp" "Statistics.h" "Auxiliary.h")
+add_executable (aho_corasick "main.cpp" "aho_corasick.hpp" "Statistics.h" "Auxiliary.h" "Bstring.h")
 
 target_include_directories(aho_corasick PRIVATE ${CMAKE_LIBRARY_PATH}/include)
 

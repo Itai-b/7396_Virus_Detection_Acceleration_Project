@@ -1,6 +1,7 @@
 #ifndef _EXACTMATCHES_H
 #define _EXACTMATCHES_H
 
+#include "bstring.h"
 #include <set>
 #include <string>
 #include <iostream>
@@ -32,6 +33,7 @@ public:
 	~ExactMatches();
 	void insert(const ExactMatch& to_insert);
 	void clear();
+	void createMap(std::map<bstring, std::set<int>>& map);
 	std::vector<ExactMatch*>* exact_matches;
 }; 
 
@@ -55,6 +57,14 @@ void ExactMatches::clear() {
 	for (auto it = exact_matches->begin(); it != exact_matches->end(); ++it)
 	{
 		delete* it;
+	}
+}
+
+void ExactMatches::createMap(std::map<std::basic_string<char>, std::set<int>>& map) {
+	for (ExactMatch* match : *exact_matches) {
+		bstring bstr;
+		hexToBstring(match->getExactMatch(), bstr);
+		map[bstr] = match->getRulesNumbers();
 	}
 }
 
