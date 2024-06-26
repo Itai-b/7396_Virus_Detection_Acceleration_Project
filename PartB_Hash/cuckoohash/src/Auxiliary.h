@@ -64,7 +64,7 @@ void getOpts(int argc, char* argv[], std::string& file_path, std::string& dest_p
 #elif defined __GNUC__  // WSL (GNU/Linux)
     // Running from WSL: get params from "run_project_unix.sh" script
     int opt = 0;
-    while ((opt = getopt(argc, argv, "f:d:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "f:d:n:t:")) != -1) {
         switch (opt) {
         case 'f':
             file_path = optarg;
@@ -75,7 +75,7 @@ void getOpts(int argc, char* argv[], std::string& file_path, std::string& dest_p
             break;
         case 'n':
             *num_of_tests = static_cast<std::size_t>(std::stoi(std::string(optarg)));
-            std::cout << "Number of tests: " << num_of_tests << std::endl;
+            std::cout << "Number of tests: " << *num_of_tests << std::endl;
             break;
         case 't':
             test_path = optarg;

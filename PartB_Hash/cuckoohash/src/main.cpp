@@ -262,7 +262,6 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
                     if (substring == testSubstring) {
                         rules_ptr = substring.rules;
                         if (rules_ptr != nullptr) {
-                            bool first = true;
                             for (auto rule : *rules_ptr) {
                                 // Document the sid hit in the historgram
                                 if (search_item.sids_hit.find(rule) == search_item.sids_hit.end()) {
@@ -334,47 +333,48 @@ int main(int argc, char* argv[]) {
     // START TESTS:
     // Search test - L8 G1
     std::cout << "Search Test L8 G1" << std::endl;
-    std::string search_test_path = dest_path + "/SearchTest_Length8_Gap1";
-    std::string command = "mkdir -p " + search_test_path;
-    createDir(search_test_path);
+    std::string search_test_dest = dest_path + "/SearchTest_Length8_Gap1";
+    std::string command = "mkdir -p " + search_test_dest;
+    createDir(search_test_dest);
     Results results_log_L8_G1;
     SubstringLogger substrings_log_L8_G1;
     searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 8, 1>(test_path, results_log_L8_G1, substrings_log_L8_G1, exact_matches);
-    results_log_L8_G1.writeToFile(search_test_path, "search_results.json");
-    substrings_log_L8_G1.writeToFile(search_test_path, "inserted_substrings.json");
+    std::cout << "search_test_dest: " << search_test_dest << std::endl; // "search_results.json" and "inserted_substrings.json
+    results_log_L8_G1.writeToFile(search_test_dest, "search_results.json");
+    substrings_log_L8_G1.writeToFile(search_test_dest, "inserted_substrings.json");
 
     // Search test - L8 G2
     std::cout << "Search Test L8 G2" << std::endl;
-    search_test_path = dest_path + "/SearchTest_Length8_Gap2";
-    command = "mkdir -p " + search_test_path;
-    createDir(search_test_path);
+    search_test_dest = dest_path + "/SearchTest_Length8_Gap2";
+    command = "mkdir -p " + search_test_dest;
+    createDir(search_test_dest);
     Results results_log_L8_G2;
     SubstringLogger substrings_log_L8_G2;
     searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 8, 2>(test_path, results_log_L8_G2, substrings_log_L8_G2, exact_matches);
-    results_log_L8_G2.writeToFile(search_test_path, "search_results.json");
-    substrings_log_L8_G2.writeToFile(search_test_path, "inserted_substrings.json");
+    results_log_L8_G2.writeToFile(search_test_dest, "search_results.json");
+    substrings_log_L8_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
     // Search test - L4 G1
     std::cout << "Search Test L4 G1" << std::endl;
-    search_test_path = dest_path + "/SearchTest_Length4_Gap1";
-    command = "mkdir -p " + search_test_path;
-    createDir(search_test_path);
+    search_test_dest = dest_path + "/SearchTest_Length4_Gap1";
+    command = "mkdir -p " + search_test_dest;
+    createDir(search_test_dest);
     Results results_log_L4_G1;
     SubstringLogger substrings_log_L4_G1;
     searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 4, 1>(test_path, results_log_L4_G1, substrings_log_L4_G1, exact_matches);
-    results_log_L4_G1.writeToFile(search_test_path, "search_results.json");
-    substrings_log_L4_G1.writeToFile(search_test_path, "inserted_substrings.json");
+    results_log_L4_G1.writeToFile(search_test_dest, "search_results.json");
+    substrings_log_L4_G1.writeToFile(search_test_dest, "inserted_substrings.json");
 
     // Search test - L4 G2
     std::cout << "Search Test L4 G2" << std::endl;
-    search_test_path = dest_path + "/SearchTest_Length4_Gap2";
-    command = "mkdir -p " + search_test_path;
-    createDir(search_test_path);
+    search_test_dest = dest_path + "/SearchTest_Length4_Gap2";
+    command = "mkdir -p " + search_test_dest;
+    createDir(search_test_dest);
     Results results_log_L4_G2;
     SubstringLogger substrings_log_L4_G2;
     searchTest<uint32_t, theoretical_ptr_type_, CustomHash, 4, 2>(test_path, results_log_L4_G2, substrings_log_L4_G2, exact_matches);
-    results_log_L4_G2.writeToFile(search_test_path, "search_results.json");
-    substrings_log_L4_G2.writeToFile(search_test_path, "inserted_substrings.json");
+    results_log_L4_G2.writeToFile(search_test_dest, "search_results.json");
+    substrings_log_L4_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
     // DEBUG
     return 0;

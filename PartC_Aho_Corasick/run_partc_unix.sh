@@ -35,13 +35,13 @@ cd $WORK_DIR/$SUBDIR/build
 while getopts "j:d:t:" opt; do
   case ${opt} in
     j )
-      JSONPATH=$OPTARG
+      $JSONPATH=$OPTARG
       ;;
     d )
-      DESTPATH=$OPTARG
+      $DESTPATH=$OPTARG
       ;;
     t )
-      TESTPATH=$OPTARG
+      $TESTPATH=$OPTARG
       ;;
     \? )
       echo "Invalid option: -$OPTARG" 1>&2

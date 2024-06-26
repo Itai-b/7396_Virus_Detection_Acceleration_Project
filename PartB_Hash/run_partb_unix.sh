@@ -39,16 +39,16 @@ cd $WORK_DIR/$SUBDIR/build
 while getopts "n:" opt; do
   case ${opt} in
     j )
-      file_path=$OPTARG
+      $FILEPATH=$OPTARG
       ;;
     d )
-      dest_path=$OPTARG
+      $DESTPATH=$OPTARG
       ;;
     n )
       num_of_tests=$OPTARG
       ;;
     t )
-      test_path=$OPTARG
+      $TESTPATH=$OPTARG
       ;;
     \? )
       echo "Invalid option: -$OPTARG" 1>&2
@@ -70,9 +70,9 @@ cmake -DCMAKE_LIBRARY_PATH="../install" ..
 make all || exit 1
 
 if [ "$num_of_tests" ]; then
-	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests || exit 1
+	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -n $num_of_tests -t $TESTPATH || exit 1
 else
-	src/cuckoohash -f "$JSONPATH" -d $DESTPATH || exit 1
+	src/cuckoohash -f "$JSONPATH" -d $DESTPATH -t $TESTPATH || exit 1
 fi
 
 # Run ResultsAnalysis.py

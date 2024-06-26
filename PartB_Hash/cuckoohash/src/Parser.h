@@ -120,6 +120,7 @@ void parseFile(std::string file_path, ExactMatches& exact_matches) {
 /// <param name="file_path">Path to JSON file containing the search hexStrings</param>
 /// <param name="res">A vector containing SearchResults element for each search pattern</param>
 void parseFile(std::string file_path, std::vector<SearchResults>& res) {
+    std::cout << "file path:" << file_path << std::endl;
     std::ifstream inputFile(file_path);
     if (!inputFile.is_open()) {
         std::cerr << "Unable to open .json file" << std::endl;
