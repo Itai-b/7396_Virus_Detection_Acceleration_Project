@@ -139,7 +139,10 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	stats.addData(test_data);
 
 	if (threshold >= 1 && threshold <= 8) {
+<<<<<<< HEAD
 		std::cout << "Statistics for Aho_Corasick with Threshold <= " << threshold;
+=======
+>>>>>>> 8b59be818e58536aa24eccde97f0617507b02548
 		std::cout << std::endl << std::dec << exact_matches_inserted << " Exact Match(es) were inserted." << std::endl		\
 			<< "Aho Corasick size: " << size_in_theory << " Bytes" << std::endl												\
 			<< "Insertion time: " << static_cast<double>(test_runtime) << "[ms]." << std::endl								\
