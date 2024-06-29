@@ -30,9 +30,9 @@ void find(aho_corasick::trie* trie, bstring& text) {
 /// <param name="log">The respective SearchResults item where the hits would be registered</param>
 void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std::map<bstring, std::set<int>>& map) {
 	auto res = trie->parse_text(text);
-	std::cout << "Matched [" << res.size() << "] item(s): " << std::endl;
+	//std::cout << "Matched on " << res.size() << " item(s)" << std::endl;
 	for (auto test : res) { // res is of class emit
-		std::cout << '\t' << test.get_keyword() << std::endl;
+		//std::cout << '\t' << test.get_keyword() << std::endl;
 		bstring test_bstring = test.get_keyword();
 		try {
 			const std::set<int>& rules = map.at(test_bstring);
@@ -44,6 +44,9 @@ void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std
 			// Handle case where key is not found
 			std::cout << "\tNo rules were found for this test." << std::endl;
 		}
+	}
+	for (auto original_sid : log.original_sids) {
+				std::cout << "SID:" << original_sid << " was hit "  << log.sids_hit[original_sid] << " times." << std::endl;
 	}
 	std::cout << std::endl;
 }
