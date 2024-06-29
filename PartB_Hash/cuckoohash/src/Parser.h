@@ -134,7 +134,7 @@ void parseFile(std::string file_path, std::vector<SearchResults>& res) {
 
     for (const auto& item : jsonObj) {
         SearchResults search_item;
-        search_item.original_sid = item["sid"];
+        search_item.original_sids = item["sids"].get<std::vector<int>>();
         std::string tmp_string = item["hex_string_example"];
         
         // Process the string from a form of {FF FF FF FF ...} -> {0xFFFFFFFF...}

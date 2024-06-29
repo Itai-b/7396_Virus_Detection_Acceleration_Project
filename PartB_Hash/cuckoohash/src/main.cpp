@@ -221,7 +221,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
     substrings_inserted = substrings_in_table.size();
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
-    // Parse the test JSON file to get a vector of {search_key, original_sid, **EMPTY** sid_hits_historam map}
+    // Parse the test JSON file to get a vector of {search_key, original_sids, **EMPTY** sid_hits_historam map}
     parseFile(test_path, search_results);
 
     // For each item in the above vector, extract the relevant size Substrings from the search_item.search_key
@@ -277,8 +277,10 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
                 }
             }
         }   // FOR LOOP: SUBSTRINGS
-        std::cout << "Search Test Results: " << std::endl;
-        std::cout << "Test String #" << (++search_test_number) << " : " << search_item.sids_hit[search_item.original_sid] << " wanted hit(s)." << std::endl;
+        std::cout << "Search Test Results for Test # " << (++search_test_number) << std::endl;
+        for (auto& sid : search_item.original_sids){
+            std::cout << "SID: " << sid << " was hit " << search_item.sids_hit[sid] << " time(s)." << std::endl;
+        }
         results.addData(search_item);
     }   // FOR LOOP: SEARCH ITEM
 

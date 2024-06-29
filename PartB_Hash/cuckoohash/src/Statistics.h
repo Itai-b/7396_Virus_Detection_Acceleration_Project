@@ -80,7 +80,7 @@ private:
 struct SearchResults {
 public:
     std::string search_key;                         // an std::string represents a search pattern that could be assosiated with a specific SID
-    int original_sid;                               // an integer represents the Snort ID of the wanted rule to search
+    std::vector<int> original_sids;                     // a vector of integers that represent the Snort IDs of the wanted rules to search
     std::map<int,int> sids_hit;       // a histogram of pairs (sid, number of hits)
 };
 
@@ -107,7 +107,7 @@ public:
         for (const auto& data : results) {
             nlohmann::json dataItem;
             dataItem["search_key"] = data.search_key;
-            dataItem["original_sid"] = data.original_sid;
+            dataItem["original_sids"] = data.original_sids;
             dataItem["sids_hit"] = data.sids_hit;
             jsonData.push_back(dataItem);
         }
