@@ -45,7 +45,7 @@ std::size_t toBstring(const ExactMatches& exact_matches, std::vector<bstring>& b
 /// <summary>
 /// Convert a SearchResults to std::basic_string<char>.
 /// </summary>
-/// <param name="search_results">A vector of SearchResults (search_key,original_sid,sids_hit) for each pattern to search in the built aho corasick TRIE</param>
+/// <param name="search_results">A vector of SearchResults (search_key,original_sids,sids_hit) for each pattern to search in the built aho corasick TRIE</param>
 /// <param name="search_strings">An empty vector in which the basic_strings will be stored</param>
 void toBstring(const std::vector<SearchResults>* search_results, std::vector<bstring>& bstrings) {
     if (search_results == nullptr) {
@@ -134,7 +134,7 @@ void parseFile(std::string file_path, std::vector<SearchResults>& res) {
 
     for (const auto& item : jsonObj) {
         SearchResults search_item;
-        search_item.original_sid = item["sid"];
+        search_item.original_sids = item["sids"].get<std::vector<int>>();
         std::string tmp_string = item["hex_string_example"];
 
         // Process the string from a form of {FF FF FF FF ...} -> {0xFFFFFFFF...}

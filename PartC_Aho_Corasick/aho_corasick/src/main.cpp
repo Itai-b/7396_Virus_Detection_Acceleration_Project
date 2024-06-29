@@ -30,19 +30,19 @@ void find(aho_corasick::trie* trie, bstring& text) {
 /// <param name="log">The respective SearchResults item where the hits would be registered</param>
 void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std::map<bstring, std::set<int>>& map) {
 	auto res = trie->parse_text(text);
-	std::cout << "Parsed [" << res.size() << "] item(s): " << std::endl;
-	for (auto match : res) { // res is of class emit
-		std::cout << '\t' << match.get_keyword() << std::endl;
-		bstring match_bstring = match.get_keyword();
+	std::cout << "Matched [" << res.size() << "] item(s): " << std::endl;
+	for (auto test : res) { // res is of class emit
+		std::cout << '\t' << test.get_keyword() << std::endl;
+		bstring test_bstring = test.get_keyword();
 		try {
-			const std::set<int>& rules = map.at(match_bstring);
+			const std::set<int>& rules = map.at(test_bstring);
 			for (int rule : rules) {
 				log.sids_hit[rule]++;
 			}
 		}
 		catch (const std::out_of_range& e) {
 			// Handle case where key is not found
-			std::cout << "\tNo rules found for this match." << std::endl;
+			std::cout << "\tNo rules were found for this test." << std::endl;
 		}
 	}
 	std::cout << std::endl;
@@ -90,7 +90,6 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	std::size_t aho_corasick_no_emits_size = 0;
 	std::size_t exact_matches_inserted = 0;
 
-
 	// TIME STAMP BEGIN: initiate Aho Corasick state machine
 	auto timestamp_a = std::chrono::high_resolution_clock::now();
 
@@ -109,14 +108,11 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	aho_corasick_size = aho_corasick_trie->traverse_tree(true, true);
 	aho_corasick_no_emits_size = aho_corasick_trie->traverse_tree(true, false);
 
-	// Find example:
-	// TODO: change this to a read from snort_string_check.json file.
-	// bstring toParse_spc = { 'g', 'A', 't', 'e', 'C', 'r', 'a', 'S', 'H', 'E', 'r' };
-	// find(aho_corasick_trie, toParse_spc);
-
 	if (threshold >= 1 && threshold <= 8){ // Relevant range for searching the tree
 		int i = 0;
+		std::cout << "==================================== Building Aho_Corasick with Threshold <= " << threshold << " Bytes ==========================================" << std::endl;
 		for (bstring& search_string : search_strings) {
+			std::cout << "Test #" << i << " results:" << std::endl;
 			find(aho_corasick_trie, search_string, (*search_results)[i], sids_map);
 			results.addData((*search_results)[i]);
 			++i;
@@ -143,7 +139,6 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 	stats.addData(test_data);
 
 	if (threshold >= 1 && threshold <= 8) {
-		std::cout << "========================================== Min Threshold <= " << threshold << " Bytes ==========================================" << std::endl;
 		std::cout << std::endl << std::dec << exact_matches_inserted << " Exact Match(es) were inserted." << std::endl		\
 			<< "Aho Corasick TRIE full size: " << aho_corasick_size << std::endl											\
 			<< "Aho Corasick TRIE no emits size: " << aho_corasick_no_emits_size << std::endl								\
@@ -219,6 +214,5 @@ int main(int argc, char* argv[]) {
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto total_runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 	std::cout << "Finished running Aho Corasick Tests in " << static_cast<double>(total_runtime) << "[ms]." << std::endl;
-	// TODO: run valgrind on this, i dont see who deletes after the 'new' allocates by state::add_state().
 	return 0;
 }
