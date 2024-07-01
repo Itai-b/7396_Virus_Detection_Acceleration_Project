@@ -335,7 +335,7 @@ int main(int argc, char* argv[]) {
     // START TESTS:
     // Search test - L8 G1
     std::cout << "Search Test L8 G1" << std::endl;
-    std::string search_test_dest = dest_path + "/SearchTest_Length8_Gap1";
+    std::string search_test_dest = dest_path + "/Search_Results_Length8_Gap1";
     std::string command = "mkdir -p " + search_test_dest;
     createDir(search_test_dest);
     Results results_log_L8_G1;
@@ -347,7 +347,7 @@ int main(int argc, char* argv[]) {
 
     // Search test - L8 G2
     std::cout << "Search Test L8 G2" << std::endl;
-    search_test_dest = dest_path + "/SearchTest_Length8_Gap2";
+    search_test_dest = dest_path + "/Search_Results_Length8_Gap2";
     command = "mkdir -p " + search_test_dest;
     createDir(search_test_dest);
     Results results_log_L8_G2;
@@ -358,7 +358,7 @@ int main(int argc, char* argv[]) {
 
     // Search test - L4 G1
     std::cout << "Search Test L4 G1" << std::endl;
-    search_test_dest = dest_path + "/SearchTest_Length4_Gap1";
+    search_test_dest = dest_path + "/Search_Results_Length4_Gap1";
     command = "mkdir -p " + search_test_dest;
     createDir(search_test_dest);
     Results results_log_L4_G1;
@@ -369,7 +369,7 @@ int main(int argc, char* argv[]) {
 
     // Search test - L4 G2
     std::cout << "Search Test L4 G2" << std::endl;
-    search_test_dest = dest_path + "/SearchTest_Length4_Gap2";
+    search_test_dest = dest_path + "/Search_Results_Length4_Gap2";
     command = "mkdir -p " + search_test_dest;
     createDir(search_test_dest);
     Results results_log_L4_G2;
@@ -378,8 +378,8 @@ int main(int argc, char* argv[]) {
     results_log_L4_G2.writeToFile(search_test_dest, "search_results.json");
     substrings_log_L4_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
-    // DEBUG
-    return 0;
+    // TODO: need to figure out what to do with the other tests.
+    // return 0;
     // DEBUG
 
     // Test 1: L = 8, G = 1
