@@ -80,8 +80,9 @@ private:
 struct SearchResults {
 public:
     std::string search_key;                         // an std::string represents a search pattern that could be assosiated with a specific SID
-    std::vector<int> original_sids;                     // a vector of integers that represent the Snort IDs of the wanted rules to search
-    std::map<int,int> sids_hit;       // a histogram of pairs (sid, number of hits)
+    std::vector<int> original_sids;                 // a vector of integers that represent the Snort IDs of the wanted rules to search
+    std::map<int,int> sids_hit;                     // a histogram of pairs (sid, number of hits)
+    std::size_t size;                               // an std::size_t that represents the size of the data structure in Bytes
 };
 
 /// <summary>
@@ -109,6 +110,7 @@ public:
             dataItem["search_key"] = data.search_key;
             dataItem["original_sids"] = data.original_sids;
             dataItem["sids_hit"] = data.sids_hit;
+            dataItem["size"] = data.size;
             jsonData.push_back(dataItem);
         }
 

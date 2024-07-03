@@ -221,6 +221,11 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
     substrings_inserted = substrings_in_table.size();
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
+    // Calculate the hash table's theoretical size (assuming a 32bits pointers are use to point at a Bloom Filter struct
+    // (The BF struct size won't be implemented and will be calculated theoretically in part D, then added to this calculated size)
+    std::size_t hash_table_size = hashTable->capacity() * sizeof(std::pair<K, theoretical_ptr_type_>);
+
+    // ###################################### Start Pattern Search Test ######################################
     // Parse the test JSON file to get a vector of {search_key, original_sids, **EMPTY** sid_hits_historam map}
     parseFile(test_path, search_results);
 
@@ -281,6 +286,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
         for (auto& sid : search_item.original_sids){
             std::cout << "SID: " << sid << " was hit " << search_item.sids_hit[sid] << " time(s)." << std::endl;
         }
+        search_item.size = hash_table_size;
         results.addData(search_item);
     }   // FOR LOOP: SEARCH ITEM
 
@@ -379,7 +385,7 @@ int main(int argc, char* argv[]) {
     substrings_log_L4_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
     // TODO: need to figure out what to do with the other tests.
-    // return 0;
+    return 0;
     // DEBUG
 
     // Test 1: L = 8, G = 1
