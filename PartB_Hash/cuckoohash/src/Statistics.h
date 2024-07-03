@@ -84,6 +84,7 @@ public:
     std::map<int,int> sids_hit;                     // a histogram of pairs (sid, number of hits)
     std::size_t size;                               // an std::size_t that represents the size of the data structure in Bytes
     std::size_t full_list_size;                     // number of bytes required to store all rules' SID(s) for all entries in the data structure
+    std::size_t iblt_size_optimal;                  // number of bytes required for an iblt that ensures optimal success rate restoring all the rules for all entries in the data structure
     std::size_t iblt_size_100_rate;                 // number of bytes required for an iblt that ensures 100 success rate restoring all the rules for all entries in the data structure
     std::size_t iblt_size_99_rate;                  // number of bytes required for an iblt that ensures 99 success rate restoring all the rules for all entries in the data structure
     std::size_t iblt_size_95_rate;                  // number of bytes required for an iblt that ensures 95 success rate restoring all the rules for all entries in the data structure
@@ -117,6 +118,7 @@ public:
             dataItem["sids_hit"] = data.sids_hit;
             dataItem["size"] = data.size;
             dataItem["additional_size_full_list"] = data.full_list_size;
+            dataItem["additional_size_iblt_optimal"] = data.iblt_size_optimal;
             dataItem["additional_size_iblt_success_rate_100"] = data.iblt_size_100_rate;
             dataItem["additional_size_iblt_success_rate_99"] = data.iblt_size_99_rate;
             dataItem["additional_size_iblt_success_rate_95"] = data.iblt_size_95_rate;

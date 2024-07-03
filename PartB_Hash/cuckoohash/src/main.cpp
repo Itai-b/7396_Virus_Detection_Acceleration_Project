@@ -192,6 +192,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
     std::set<int> unique_rules_inserted;
     std::vector<Substring<K>> substrings_in_table;
     std::size_t raw_list_size = 0;
+    std::size_t iblt_size_optimal = 0;
     std::size_t iblt_size_100_rate = 0;
     std::size_t iblt_size_99_rate = 0;
     std::size_t iblt_size_95_rate = 0;
@@ -223,6 +224,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
 
         // IBLT size calculation
         raw_list_size += iter.rules->size() * SID_ENTRY_IN_LINKED_LIST;
+        iblt_size_optimal += 2 * iter.rules->size() * IBLT_CELL_SIZE;
         iblt_size_100_rate += ibltNumOfCells(L, G, 1) * IBLT_CELL_SIZE;
         iblt_size_99_rate += ibltNumOfCells(L, G, 0.99) * IBLT_CELL_SIZE;
         iblt_size_95_rate += ibltNumOfCells(L, G, 0.95) * IBLT_CELL_SIZE;
@@ -298,6 +300,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
         }
         search_item.size = hash_table_size;
         search_item.full_list_size = int(raw_list_size/8);
+        search_item.iblt_size_optimal = int(iblt_size_optimal/8);
         search_item.iblt_size_100_rate = int(iblt_size_100_rate/8);
         search_item.iblt_size_99_rate = int(iblt_size_99_rate/8);
         search_item.iblt_size_95_rate = int(iblt_size_95_rate/8);

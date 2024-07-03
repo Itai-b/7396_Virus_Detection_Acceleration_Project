@@ -24,6 +24,22 @@ class Data:
             else:
                 total_success_rate += 1
         self.success_rate = total_success_rate/len(self.rules_set)
+    
+    def calculate_success_rate_optimal(self):
+        total_success_rate = 0
+        for rules in self.rules_set:
+            iblt_size = int(2*len(rules))
+            iblt = IBLT(iblt_size, K, KEYSIZE, VALUESIZE)
+            for rule in rules:
+                iblt.insert(str(rule), str(rule))
+            entries = iblt.list_entries()
+            if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
+                entries_size = len(entries[1])
+                success_rate = (entries_size/len(rules))
+                total_success_rate += success_rate
+            else:
+                total_success_rate += 1
+        self.success_rate = total_success_rate/len(self.rules_set)
 
 def check_json_file_type(file_path):
     with open(file_path, 'r') as file:
@@ -91,6 +107,13 @@ def main():
     results = []
     # Create an instance of IBLT
     rules = parse_json(json_path)
+
+    # optimal check
+    data = Data(0, rules)
+    data.calculate_success_rate_optimal()
+    print('Optimal')
+    print('success rate: ', data.success_rate)
+
     for m in M:
         data = Data(m, rules)
         data.calculate_success_rate()

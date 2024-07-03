@@ -12,7 +12,7 @@ class DataStructureStats:
         self.avg_success_rate = 0.0
         self.avg_fp_rate = 0.0
         self.data_structure_size = 0.0
-        self.iblt_size = 0.0
+        self.additional_size = 0.0
         self.total_size = 0.0
         self.data_entries = []
 
@@ -83,12 +83,12 @@ def dataCollection(data_path):
                 data_entry.sids_hit = {sid: hits for sid, hits in entry["sids_hit"]}
                 if data_structure_type.startswith("hash_table"):
                     data_structure_stats.data_structure_size = entry["size"]
-                #TODO - add iblt size
-                data_structure_stats.total_size = data_structure_stats.data_structure_size + data_structure_stats.iblt_size
+                data_structure_stats.additional_size = entry["additional_size_full_list"]
                 data_structure_stats.data_entries.append(data_entry)
                 calculateStats(data_structure_stats)
             
             getMemoryStats(data_structure_type, data_structure_stats, data_path)
+            data_structure_stats.total_size = data_structure_stats.data_structure_size + data_structure_stats.additional_size
             search_data.append((data_structure_type, data_structure_stats))
     
     # print the results
@@ -107,7 +107,7 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     avg_success_rates = [stats[1].avg_success_rate for stats in search_data]
     avg_fp_rates = [stats[1].avg_fp_rate for stats in search_data]
     data_structure_sizes = [stats[1].data_structure_size for stats in search_data]
-    iblt_sizes = [stats[1].iblt_size for stats in search_data]
+    additional_sizes = [stats[1].additional_size for stats in search_data]
 
     # Set up the figure and axes
     fig, ax1 = plt.subplots(figsize=(12, 8))
@@ -130,7 +130,7 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     font_size = 12
     if (title == "Aho-Corasick Statistics"):
         labels = [label.split("aho_corasick_")[1] for label in labels]
-        font_size = 10
+        font_size = 8
 
     # Set x-axis ticks with horizontal labels
     ax1.set_xticks(x)
@@ -139,11 +139,8 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     # Add legends
     ax1.legend(loc='upper right')
 
-    # Add data structure size and IBLT size as text
-
-
-    for i, (ds_size, iblt_size) in enumerate(zip(data_structure_sizes, iblt_sizes)):
-        ax1.text(x[i], -0.05, f'DS Size: {ds_size/1024:.0f}[KB]\nIBLT Size: {iblt_size/1024:.0f}[KB]', 
+    for i, (ds_size, additional_size) in enumerate(zip(data_structure_sizes, additional_sizes)):
+        ax1.text(x[i], -0.05, f'DS Size: {ds_size/1024:.0f}[KB]\nAdditional Size: {additional_size/1024:.0f}[KB]', 
                 ha='center', va='top', transform=ax1.get_xaxis_transform(), fontsize=font_size, color='black')
 
     # Add value labels above each bar

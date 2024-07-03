@@ -209,6 +209,7 @@ int main(int argc, char* argv[]) {
 
 		// additional storage calculation
 		std::size_t raw_list_size = 0;
+		std::size_t iblt_size_optimal = 0;
 		std::size_t iblt_size_100_rate = 0;
 		std::size_t iblt_size_99_rate = 0;
 		std::size_t iblt_size_95_rate = 0;
@@ -223,6 +224,7 @@ int main(int argc, char* argv[]) {
 				//std::cout << "Exact Match Length: " << bstr.length() << std::endl;
 				if (bstr.length() >= threshold) {	// Exact Match is in the Aho Corasick for current threshold
 					raw_list_size += exact_match->getRulesNumbers().size() * SID_ENTRY_IN_LINKED_LIST;
+					iblt_size_optimal += 2 * exact_match->getRulesNumbers().size() * IBLT_CELL_SIZE;
 					iblt_size_100_rate += IBLT_CELLS_SUCCESS_RATE_100 * IBLT_CELL_SIZE;
 					iblt_size_99_rate += IBLT_CELLS_SUCCESS_RATE_99 * IBLT_CELL_SIZE;
 					iblt_size_95_rate += IBLT_CELLS_SUCCESS_RATE_95 * IBLT_CELL_SIZE;
@@ -231,6 +233,7 @@ int main(int argc, char* argv[]) {
 
 			for (SearchResults search_item : search_results) {
 				search_item.full_list_size = int(raw_list_size / 8);
+				search_item.iblt_size_optimal = int(iblt_size_optimal / 8);
 				search_item.iblt_size_100_rate = int(iblt_size_100_rate / 8);
 				search_item.iblt_size_99_rate = int(iblt_size_99_rate / 8);
 				search_item.iblt_size_95_rate = int(iblt_size_95_rate / 8);
