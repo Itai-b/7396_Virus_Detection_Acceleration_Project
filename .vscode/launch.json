@@ -10,7 +10,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "args": ["-p", "../Data/PartB_Data/Length4_Gap1/L4_G1_substrings.json", "-n", "L4_G1_substrings"],
+            "args": ["-p", "Data"],
             "console": "integratedTerminal"
         }
     ]
