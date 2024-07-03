@@ -125,7 +125,7 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 		for (bstring& search_string : search_strings) {
 			std::cout << "Test #" << i+1 << " results:" << std::endl;
 			find(aho_corasick_trie, search_string, (*search_results)[i], sids_map);
-			results.addData((*search_results)[i]);
+			//results.addData((*search_results)[i]);
 			++i;
 		}
 	}
@@ -213,25 +213,30 @@ int main(int argc, char* argv[]) {
 		std::size_t iblt_size_99_rate = 0;
 		std::size_t iblt_size_95_rate = 0;
 		
-		// Calculate additional size required
-		for (ExactMatch* exact_match : (*exact_matches.exact_matches)) {
-			if (exact_match->getExactMatch().length() >= threshold) {	// Exact Match is in the Aho Corasick for current threshold
-				raw_list_size += exact_match->getRulesNumbers().size() * SID_ENTRY_IN_LINKED_LIST;
-				iblt_size_100_rate += IBLT_CELLS_SUCCESS_RATE_100 * IBLT_CELL_SIZE;
-				iblt_size_99_rate += IBLT_CELLS_SUCCESS_RATE_99 * IBLT_CELL_SIZE;
-				iblt_size_95_rate += IBLT_CELLS_SUCCESS_RATE_95 * IBLT_CELL_SIZE;
-			}
-		}
-
-		for (SearchResults search_item : search_results) {
-			search_item.full_list_size = int(raw_list_size / 8);
-			search_item.iblt_size_100_rate = int(iblt_size_100_rate / 8);
-			search_item.iblt_size_99_rate = int(iblt_size_99_rate / 8);
-			search_item.iblt_size_95_rate = int(iblt_size_95_rate / 8);
-		}
-
 		// In order to have comparison ground with the Hash Table, we will also check the search results (hits/misses) using threshold
 		if (threshold >= 1 && threshold <= 8) {
+			// Calculate additional size required
+			for (ExactMatch* exact_match : (*exact_matches.exact_matches)) {
+				bstring bstr;
+				hexToBstring(exact_match->getExactMatch(), bstr);
+				//std::cout << "Exact Match: " << bstr << std::endl;
+				//std::cout << "Exact Match Length: " << bstr.length() << std::endl;
+				if (bstr.length() >= threshold) {	// Exact Match is in the Aho Corasick for current threshold
+					raw_list_size += exact_match->getRulesNumbers().size() * SID_ENTRY_IN_LINKED_LIST;
+					iblt_size_100_rate += IBLT_CELLS_SUCCESS_RATE_100 * IBLT_CELL_SIZE;
+					iblt_size_99_rate += IBLT_CELLS_SUCCESS_RATE_99 * IBLT_CELL_SIZE;
+					iblt_size_95_rate += IBLT_CELLS_SUCCESS_RATE_95 * IBLT_CELL_SIZE;
+				}
+			}
+
+			for (SearchResults search_item : search_results) {
+				search_item.full_list_size = int(raw_list_size / 8);
+				search_item.iblt_size_100_rate = int(iblt_size_100_rate / 8);
+				search_item.iblt_size_99_rate = int(iblt_size_99_rate / 8);
+				search_item.iblt_size_95_rate = int(iblt_size_95_rate / 8);
+				results.addData(search_item);
+			}
+
 			results.writeToFile(dest_path, res_file_name);
 			// Clear sids_hit histogram for next threshold search
 			for (SearchResults search_item : search_results) {
