@@ -76,12 +76,18 @@ private:
 struct SearchResults {
 public:
     std::string search_key;                         // an std::string represents a search pattern that could be assosiated with a specific SID
-    std::vector<int> original_sids;                 // a vector of integers that represents the Snort IDs of the wanted rules to search
-    std::map<int, int> sids_hit;       // a histogram of pairs (sid, number of hits)
+    std::vector<int> original_sids;                 // a vector of integers that represent the Snort IDs of the wanted rules to search
+    std::map<int, int> sids_hit;                    // a histogram of pairs (sid, number of hits)
+    std::size_t size;                               // an std::size_t that represents the size of the data structure in Bytes
+    std::size_t full_list_size;                     // number of bytes required to store all rules' SID(s) for all entries in the data structure
+    std::size_t iblt_size_100_rate;                 // number of bytes required for an iblt that ensures 100 success rate restoring all the rules for all entries in the data structure
+    std::size_t iblt_size_99_rate;                  // number of bytes required for an iblt that ensures 99 success rate restoring all the rules for all entries in the data structure
+    std::size_t iblt_size_95_rate;                  // number of bytes required for an iblt that ensures 95 success rate restoring all the rules for all entries in the data structure
+
 };
 
 /// <summary>
-/// Class dedicated to store results from the search test in the cuckoo hash map.
+/// Class dedicated to store results from the search test in the aho corasick automaton.
 /// Stores the data from each test to a json file.
 /// </summary>
 class Results {
@@ -90,7 +96,7 @@ public:
 
     /// <summary>
     /// Usage: 
-    ///     stats.addData({std::string search_key, std::vector<int> original_sids, std::vector<std::pair<int, int>> sids_hit})
+    ///     stats.addData({std::string search_key, int original_sid, std::vector<std::pair<int, int>> sids_hit})
     /// </summary>
     /// <param name="searchResults">A struct to contain the logged test results.</param>
     void addData(const SearchResults& searchResults) {
@@ -105,6 +111,11 @@ public:
             dataItem["search_key"] = data.search_key;
             dataItem["original_sids"] = data.original_sids;
             dataItem["sids_hit"] = data.sids_hit;
+            dataItem["size"] = data.size;
+            dataItem["additional_size_full_list"] = data.full_list_size;
+            dataItem["additional_size_iblt_success_rate_100"] = data.iblt_size_100_rate;
+            dataItem["additional_size_iblt_success_rate_99"] = data.iblt_size_99_rate;
+            dataItem["additional_size_iblt_success_rate_95"] = data.iblt_size_95_rate;
             jsonData.push_back(dataItem);
         }
 
@@ -114,7 +125,7 @@ public:
         if (outputFile.is_open()) {
             outputFile << std::setw(4) << jsonData; // Print with indentation of 4 spaces (= 1 tab)
             outputFile.close();
-            std::cout << "Search Data has been written to " << filename << " successfully." << std::endl << std::endl;
+            std::cout << "Data has been written to " << filename << " successfully." << std::endl;
         }
         else {
             std::cerr << "Unable to open file " << file_path << "." << std::endl;
@@ -124,5 +135,7 @@ public:
 private:
     std::vector<SearchResults> results;
 };
+
+
 
 #endif // _STATISTICS_H

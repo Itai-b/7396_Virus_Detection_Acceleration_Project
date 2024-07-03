@@ -66,6 +66,6 @@ void ExactMatches::createMap(std::map<std::basic_string<char>, std::set<int>>& m
 		hexToBstring(match->getExactMatch(), bstr);
 		map[bstr] = match->getRulesNumbers();
 	}
-}
+} 
 
 #endif // _EXACTMATCHES_H

@@ -6,6 +6,14 @@
 // (This is assuming a x32-bits hardware).
 #define SIZE_OF_GO_TO_TABLE_ENTRY 11	// Bytes
 
+// Theoretical calculations for the addition size needed to store the rules' SID(s) list / IBLT for each entry
+const std::size_t SID_ENTRY_IN_LINKED_LIST = 64; // size in bits (32bits for the SID, 32bits for the pointer to next item)
+const std::size_t IBLT_CELL_SIZE = 40; // size in bits (32 bits for the SID xor sum, 8 bits for the Bloom Filter)
+const std::size_t IBLT_CELLS_SUCCESS_RATE_100 = 256; // based on part D
+const std::size_t IBLT_CELLS_SUCCESS_RATE_99 = 32; // based on part D
+const std::size_t IBLT_CELLS_SUCCESS_RATE_95 = 8; // based on part D
+
+
 /// <summary>
 /// Parse text to find exact matches in the Aho Corasick TRIE.
 /// Prints any exact matches found.
@@ -198,6 +206,29 @@ int main(int argc, char* argv[]) {
 		Results results;
 		runTest(stats, results, threshold, bstrings, &search_results, sids_map);
 		std::string res_file_name = "search_results_threshold_" + std::to_string(threshold) + ".json";
+
+		// additional storage calculation
+		std::size_t raw_list_size = 0;
+		std::size_t iblt_size_100_rate = 0;
+		std::size_t iblt_size_99_rate = 0;
+		std::size_t iblt_size_95_rate = 0;
+		
+		// Calculate additional size required
+		for (ExactMatch* exact_match : (*exact_matches.exact_matches)) {
+			if (exact_match->getExactMatch().length() >= threshold) {	// Exact Match is in the Aho Corasick for current threshold
+				raw_list_size += exact_match->getRulesNumbers().size() * SID_ENTRY_IN_LINKED_LIST;
+				iblt_size_100_rate += IBLT_CELLS_SUCCESS_RATE_100 * IBLT_CELL_SIZE;
+				iblt_size_99_rate += IBLT_CELLS_SUCCESS_RATE_99 * IBLT_CELL_SIZE;
+				iblt_size_95_rate += IBLT_CELLS_SUCCESS_RATE_95 * IBLT_CELL_SIZE;
+			}
+		}
+
+		for (SearchResults search_item : search_results) {
+			search_item.full_list_size = int(raw_list_size / 8);
+			search_item.iblt_size_100_rate = int(iblt_size_100_rate / 8);
+			search_item.iblt_size_99_rate = int(iblt_size_99_rate / 8);
+			search_item.iblt_size_95_rate = int(iblt_size_95_rate / 8);
+		}
 
 		// In order to have comparison ground with the Hash Table, we will also check the search results (hits/misses) using threshold
 		if (threshold >= 1 && threshold <= 8) {

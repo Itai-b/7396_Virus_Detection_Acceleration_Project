@@ -191,6 +191,10 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
     int substrings_inserted = 0;
     std::set<int> unique_rules_inserted;
     std::vector<Substring<K>> substrings_in_table;
+    std::size_t raw_list_size = 0;
+    std::size_t iblt_size_100_rate = 0;
+    std::size_t iblt_size_99_rate = 0;
+    std::size_t iblt_size_95_rate = 0;
 
     // Insert all substrings to the hash table
     for (auto& iter : substrings) {
@@ -216,15 +220,21 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
         hashTable->insert(key, value);
         substrings_in_table.push_back(iter);
         unique_rules_inserted.insert(iter.rules->begin(), iter.rules->end());
+
+        // IBLT size calculation
+        raw_list_size += iter.rules.size() * SID_ENTRY_IN_LINKED_LIST;
+        iblt_size_100_rate += ibltNumOfCells(L, G, 1) * IBLT_CELL_SIZE;
+        iblt_size_99_rate += ibltNumOfCells(L, G, 0.99) * IBLT_CELL_SIZE;
+        iblt_size_95_rate += ibltNumOfCells(L, G, 0.95) * IBLT_CELL_SIZE;
     }
 
     substrings_inserted = substrings_in_table.size();
     std::cout << "Hash Table created! " << substrings_inserted << " Substring(s) were inserted." << std::endl;
 
     // Calculate the hash table's theoretical size (assuming a 32bits pointers are use to point at a Bloom Filter struct
-    // (The BF struct size won't be implemented and will be calculated theoretically in part D, then added to this calculated size)
+    // IBLT size calculation: Total bits = 2 * M * (8 + 32 + 32) = 144 * M bits = 18M Bytes, where M is the number of rules.
     std::size_t hash_table_size = hashTable->capacity() * sizeof(std::pair<K, theoretical_ptr_type_>);
-
+    
     // ###################################### Start Pattern Search Test ######################################
     // Parse the test JSON file to get a vector of {search_key, original_sids, **EMPTY** sid_hits_historam map}
     parseFile(test_path, search_results);
@@ -287,6 +297,10 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
             std::cout << "SID: " << sid << " was hit " << search_item.sids_hit[sid] << " time(s)." << std::endl;
         }
         search_item.size = hash_table_size;
+        search_item.full_list_size = int(raw_list_size/8);
+        search_item.iblt_size_100_rate = int(iblt_size_100_rate/8);
+        search_item.iblt_size_99_rate = int(iblt_size_99_rate/8);
+        search_item.iblt_size_95_rate = int(iblt_size_95_rate/8);
         results.addData(search_item);
     }   // FOR LOOP: SEARCH ITEM
 
@@ -339,7 +353,7 @@ int main(int argc, char* argv[]) {
     parseFile(file_path, exact_matches); 
 
     // START TESTS:
-    // Search test - L8 G1
+    // Test 1: Search test - L8 G1
     std::cout << "Search Test L8 G1" << std::endl;
     std::string search_test_dest = dest_path + "/Search_Results_Length8_Gap1";
     std::string command = "mkdir -p " + search_test_dest;
@@ -351,7 +365,7 @@ int main(int argc, char* argv[]) {
     results_log_L8_G1.writeToFile(search_test_dest, "search_results.json");
     substrings_log_L8_G1.writeToFile(search_test_dest, "inserted_substrings.json");
 
-    // Search test - L8 G2
+    // Test 2: Search test - L8 G2
     std::cout << "Search Test L8 G2" << std::endl;
     search_test_dest = dest_path + "/Search_Results_Length8_Gap2";
     command = "mkdir -p " + search_test_dest;
@@ -362,7 +376,7 @@ int main(int argc, char* argv[]) {
     results_log_L8_G2.writeToFile(search_test_dest, "search_results.json");
     substrings_log_L8_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
-    // Search test - L4 G1
+    // Test 3: Search test - L4 G1
     std::cout << "Search Test L4 G1" << std::endl;
     search_test_dest = dest_path + "/Search_Results_Length4_Gap1";
     command = "mkdir -p " + search_test_dest;
@@ -373,7 +387,7 @@ int main(int argc, char* argv[]) {
     results_log_L4_G1.writeToFile(search_test_dest, "search_results.json");
     substrings_log_L4_G1.writeToFile(search_test_dest, "inserted_substrings.json");
 
-    // Search test - L4 G2
+    // Test 4: Search test - L4 G2
     std::cout << "Search Test L4 G2" << std::endl;
     search_test_dest = dest_path + "/Search_Results_Length4_Gap2";
     command = "mkdir -p " + search_test_dest;
@@ -384,11 +398,7 @@ int main(int argc, char* argv[]) {
     results_log_L4_G2.writeToFile(search_test_dest, "search_results.json");
     substrings_log_L4_G2.writeToFile(search_test_dest, "inserted_substrings.json");
 
-    // TODO: need to figure out what to do with the other tests.
-    return 0;
-    // DEBUG
-
-    // Test 1: L = 8, G = 1
+    // Test 5: Insert test L = 8, G = 1
     Statistics stats_test1;
     SubstringLogger substrings_log1;
     std::string l8g1_path = dest_path + "/Length8_Gap1";
@@ -398,7 +408,7 @@ int main(int argc, char* argv[]) {
     stats_test1.writeToFile(l8g1_path, "L8_G1_increasing_table_size.json");
     substrings_log1.writeToFile(l8g1_path, "L8_G1_substrings.json");
 
-    // Test 2: L = 8, G = 2
+    // Test 6: Insert test L = 8, G = 2
     Statistics stats_test2;
     SubstringLogger substrings_log2;
     std::string l8g2_path = dest_path + "/Length8_Gap2";
@@ -408,7 +418,7 @@ int main(int argc, char* argv[]) {
     stats_test2.writeToFile(l8g2_path, "L8_G2_increasing_table_size.json");
     substrings_log2.writeToFile(l8g2_path, "L8_G2_substrings.json");
 
-    // Test 3: L = 4, G = 1
+    // Test 7: Insert test L = 4, G = 1
     Statistics stats_test3;
     SubstringLogger substrings_log3;
     std::string l4g1_path = dest_path + "/Length4_Gap1";
@@ -418,7 +428,7 @@ int main(int argc, char* argv[]) {
     stats_test3.writeToFile(l4g1_path, "L4_G1_increasing_table_size.json");
     substrings_log3.writeToFile(l4g1_path, "L4_G1_substrings.json");
 
-    // Test 4: L = 4, G = 2
+    // Test 8: Insert test L = 4, G = 2
     Statistics stats_test4;
     SubstringLogger substrings_log4;
     std::string l4g2_path = dest_path + "/Length4_Gap2";
