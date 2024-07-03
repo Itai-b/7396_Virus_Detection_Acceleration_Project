@@ -222,7 +222,7 @@ void searchTest(std::string test_path, Results& results, SubstringLogger& log, c
         unique_rules_inserted.insert(iter.rules->begin(), iter.rules->end());
 
         // IBLT size calculation
-        raw_list_size += iter.rules.size() * SID_ENTRY_IN_LINKED_LIST;
+        raw_list_size += iter.rules->size() * SID_ENTRY_IN_LINKED_LIST;
         iblt_size_100_rate += ibltNumOfCells(L, G, 1) * IBLT_CELL_SIZE;
         iblt_size_99_rate += ibltNumOfCells(L, G, 0.99) * IBLT_CELL_SIZE;
         iblt_size_95_rate += ibltNumOfCells(L, G, 0.95) * IBLT_CELL_SIZE;

@@ -123,7 +123,7 @@ void runTest(Statistics& stats, Results& results, const size_t threshold, const 
 		int i = 0;
 		std::cout << "==================================== Building Aho_Corasick with Threshold <= " << threshold << " Bytes ==========================================" << std::endl;
 		for (bstring& search_string : search_strings) {
-			std::cout << "Test #" << i << " results:" << std::endl;
+			std::cout << "Test #" << i+1 << " results:" << std::endl;
 			find(aho_corasick_trie, search_string, (*search_results)[i], sids_map);
 			results.addData((*search_results)[i]);
 			++i;
