@@ -9,6 +9,7 @@ class Data:
         self.m = m
         self.rules_set = rules
         self.success_rate = 0
+        self.iblts_total_size = 0
 
     def calculate_success_rate(self):
         total_success_rate = 0
@@ -16,6 +17,8 @@ class Data:
             iblt = IBLT(self.m, K, KEYSIZE, VALUESIZE)
             for rule in rules:
                 iblt.insert(str(rule), str(rule))
+            size = iblt.get_serialized_size()
+            self.iblts_total_size += size
             entries = iblt.list_entries()
             if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
                 entries_size = len(entries[1])
@@ -32,6 +35,8 @@ class Data:
             iblt = IBLT(iblt_size, K, KEYSIZE, VALUESIZE)
             for rule in rules:
                 iblt.insert(str(rule), str(rule))
+            size = iblt.get_serialized_size()
+            self.iblts_total_size += size
             entries = iblt.list_entries()
             if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
                 entries_size = len(entries[1])
@@ -111,15 +116,17 @@ def main():
     # optimal check
     data = Data(0, rules)
     data.calculate_success_rate_optimal()
-    print('Optimal')
-    print('success rate: ', data.success_rate)
+    print('Optimal Check')
+    print('list_enteries success rate: ', data.success_rate)
+    print('total size in Bytes: ', data.iblts_total_size)
 
     for m in M:
         data = Data(m, rules)
         data.calculate_success_rate()
-        print('M: ', m)
-        print('success rate: ', data.success_rate)
-        results.append({'m': m, 'success_rate': data.success_rate})
+        print('Cells number: ', m)
+        print('list_enteries success rate: ', data.success_rate)
+        #print('total size in Bytes: ', data.iblts_total_size)
+        results.append({'m': m, 'success_rate': data.success_rate, 'total_size': data.iblts_total_size})
 
     # Save the results to a .json file
     # Create the directory if it doesn't exist using mkdir -p

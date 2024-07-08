@@ -53,13 +53,24 @@ def getMemoryStats(data_structure_type, data_structure_stats,data_path):
 
 def calculateStats(data_structure):
     # Calculate the average success rate and average false positive rate
+    threshold = 4
     total_success_rate = 0.0
     total_fp_rate = 0.0
     for data_entry in data_structure.data_entries:
+        data_type = "" 
+        if np.max(list(data_entry.sids_hit.values())) > threshold :
+            data_type = "hash_table"
+        else:
+            data_type = "aho_corasick"
         # if sids in original_sids are in sids_hit, and the number of sids_hit is greater than 0, then it is a success:
-        total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > 0]) / len(data_entry.original_sids)
         # if sids keys in sids_hit are not in original_sids, then it is a false positive:
-        total_fp_rate += sum([1 for sid in data_entry.sids_hit.keys() if sid not in data_entry.original_sids]) / len(data_entry.sids_hit)
+        if data_type == "aho_corasick":
+            total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > 0]) / len(data_entry.original_sids)
+            total_fp_rate += sum([1 for sid in data_entry.sids_hit.keys() if sid not in data_entry.original_sids]) / len(data_entry.sids_hit)
+        else:
+            total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > threshold/2]) / len(data_entry.original_sids)
+            total_fp_rate += sum([1 for sid, hits in data_entry.sids_hit.items() if (sid not in data_entry.original_sids and hits > threshold/2)]) / len(data_entry.sids_hit)
+
     data_structure.avg_success_rate = total_success_rate / len(data_structure.data_entries)
     data_structure.avg_fp_rate = total_fp_rate / len(data_structure.data_entries)
     assert(data_structure.avg_success_rate <= 1.0)
@@ -92,12 +103,12 @@ def dataCollection(data_path):
             search_data.append((data_structure_type, data_structure_stats))
     
     # print the results
-    for data_structure_type, data_structure_stats in search_data:
-        print(f"Data structure: {data_structure_type}")
-        print(f"Average success rate: {data_structure_stats.avg_success_rate}")
-        print(f"Average false positive rate: {data_structure_stats.avg_fp_rate}")
-        print(f"Size: {data_structure_stats.total_size}")
-        print()
+    # for data_structure_type, data_structure_stats in search_data:
+    #     print(f"Data structure: {data_structure_type}")
+    #     print(f"Average success rate: {data_structure_stats.avg_success_rate:.2f}")
+    #     print(f"Average false positive rate: {data_structure_stats.avg_fp_rate:.2f}")
+    #     print(f"Size: {data_structure_stats.total_size}")
+    #     print()
     
     return search_data
 
@@ -168,6 +179,60 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     #plt.show()
     plt.savefig(os.path.join(data_path, title.replace(" ", "_") + ".png"),  bbox_inches='tight', dpi=300)
 
+def combine_sids_hit(data_structure_stats):
+    combined_sids = {}
+    original_sids = []
+    combined_sids_hit_idx = {}
+    original_sids_idx = []
+
+    entries = data_structure_stats.data_entries
+    for entry in entries:
+        for orig_sid in entry.original_sids:
+            if orig_sid not in original_sids:
+                original_sids.append(orig_sid)
+        for sid, count in entry.sids_hit.items():
+            if sid in combined_sids:
+                combined_sids[sid] += count
+            else:
+                combined_sids[sid] = count
+    
+    # Creating an indexed histogram to avoid empty spaces on x-axis (Snort ID)
+    index = 1
+    for sid,hits in combined_sids.items():
+        if sid in original_sids:
+            original_sids_idx.append(index)
+        combined_sids_hit_idx[index] = hits
+        index += 1
+        
+    return combined_sids_hit_idx, original_sids_idx
+
+def bestCaseVisualization(data_structure, data_path=""):
+    combined_sids_hit, combined_orig_sids = combine_sids_hit(data_structure[1])
+    
+    # Prepare data for plotting
+    sids = list(combined_sids_hit.keys())
+    hits = list(combined_sids_hit.values())
+
+    # Create color list
+    colors = ['red' if sid in combined_orig_sids else 'blue' for sid in sids]
+
+    # Create the plot
+    plt.figure(figsize=(20, 10))
+    bars = plt.bar(sids, hits, color=colors)
+
+    # Customize the plot
+    plt.title(f'Combined SIDs Hit for {data_structure[0]}')
+    plt.xlabel('SID index')
+    plt.ylabel('Hit Count')
+    plt.xticks(rotation=90)
+
+    # Add a legend
+    plt.legend(['In original SIDs', 'Not in original SIDs'])
+
+    # Show the plot
+    plt.tight_layout()
+    plt.savefig(os.path.join(data_path, "sids_hit_histogram_"+ data_structure[0] + ".png"),  bbox_inches='tight', dpi=300)
+
 def bestDataStructures(search_data, category, weights=[0.5, 0.5]):
     if sum(weights) != 1:
         print("The sum of weights must be 1")
@@ -201,6 +266,8 @@ def main():
     best_hash_table = bestDataStructures(search_data, "hash_table",[0.75,0.25])
     best_aho_corasick = bestDataStructures(search_data, "aho_corasick",[0.75,0.25])
     dataVisualization([best_hash_table, best_aho_corasick], "Best Data Structures in term of Success Rate and False Positive Rate", args.path)
+    bestCaseVisualization(best_hash_table, args.path)
+    bestCaseVisualization(best_aho_corasick, args.path)
     
 if __name__ == "__main__":
     #set working directory to script directory

@@ -110,6 +110,21 @@ else
 	exit 1
 fi
 
+# Run the Summary script
+
+chmod +x $WORK_DIR/ResultsSummary.py
+dos2unix $WORK_DIR/ResultsSummary.py
+
+echo -e "${BLUE}Running the Results Summary script...${NC}"
+command python3 $WORK_DIR/ResultsSummary.py -p $WORK_DIR/Data
+# check if the summary script ran successfully
+if [ $? -eq 0 ]; then
+	echo -e "${GREEN}Results Summary script ran successfully!${NC}"
+else
+	echo -e "${RED}Results Summary script was not complited.${NC}"
+	exit 1
+fi
+
 # Check if the user wants to run PartD
 echo -e "${BLUE}Do you want to run PartD - IBLT? enter (${GREEN}y${BLUE}/${RED}n${BLUE})${NC}"
 echo -e "${BLUE}It is expected to finish in ~15 min${NC}"

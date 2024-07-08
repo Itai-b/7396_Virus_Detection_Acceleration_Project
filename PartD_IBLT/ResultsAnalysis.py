@@ -75,7 +75,7 @@ def genIBLTPlot(iblt_paths):
     # Plot a bar chart by m in x axis and success rate in y axis
     for i, (key, value) in enumerate(plot_data.items()):
         plt.bar([x + barwidth * i for x in range(len(value))], [x[1] for x in value], width=barwidth, label=key)
-    plt.xlabel('Number of Bits in IBLT (m)')
+    plt.xlabel('Number of Cells in IBLT (m)')
     plt.ylabel('Success Rate')
     # change the y-axis to percentage
     plt.axhline(y=1, color='r', linestyle='--', alpha=0.5, linewidth=0.5)
@@ -85,7 +85,7 @@ def genIBLTPlot(iblt_paths):
     ax.set_yticks(ticks)
     ax.set_yticklabels(['{:.0f}%'.format(x*100) for x in ticks[:-1]] + [''])
     # draw a horizontal red line at y=100%
-    plt.title('IBLT ListEntries Mean Success Rate by Number of Bits in IBLT (m)')
+    plt.title('IBLT ListEntries Mean Success Rate by Number of Cells in IBLT (m)')
     plt.xticks([r + barwidth * 2 for r in range(len(plot_data['aho_corasick']))], [x[0] for x in plot_data['aho_corasick']])
 
     plt.legend(bbox_to_anchor=(1.2, 1), loc='upper right')

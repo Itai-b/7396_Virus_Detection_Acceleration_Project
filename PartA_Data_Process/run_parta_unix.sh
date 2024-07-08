@@ -19,7 +19,19 @@ if ! command -v python3 &>/dev/null; then
     if [ "$answer" != "${answer#[Yy]}" ] ;then
         sudo apt install python3
     else
-        echo -e "${RED}Stopping script.${NC}"
+        echo -e "${RED}Stopping script, you need python to continue${NC}"
+        exit 1
+    fi
+fi
+
+# Check if pip is installed
+if ! command -v pip3 &>/dev/null; then
+    echo "pip is not installed. Do you want to install it? (y/n)"
+    read answer
+    if [ "$answer" != "${answer#[Yy]}" ] ;then
+        sudo apt install python3-pip
+    else
+        echo -e "${RED}Stopping script, you need pip to continue${NC}"
         exit 1
     fi
 fi
@@ -29,9 +41,9 @@ if ! python3 -c "import matplotlib" &> /dev/null; then
     echo "matplotlib is not installed. Do you want to install it? (y/n)"
     read answer
     if [ "$answer" != "${answer#[Yy]}" ] ;then
-		sudo apt install python3-matplotlib
-	else
-        echo -e "{$RED}matplotlib not installed. Exiting.${NC}"
+        pip3 install matplotlib
+    else
+        echo -e "${RED}matplotlib not installed. Exiting.${NC}"
         exit 1
     fi
 fi
