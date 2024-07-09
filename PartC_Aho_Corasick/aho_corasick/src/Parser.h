@@ -45,7 +45,8 @@ std::size_t toBstring(const ExactMatches& exact_matches, std::vector<bstring>& b
 /// <summary>
 /// Convert a SearchResults to std::basic_string<char>.
 /// </summary>
-/// <param name="search_results">A vector of SearchResults (search_key,original_sids,sids_hit) for each pattern to search in the built aho corasick TRIE</param>
+/// <param name="search_results">A vector of SearchResults (search_key,
+/// _sids,sids_hit) for each pattern to search in the built aho corasick TRIE</param>
 /// <param name="search_strings">An empty vector in which the basic_strings will be stored</param>
 void toBstring(const std::vector<SearchResults>* search_results, std::vector<bstring>& bstrings) {
     if (search_results == nullptr) {

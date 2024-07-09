@@ -45,7 +45,8 @@ void find(aho_corasick::trie* trie, bstring& text, SearchResults& log, const std
 		try {
 			const std::set<int>& rules = map.at(test_bstring);
 			for (int rule : rules) {
-				log.sids_hit[rule]++;
+				// log.sids_hit[rule]++;
+				log.sids_hit[rule] += test.length();
 			}
 		}
 		catch (const std::out_of_range& e) {

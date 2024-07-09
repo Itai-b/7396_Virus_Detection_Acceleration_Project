@@ -287,6 +287,7 @@ const bool DEFAULT_INSENSITIVE = true;
 		string_type get_keyword() const { return string_type(d_keyword); }
 		unsigned get_index() const { return d_index; }
 		bool is_empty() const { return (get_start() == -1 && get_end() == -1); }
+		std::size_t length() const { return this->size(); }
 	};
 
 	/// <summary>

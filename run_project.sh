@@ -45,7 +45,7 @@ command $WORK_DIR/PartA_Data_Process/run_parta_unix.sh -r $SNORT_RULES_FILE -p $
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartA - Data Process ran successfully!${NC}"
 else
-	echo -e "${RED}PartA - Data Process was not complited.${NC}"
+	echo -e "${RED}PartA - Data Process was not completed.${NC}"
 	exit 1
 fi
 
@@ -82,7 +82,7 @@ command $WORK_DIR/PartB_Hash/run_partb_unix.sh -n $num_of_tests
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartB - Hash Insertion ran successfully!${NC}"
 else
-	echo -e "${RED}PartB - Hash Insertion was not complited.${NC}"
+	echo -e "${RED}PartB - Hash Insertion was not completed.${NC}"
 	exit 1
 fi
 
@@ -106,7 +106,7 @@ command $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartC - Aho-Corasick Insertion ran successfully!${NC}"
 else
-	echo -e "${RED}PartC - Aho-Corasick Insertion was not complited.${NC}"
+	echo -e "${RED}PartC - Aho-Corasick Insertion was not completed.${NC}"
 	exit 1
 fi
 
@@ -121,7 +121,7 @@ command python3 $WORK_DIR/ResultsSummary.py -p $WORK_DIR/Data
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Results Summary script ran successfully!${NC}"
 else
-	echo -e "${RED}Results Summary script was not complited.${NC}"
+	echo -e "${RED}Results Summary script was not completed.${NC}"
 	exit 1
 fi
 
@@ -146,7 +146,7 @@ command $WORK_DIR/PartD_IBLT/run_partd_unix.sh
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartD - IBLT ran successfully!${NC}"
 else
-	echo -e "${RED}PartB - IBLT was not complited.${NC}"
+	echo -e "${RED}PartB - IBLT was not completed.${NC}"
 	exit 1
 fi
 
