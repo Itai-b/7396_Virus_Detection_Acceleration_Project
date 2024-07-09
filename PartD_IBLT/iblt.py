@@ -256,6 +256,12 @@ class IBLT:
 
 		return t
 
+	def get_theoretical_size (self):
+		# calculate the theoretical size of the iblt
+		bloom_filter_size = 1 # one byte for BLOOM LOOKUP TABLE SIZE
+		xor_key_size = 4 # four bytes for the XOR sum of keys
+		return (self.m * (bloom_filter_size + xor_key_size))
+
 	def get_serialized_size( self ):
 		# Magic bytes
 		result = 4
@@ -286,14 +292,24 @@ class IBLT:
 		return hashlib.sha512( key.encode('utf-8') ).hexdigest()
 
 	hash_hex_length = None
-	def __hash( self, i, value ):
+
+	def __hash(self, i, value):
 		if self.hash_hex_length == None:
 			# Find the shortest length to extract from the hash,
 			# get the bit length of m and divide by four to get hex length
-			self.hash_hex_length = int( math.ceil( math.log( self.m, 2 ) / 4.0 ) )
+			self.hash_hex_length = max(1, int(math.ceil(math.log(self.m, 2) / 4.0)))
 		if not 0 <= i < self.k:
-			raise Exception( 'Hash i must be between 0 and %d (%d)' % ( self.k, i ) )
-		return int( hashlib.sha512( (str( i ) + value).encode('utf-8') ).hexdigest()[:self.hash_hex_length], 16 ) % self.m
+			raise Exception('Hash i must be between 0 and %d (%d)' % (self.k, i))
+		return int(hashlib.sha512((str(i) + value).encode('utf-8')).hexdigest()[:self.hash_hex_length], 16) % self.m
+
+	# def __hash( self, i, value ):
+	# 	if self.hash_hex_length == None:
+	# 		# Find the shortest length to extract from the hash,
+	# 		# get the bit length of m and divide by four to get hex length
+	# 		self.hash_hex_length = int( math.ceil( math.log( self.m, 2 ) / 4.0 ) )
+	# 	if not 0 <= i < self.k:
+	# 		raise Exception( 'Hash i must be between 0 and %d (%d)' % ( self.k, i ) )
+	# 	return int( hashlib.sha512( (str( i ) + value).encode('utf-8') ).hexdigest()[:self.hash_hex_length], 16 ) % self.m
 
 	def __sum_int_arrays( self, arr1, arr2 ):
 		assert len( arr1 ) == len( arr2 )

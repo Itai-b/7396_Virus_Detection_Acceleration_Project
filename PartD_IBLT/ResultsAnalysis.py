@@ -55,7 +55,7 @@ def genIBLTPlot(iblt_paths):
     plot_data = {}
     for iblt_path in iblt_paths:
         with open(iblt_path, 'r') as file:
-            filename = iblt_path.split('\\')[-1]
+            filename = iblt_path.split('/')[-1]
             modified_filename = '_'.join(filename.split('_')[3:]).split('.')[0]
             modified_filename = modified_filename.lower()
             if modified_filename.endswith('exactmatches'):
@@ -67,7 +67,7 @@ def genIBLTPlot(iblt_paths):
             data = []
             for line in file:
                 file_data = json.loads(line)
-                data.append((file_data['m'], file_data['success_rate']))
+                data.append((file_data['cells_number'], file_data['success_rate']))
             plot_data[modified_filename] = data
 
     barwidth = 0.1
@@ -94,8 +94,7 @@ def genIBLTPlot(iblt_paths):
     plt.close()
 
 def genHeatmap():
-    fig = plt.figure(figsize=(10,6))
-    # Get the file path
+    # Get the file paths
     paths = []
     exactmatch_path = os.path.join(DATA_PATH, 'PartA_Data', 'parta_data_by_exactmatch.json')
     if not os.path.exists(exactmatch_path):
@@ -108,18 +107,21 @@ def genHeatmap():
         return 1
     for root, dirs, files in os.walk(partb_data_path):
         for file in files:
-            if file.endswith('substrings.json'):
+            if file.endswith('substrings.json') and not file.startswith('inserted_'):
                 paths.append(os.path.join(root, file))
-    if paths is []:
+    if not paths:
         print("No substrings.json files found in PartB_Data/")
         return 1
     
-    fig, axs = plt.subplots(len(paths), 1)
+    fig, axs = plt.subplots(len(paths), 1, figsize=(12, 10))  # Increased width
     
+    if len(paths) == 1:
+        axs = [axs]  # Make axs iterable if there's only one subplot
+
     heatmap_data = []
     largest_rules_len = 0
-    for i, path in enumerate(paths):
-        name = path.split('\\')[-1].split('.')[0]
+    for path in paths:
+        name = path.split('/')[-1].split('.')[0]
         if name.endswith('exactmatch'):
             name = 'exactmatches'
         else:
@@ -128,33 +130,36 @@ def genHeatmap():
         rules_lengths = [len(x) for x in rules]
         heatmap_data.append({'name': name, 'rules_lengths': rules_lengths})
         file_largest_rules_len = max(rules_lengths)
-        if file_largest_rules_len > largest_rules_len:
-            largest_rules_len = file_largest_rules_len
+        largest_rules_len = max(largest_rules_len, file_largest_rules_len)
 
     for i, data in enumerate(heatmap_data):    
         # Create a 2D array where each row is the rules_lengths array
-        heatmap_data = np.array(data['rules_lengths'])[np.newaxis,:]
-        length_mean = np.mean(heatmap_data).round(2)
-        length_median = np.median(heatmap_data).round(2)
-        axs[i].imshow(heatmap_data, cmap='cividis', aspect='auto', interpolation='nearest', vmin=0, vmax=largest_rules_len)
+        heatmap_array = np.array(data['rules_lengths'])[np.newaxis,:]
+        length_mean = np.mean(heatmap_array).round(2)
+        length_median = np.median(heatmap_array).round(2)
+        
+        im = axs[i].imshow(heatmap_array, cmap='cividis', aspect='auto', interpolation='nearest', vmin=0, vmax=largest_rules_len)
         axs[i].set_yticks([])
-        axs[i].title.set_fontsize(10)
-        axs[i].title.set_position([0.5, 1.5])
-        axs[i].title.set_text(f"{data['name']}")
-        # Add the mean and median values to the plot below the title
+        
+        # Set the main title (name) above the heatmap
+        axs[i].set_title(data["name"], fontsize=10, y=1.0)
+        
+        # Add the mean and median as a subtitle on the right side
+        axs[i].text(1.005, 0.5, f"Mean: {length_mean:.2f}\nMedian: {length_median:.2f}", 
+                    transform=axs[i].transAxes, ha='left', va='center', fontsize=8)
 
-        axs[i].text(0.9, 1.3, f"Mean: {length_mean:.2f}, Median: {length_median:.2f}", \
-                    transform=axs[i].transAxes, ha='center', va='top', fontsize=6)
-    
     # Add a colorbar on the right side of the plot vertically
-    cbar_ax = fig.add_axes([0.9, 0.15, 0.03, 0.7])    
-    cbar = fig.colorbar(axs[0].imshow(heatmap_data, cmap='cividis', aspect='auto', interpolation='nearest'), cax=cbar_ax, orientation='vertical')
+    cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])    
+    cbar = fig.colorbar(im, cax=cbar_ax, orientation='vertical')
     plt.setp(cbar.ax.get_yticklabels(), fontsize=6)
-    plt.subplots_adjust(hspace=1.2, wspace=0.8, right=0.85)
-    plt.suptitle('Number of Rules in Each Exact Match/Substring')
-    plt.savefig(os.path.join(SAVE_PATH, 'rules_length_heatmap.png'))
-    plt.close()
     
+    # Adjust the layout
+    plt.subplots_adjust(left=0.1, right=0.85, top=0.92, bottom=0.05, hspace=0.6)
+    fig.suptitle('Number of Rules in Each Exact Match/Substring', fontsize=12, y=0.98)
+    
+    plt.savefig(os.path.join(SAVE_PATH, 'rules_length_heatmap.png'), dpi=300, bbox_inches='tight')
+    plt.close()
+
 DATA_PATH = os.path.join('..', 'Data')
 SAVE_PATH = os.path.join(DATA_PATH, 'PartD_Data')
 def main():
@@ -172,7 +177,7 @@ def main():
         return 1
     for root, dirs, files in os.walk(partd_data_path):
         for file in files:
-            if file.startswith('iblt_theoretical_checks') and file.endswith('.json'):
+            if file.startswith('iblt_theoretical_checks_bounds') and file.endswith('.json'):
                 iblt_paths.append(os.path.join(root, file))
 
     genIBLTPlot(iblt_paths)

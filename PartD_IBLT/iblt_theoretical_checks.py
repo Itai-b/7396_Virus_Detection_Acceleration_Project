@@ -17,7 +17,7 @@ class Data:
             iblt = IBLT(self.m, K, KEYSIZE, VALUESIZE)
             for rule in rules:
                 iblt.insert(str(rule), str(rule))
-            size = iblt.get_serialized_size()
+            size = iblt.get_theoretical_size()
             self.iblts_total_size += size
             entries = iblt.list_entries()
             if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
@@ -28,14 +28,14 @@ class Data:
                 total_success_rate += 1
         self.success_rate = total_success_rate/len(self.rules_set)
     
-    def calculate_success_rate_optimal(self):
+    def calculate_success_rate_optimal(self, l):
         total_success_rate = 0
         for rules in self.rules_set:
-            iblt_size = int(2*len(rules))
+            iblt_size = int(l*len(rules))
             iblt = IBLT(iblt_size, K, KEYSIZE, VALUESIZE)
             for rule in rules:
                 iblt.insert(str(rule), str(rule))
-            size = iblt.get_serialized_size()
+            size = iblt.get_theoretical_size()
             self.iblts_total_size += size
             entries = iblt.list_entries()
             if entries[0] == IBLT.RESULT_LIST_ENTRIES_INCOMPLETE:
@@ -87,6 +87,7 @@ VALUESIZE = 10
 KEYSIZE = 10
 K = 6
 M = [2, 4, 8, 16, 32, 64, 128, 256, 512]
+L = [1.5, 2, 3, 4]
 def main():
     global NAME, SAVE_PATH
     # get from args the path to .json file
@@ -109,33 +110,51 @@ def main():
 
     NAME = args.name
 
-    results = []
+    results_bound_check = []
+    results_optimal_check = []
     # Create an instance of IBLT
     rules = parse_json(json_path)
 
     # optimal check
-    data = Data(0, rules)
-    data.calculate_success_rate_optimal()
-    print('Optimal Check')
-    print('list_enteries success rate: ', data.success_rate)
-    print('total size in Bytes: ', data.iblts_total_size)
+    print(f'Starting an optimal check, cell_number=L*N')
+    print(f'N is the number of items in iblt')
+    print(f'L is the multiple')
+    print()
+    for l in L:
+        data = Data(0, rules)
+        data.calculate_success_rate_optimal(l)
+        print(f'Optimal Check, Cell Number={l}*N for each iblt.')
+        print('N is the number of items')
+        print(f'list_enteries success rate: {data.success_rate:.2f}')
+        print(f'total size in Bytes: {data.iblts_total_size}')
+        print()
+        results_optimal_check.append({'l:': l, 'success_rate': data.success_rate, 'total_size': data.iblts_total_size})
 
+    print(f'Starting a bounded check for the cell number')
+    print()
     for m in M:
         data = Data(m, rules)
         data.calculate_success_rate()
         print('Cells number: ', m)
-        print('list_enteries success rate: ', data.success_rate)
-        #print('total size in Bytes: ', data.iblts_total_size)
-        results.append({'m': m, 'success_rate': data.success_rate, 'total_size': data.iblts_total_size})
+        print(f'list_enteries success rate: {data.success_rate:.2f}')
+        print(f'total size in Bytes: {data.iblts_total_size}')
+        print()
+        results_bound_check.append({'cells_number': m, 'success_rate': data.success_rate, 'total_size': data.iblts_total_size})
 
     # Save the results to a .json file
     # Create the directory if it doesn't exist using mkdir -p
     if not os.path.exists(SAVE_PATH):
         os.makedirs(SAVE_PATH)
-        
-    file_path = os.path.join(SAVE_PATH, f'iblt_theoretical_checks_{NAME}.json')
+
+    file_path = os.path.join(SAVE_PATH, f'iblt_theoretical_checks_optimal_{NAME}.json')
     with open(file_path, 'w') as file:
-        for result in results:
+        for result in results_optimal_check:
+            file.write(json.dumps(result) + '\n')
+
+
+    file_path = os.path.join(SAVE_PATH, f'iblt_theoretical_checks_bounds_{NAME}.json')
+    with open(file_path, 'w') as file:
+        for result in results_bound_check:
             file.write(json.dumps(result) + '\n')
 
     return 0
