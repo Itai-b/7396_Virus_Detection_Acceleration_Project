@@ -207,6 +207,12 @@ def combine_sids_hit(data_structure_stats):
     return combined_sids_hit_idx, original_sids_idx
 
 def bestCaseVisualization(data_structure, data_path=""):
+    
+    # Create a directory to save the tests histograms
+    if not os.path.exists(os.path.join(data_path, data_structure[0] + "_test_histograms")):
+        os.makedirs(os.path.join(data_path, data_structure[0] + "_test_histograms"))
+    save_path = os.path.join(data_path, data_structure[0] + "_test_histograms")
+
     combined_sids_hit, combined_orig_sids = combine_sids_hit(data_structure[1])
     
     # Prepare data for plotting
@@ -231,7 +237,7 @@ def bestCaseVisualization(data_structure, data_path=""):
 
     # Show the plot
     plt.tight_layout()
-    plt.savefig(os.path.join(data_path, "sids_hit_histogram_"+ data_structure[0] + ".png"),  bbox_inches='tight', dpi=300)
+    plt.savefig(os.path.join(save_path, "sids_hit_histogram_"+ data_structure[0] + ".png"),  bbox_inches='tight', dpi=300)
 
 def bestDataStructures(search_data, category, weights=[0.5, 0.5]):
     if sum(weights) != 1:
@@ -258,16 +264,22 @@ def main():
         print("The path given is not a directory")
         return 1
     
+    # Create End-to-End Directory under the given path
+    if not os.path.exists(os.path.join(args.path, "End_to_End")):
+        os.makedirs(os.path.join(args.path, "End_to_End"))
+
+    save_path = os.path.join(args.path, "End_to_End")
+
     search_data = dataCollection(args.path)
     hash_tables = [data for data in search_data if data[0].startswith("hash_table")]
     aho_corasicks = [data for data in search_data if data[0].startswith("aho_corasick")]
-    dataVisualization(hash_tables, "Hash Table Statistics", args.path)
-    dataVisualization(aho_corasicks, "Aho-Corasick Statistics", args.path)
+    dataVisualization(hash_tables, "Hash Table Statistics", save_path)
+    dataVisualization(aho_corasicks, "Aho-Corasick Statistics", save_path)
     best_hash_table = bestDataStructures(search_data, "hash_table",[0.75,0.25])
     best_aho_corasick = bestDataStructures(search_data, "aho_corasick",[0.75,0.25])
-    dataVisualization([best_hash_table, best_aho_corasick], "Best Data Structures in term of Success Rate and False Positive Rate", args.path)
-    bestCaseVisualization(best_hash_table, args.path)
-    bestCaseVisualization(best_aho_corasick, args.path)
+    dataVisualization([best_hash_table, best_aho_corasick], "Best Data Structures in term of Success Rate and False Positive Rate", save_path)
+    bestCaseVisualization(best_hash_table, save_path)
+    bestCaseVisualization(best_aho_corasick, save_path)
     
 if __name__ == "__main__":
     #set working directory to script directory
