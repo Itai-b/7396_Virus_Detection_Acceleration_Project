@@ -9,7 +9,7 @@ SUBDIR=aho_corasick
 INSTALLDIR=$WORK_DIR/install
 JSONPATH=$WORK_DIR/../Data/PartA_Data/parta_data_by_exactmatch.json
 DESTPATH=$WORK_DIR/../Data/PartC_Data
-TESTPATH=$WORK_DIR/../Auxiliary/snort_string_to_check.json
+TESTPATH=$WORK_DIR/../Auxiliary/end_to_end_test.json
 
 # Set up the installation scripts for running
 chmod +x $WORK_DIR/install_nlohmann_json_unix.sh

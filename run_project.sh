@@ -9,25 +9,46 @@ NC='\033[0m' # No Color
 # Set up working dir params
 WORK_DIR=$(cd "$(dirname "$0")" && pwd)
 SNORT_RULES_FILE=$WORK_DIR/Auxiliary/snort3-community.rules
+END_TO_END_TEST=$WORK_DIR/Auxiliary/end_to_end_test.json
 
-# Check if more than one argument is provided
-if [ $# -gt 1 ]; then
-    echo "Error: Too many arguments. Only a .rules file is expected."
+# Check for arguments
+while getopts ":p:t:" opt; do
+    case $opt in
+        p)
+            SNORT_RULES_FILE="$OPTARG"
+            ;;
+        t)
+            END_TO_END_TEST="$OPTARG"
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Check if -p option is provided and it ends with .rules
+if [[ $SNORT_RULES_FILE && $SNORT_RULES_FILE != *.rules ]]; then
+    echo "Error: Invalid .rules file provided for -p option."
     exit 1
 fi
 
-# Check if the first argument is provided and it ends with .rules
-if [[ $1 ]]; then
-	if [[ $1 == *.rules ]]; then
-		echo "Processing $1..."
-		SNORT_RULES_FILE=$(realpath $1)
-	else
-		echo "A wrong .rules file was incorrect! Stopping the script..."
-		exit 1
-	fi
-else
-    echo "No .rules file provided... parse snort3-community.rules by default"
+# Check if -t option is provided and it ends with .json
+if [[ $END_TO_END_TEST && $END_TO_END_TEST != *.json ]]; then
+    echo "Error: Invalid .json file provided for -t option."
+    exit 1
 fi
+
+# Get the full path of the provided files
+SNORT_RULES_FILE=$(realpath "$SNORT_RULES_FILE")
+END_TO_END_TEST=$(realpath "$END_TO_END_TEST")
+
+echo -e "${BLUE}Using the following files:${NC}"
+echo -e "Snort Rules File: $SNORT_RULES_FILE"
+echo -e "End to End Test File: $END_TO_END_TEST"
+
+
+# Welcome message
 
 echo -e "Welcome and thank you for using our script!"
 echo -e "All the relevant data will be saved in the Data folder."
@@ -77,7 +98,7 @@ if [ $num_of_tests -lt 1 ] || [ $num_of_tests -gt 100 ]; then
 fi
 
 # Run PartB - Hash Insertion
-command $WORK_DIR/PartB_Hash/run_partb_unix.sh -n $num_of_tests
+command $WORK_DIR/PartB_Hash/run_partb_unix.sh -n $num_of_tests -t $END_TO_END_TEST
 # check if partB ran successfully
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartB - Hash Insertion ran successfully!${NC}"
@@ -101,7 +122,7 @@ mkdir -p $WORK_DIR/Data/PartC_Data
 chmod +x $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
 dos2unix $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
 
-command $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh
+command $WORK_DIR/PartC_Aho_Corasick/run_partc_unix.sh -t $END_TO_END_TEST
 # check if PartC ran successfully
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}PartC - Aho-Corasick Insertion ran successfully!${NC}"
