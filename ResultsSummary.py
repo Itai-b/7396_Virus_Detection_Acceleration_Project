@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import numpy as np
 import os
 import argparse
@@ -29,7 +31,7 @@ def getDataStructureType(file):
         data_structure = "aho_corasick" + file.split("/")[-1].split(".")[0].split("search_results")[1]
     return data_structure        
 
-def find_file_in_directory(directory, filename="partc_results.json"):
+def findFileInDirectory(directory, filename="partc_results.json"):
     for root, dirs, files in os.walk(directory):
         if filename in files:
             return os.path.join(root, filename)
@@ -38,7 +40,7 @@ def find_file_in_directory(directory, filename="partc_results.json"):
 def getMemoryStats(data_structure_type, data_structure_stats,data_path):
     # Read the memory stats from the files
     # search for partc_results.json under data_path
-    partc_results = find_file_in_directory(data_path)
+    partc_results = findFileInDirectory(data_path)
     if partc_results is None:
         return
     with open(partc_results) as f:
@@ -51,18 +53,18 @@ def getMemoryStats(data_structure_type, data_structure_stats,data_path):
                 data_structure_stats.data_structure_size = entry["size_in_theory"]
                 break
 
-def calculateStats(data_structure, data_type):
+def calculateStats(data_structure, data_type, threshold=4):
     # Calculate the average success rate and average false positive rate
-    threshold = 4
     total_success_rate = 0.0
     total_fp_rate = 0.0
     for data_entry in data_structure.data_entries:
+        
         is_spammy = False 
         if np.max(list(data_entry.sids_hit.values())) > threshold :
             is_spammy = True
         else:
             is_spammy = False
-        if not is_spammy or data_type.startswith("aho_corasick"):
+        if not is_spammy:
             # if sids in original_sids are in sids_hit, and the number of sids_hit is greater than 0, then it is a success:
             total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > 0]) / len(data_entry.original_sids)
             # if sids keys in sids_hit are not in original_sids, then it is a false positive:
@@ -70,7 +72,10 @@ def calculateStats(data_structure, data_type):
         else:
             total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > threshold/2]) / len(data_entry.original_sids)
             total_fp_rate += sum([1 for sid, hits in data_entry.sids_hit.items() if (sid not in data_entry.original_sids and hits > threshold/2)]) / len(data_entry.sids_hit)
-
+        
+        # total_success_rate += sum([1 for sid in data_entry.original_sids if sid in data_entry.sids_hit and data_entry.sids_hit[sid] > 0]) / len(data_entry.original_sids)
+        # total_fp_rate += sum([1 for sid, hits in data_entry.sids_hit.items() if (sid not in data_entry.original_sids and hits > 0)]) / len(data_entry.sids_hit)
+    
     data_structure.avg_success_rate = total_success_rate / len(data_structure.data_entries)
     data_structure.avg_fp_rate = total_fp_rate / len(data_structure.data_entries)
     assert(data_structure.avg_success_rate <= 1.0)
@@ -96,7 +101,7 @@ def dataCollection(data_path):
                     data_structure_stats.data_structure_size = entry["size"]
                 data_structure_stats.additional_size = entry["additional_size_full_list"]
                 data_structure_stats.data_entries.append(data_entry)
-                calculateStats(data_structure_stats, data_structure_type)
+                calculateStats(data_structure_stats, data_structure_type, 4)
             
             getMemoryStats(data_structure_type, data_structure_stats, data_path)
             data_structure_stats.total_size = data_structure_stats.data_structure_size + data_structure_stats.additional_size
@@ -131,8 +136,8 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     x = np.arange(len(labels)) * space
 
     # Plot bars
-    bar1 = ax1.bar(x - width/2, avg_success_rates, width, label='Avg Success Rate', color=colors[0], alpha=0.7)
-    bar2 = ax1.bar(x + width/2, avg_fp_rates, width, label='Avg FP Rate', color=colors[1], alpha=0.7)
+    bar1 = ax1.bar(x - width/2, avg_success_rates, width, label='Mean Success Rate', color=colors[0], alpha=0.7)
+    bar2 = ax1.bar(x + width/2, avg_fp_rates, width, label='Mean FP Rate', color=colors[1], alpha=0.7)
 
     # Set labels and title
     ax1.set_ylabel('Rate')
@@ -178,66 +183,92 @@ def dataVisualization(search_data, title="Data Structure Statistics", data_path=
     plt.subplots_adjust(bottom=0.25)  # Adjust bottom margin for text
     #plt.show()
     plt.savefig(os.path.join(data_path, title.replace(" ", "_") + ".png"),  bbox_inches='tight', dpi=300)
+    plt.close()
 
-def combine_sids_hit(data_structure_stats):
+def combineSIDsHit(data_structure_stats, threshold=0):
     combined_sids = {}
     original_sids = []
-    combined_sids_hit_idx = {}
-    original_sids_idx = []
 
     entries = data_structure_stats.data_entries
-    for entry in entries:
-        for orig_sid in entry.original_sids:
-            if orig_sid not in original_sids:
-                original_sids.append(orig_sid)
-        for sid, count in entry.sids_hit.items():
-            if sid in combined_sids:
-                combined_sids[sid] += count
-            else:
-                combined_sids[sid] = count
+    count=1
+    for entry in entries: 
+        #print(f'max_val = {np.max(list(entry.sids_hit.values()))}')
+        if np.max(list(entry.sids_hit.values())) > threshold :
+            count += 1
+            for orig_sid in entry.original_sids:
+                if orig_sid not in original_sids:
+                    original_sids.append(orig_sid)
+            for sid, count in entry.sids_hit.items():
+                if sid in combined_sids:
+                    combined_sids[sid] += count
+                else:
+                    combined_sids[sid] = count
+        
+    return combined_sids, original_sids
+
+def calculateThreshold(sids_hit):
+    # return the threshold
+    # max(count for an sid in sids_hit)*80%
+    max_count = np.max(list(sids_hit.values()))
+    threshold = np.max([1, int(max_count*0.8)])
+    return threshold
+
+def bestCaseVisualization(data_structure, sids_hit, original_sids, data_path="", name="", threshold=0):
     
+    save_path = data_path    
+    if not name.endswith("combined"):
+        if not os.path.exists(os.path.join(data_path, data_structure[0] + "_tests")):
+            os.makedirs(os.path.join(data_path, data_structure[0] + "_tests"))
+        save_path = os.path.join(data_path, data_structure[0] + "_tests")
+    
+    sids_hit_idx = {}
+    original_sids_idx = []
+
     # Creating an indexed histogram to avoid empty spaces on x-axis (Snort ID)
     index = 1
-    for sid,hits in combined_sids.items():
+    for sid,hits in sids_hit.items():
         if sid in original_sids:
             original_sids_idx.append(index)
-        combined_sids_hit_idx[index] = hits
+        sids_hit_idx[index] = hits
         index += 1
-        
-    return combined_sids_hit_idx, original_sids_idx
 
-def bestCaseVisualization(data_structure, data_path=""):
-    
-    # Create a directory to save the tests histograms
-    if not os.path.exists(os.path.join(data_path, data_structure[0] + "_test_histograms")):
-        os.makedirs(os.path.join(data_path, data_structure[0] + "_test_histograms"))
-    save_path = os.path.join(data_path, data_structure[0] + "_test_histograms")
-
-    combined_sids_hit, combined_orig_sids = combine_sids_hit(data_structure[1])
-    
     # Prepare data for plotting
-    sids = list(combined_sids_hit.keys())
-    hits = list(combined_sids_hit.values())
+    sids = list(sids_hit_idx.keys())
+    hits = list(sids_hit_idx.values())
+
+    if threshold == 0:
+        threshold = calculateThreshold(sids_hit_idx)
 
     # Create color list
-    colors = ['red' if sid in combined_orig_sids else 'blue' for sid in sids]
+    colors = ['red' if sid in original_sids_idx else 'blue' for sid in sids]
 
     # Create the plot
     plt.figure(figsize=(20, 10))
     bars = plt.bar(sids, hits, color=colors)
 
+    # Add dotted vertical line at y = threshold/2
+    plt.axhline(y=threshold, color='green', linestyle=':', linewidth=2)
+
     # Customize the plot
-    plt.title(f'Combined SIDs Hit for {data_structure[0]}')
+    plt.title(f'Combined SIDs Hit for {name}')
     plt.xlabel('SID index')
     plt.ylabel('Hit Count')
     plt.xticks(rotation=90)
 
-    # Add a legend
-    plt.legend(['In original SIDs', 'Not in original SIDs'])
+    # Create legend handles
+    legend_elements = [
+        Line2D([0], [0], color='green', linestyle=':', lw=2, label='Threshold'),
+        Patch(facecolor='red', edgecolor='red', label='In original SIDs'),
+        Patch(facecolor='blue', edgecolor='blue', label='Not in original SIDs')
+    ]
+
+    # Add the legend with custom colors
+    plt.legend(handles=legend_elements)
 
     # Show the plot
     plt.tight_layout()
-    plt.savefig(os.path.join(save_path, "sids_hit_histogram_"+ data_structure[0] + ".png"),  bbox_inches='tight', dpi=300)
+    plt.savefig(os.path.join(save_path, name + ".png"),  bbox_inches='tight', dpi=300)
+    plt.close()
 
 def bestDataStructures(search_data, category, weights=[0.5, 0.5]):
     if sum(weights) != 1:
@@ -275,11 +306,48 @@ def main():
     aho_corasicks = [data for data in search_data if data[0].startswith("aho_corasick")]
     dataVisualization(hash_tables, "Hash Table Statistics", save_path)
     dataVisualization(aho_corasicks, "Aho-Corasick Statistics", save_path)
+    
     best_hash_table = bestDataStructures(search_data, "hash_table",[0.75,0.25])
     best_aho_corasick = bestDataStructures(search_data, "aho_corasick",[0.75,0.25])
-    dataVisualization([best_hash_table, best_aho_corasick], "Best Data Structures in term of Success Rate and False Positive Rate", save_path)
-    bestCaseVisualization(best_hash_table, save_path)
-    bestCaseVisualization(best_aho_corasick, save_path)
+    dataVisualization([best_hash_table, best_aho_corasick], "Best Data Structures in term of Mean Success Rate and Mean False Positive Rate", save_path)
+    
+    if not os.path.exists(os.path.join(save_path, best_hash_table[0] + "_histograms")):
+        os.makedirs(os.path.join(save_path, best_hash_table[0] + "_histograms"))
+    best_hash_table_test_path = os.path.join(save_path, best_hash_table[0] + "_histograms")
+    
+    if not os.path.exists(os.path.join(save_path, best_aho_corasick[0] + "_histograms")):
+        os.makedirs(os.path.join(save_path, best_aho_corasick[0] + "_histograms"))
+    best_aho_corasick_test_path = os.path.join(save_path, best_aho_corasick[0] + "_histograms")
+
+    for test_index in range(0, len(best_hash_table[1].data_entries)):
+        bestCaseVisualization(best_hash_table, \
+            sids_hit=best_hash_table[1].data_entries[test_index].sids_hit, \
+            original_sids=best_hash_table[1].data_entries[test_index].original_sids, \
+            data_path=best_hash_table_test_path, \
+            name=f'{best_hash_table[0]}_test_{test_index+1}')
+
+    for test_index in range(0, len(best_aho_corasick[1].data_entries)):
+        bestCaseVisualization(best_aho_corasick, \
+            sids_hit=best_aho_corasick[1].data_entries[test_index].sids_hit, \
+            original_sids=best_aho_corasick[1].data_entries[test_index].original_sids, \
+            data_path=best_aho_corasick_test_path, \
+            name=f'{best_aho_corasick[0]}_test_{test_index+1}')
+
+    combined_hash_sids, combined_original_sids = combineSIDsHit(data_structure_stats=best_hash_table[1] , threshold=10)
+    bestCaseVisualization(best_hash_table, \
+            sids_hit=combined_hash_sids, \
+            original_sids=combined_original_sids, \
+            data_path=best_hash_table_test_path, \
+            name=f'{best_hash_table[0]}_combined', \
+            threshold=10)
+
+    combined_aho_sids, combined_original_sids = combineSIDsHit(data_structure_stats=best_aho_corasick[1], threshold=30)
+    bestCaseVisualization(best_aho_corasick, \
+            sids_hit=combined_aho_sids, \
+            original_sids=combined_original_sids, \
+            data_path=best_aho_corasick_test_path, \
+            name=f'{best_aho_corasick[0]}_combined', \
+            threshold=30)
     
 if __name__ == "__main__":
     #set working directory to script directory
